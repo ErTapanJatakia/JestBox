@@ -86,3 +86,16 @@ footer { padding: 2rem; color: var(--muted); border-top: 1px solid var(--border)
 [hidden] { display: none !important; }
 @media (max-width: 760px) { .two-column, .board { grid-template-columns: 1fr; }.toolbar { align-items: stretch; flex-direction: column; }.hero { min-height: 46vh; }.site-header { padding-inline: 1rem; } }
 @media print { body { background: white; }.no-print, .site-header, footer { display: none !important; }.paper, .invoice { box-shadow: none; margin: 0; } }
+
+
+/* Respect system-level reduced-motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
