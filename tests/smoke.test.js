@@ -44,7 +44,9 @@ function bootApp() {
   };
   const clipboardWrites = [];
   const navigator = { clipboard: { async writeText(value) { clipboardWrites.push(value); } } };
-  const context = { document, navigator, Date, Math };
+  const deterministicMath = Object.create(Math);
+  deterministicMath.random = () => 0;
+  const context = { document, navigator, Date, Math: deterministicMath };
   vm.runInNewContext(source + "\nglobalThis.__testJokes = jokes;", context);
   return { elements, localeButtons, root, navigator, clipboardWrites, context };
 }
@@ -81,6 +83,13 @@ test("random selection respects the active category", () => {
   assert.equal(app.elements["joke-category"].textContent, "Tech & internet");
   assert.ok(app.context.__testJokes["en-US"].some((joke) =>
     joke.category === "tech" && joke.text === app.elements["joke-heading"].textContent));
+});
+
+test("another joke does not repeat the currently displayed joke", () => {
+  const app = bootApp();
+  const firstJoke = app.elements["joke-heading"].textContent;
+  app.elements["another-button"].listeners.click();
+  assert.notEqual(app.elements["joke-heading"].textContent, firstJoke);
 });
 
 test("copy and share use clipboard only after explicit user actions", async () => {
