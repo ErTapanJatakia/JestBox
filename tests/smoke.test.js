@@ -131,6 +131,20 @@ test("copy and share use clipboard only after explicit user actions", async () =
     "Sharing isn't available here. The joke has been copied instead.");
 });
 
+test("cancelling the native share sheet does not report success or copy the joke", async () => {
+  const app = bootApp();
+  app.navigator.share = async () => {
+    const error = new Error("Share cancelled");
+    error.name = "AbortError";
+    throw error;
+  };
+
+  await app.elements["share-button"].listeners.click();
+
+  assert.deepEqual(app.clipboardWrites, []);
+  assert.equal(app.elements.status.textContent, "");
+});
+
 test("the app has no network or persistent-storage integration", () => {
   assert.doesNotMatch(source,
     /\b(?:fetch|XMLHttpRequest|WebSocket|sendBeacon)\s*\(|\b(?:localStorage|sessionStorage|indexedDB)\b|document\.cookie/);
