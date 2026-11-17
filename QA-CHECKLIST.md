@@ -39,8 +39,9 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Confirm daily, random, and category-filtered joke updates are announced by a screen reader.
 - [ ] Confirm locale changes announce the updated joke in the newly selected document language.
 - [ ] Confirm the skip link moves keyboard focus to the main landmark.
-- [ ] Check 320px-wide phones, narrow phones, portrait tablet, landscape tablet, and desktop layouts for clipping, overlap, and horizontal scrolling.
-- [ ] Check short landscape viewports and 200% text zoom; action controls must remain usable.
+- [ ] Check a 320px-wide viewport and narrower effective widths produced by 200% browser/text zoom; confirm the header can wrap, the category label and filter stack cleanly, and no content is clipped.
+- [ ] Check narrow phones, portrait tablet, landscape tablet, and desktop layouts for clipping, overlap, and horizontal scrolling.
+- [ ] Check short landscape viewports; confirm vertical spacing is compact and all joke actions remain reachable by scrolling.
 - [ ] Check text zoom and reduced-motion preferences.
 - [ ] Confirm the header home link and category filter provide at least 44px touch targets.
 
