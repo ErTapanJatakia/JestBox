@@ -229,3 +229,17 @@ test("successful native sharing reports success without using clipboard", async 
   assert.deepEqual(app.clipboardWrites, []);
   assert.equal(app.elements.status.textContent, "Ready to share.");
 });
+
+test("a failed native share falls back to clipboard and reports the fallback", async () => {
+  const app = bootApp();
+  const joke = app.elements["joke-heading"].textContent;
+  app.navigator.share = async () => {
+    throw new Error("Share failed");
+  };
+
+  await app.elements["share-button"].listeners.click();
+
+  assert.deepEqual(app.clipboardWrites, [joke]);
+  assert.equal(app.elements.status.textContent,
+    "Sharing isn't available here. The joke has been copied instead.");
+});
