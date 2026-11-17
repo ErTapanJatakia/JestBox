@@ -33,6 +33,7 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Check 320px-wide phones, narrow phones, portrait tablet, landscape tablet, and desktop layouts for clipping, overlap, and horizontal scrolling.
 - [ ] Check short landscape viewports and 200% text zoom; action controls must remain usable.
 - [ ] Check text zoom and reduced-motion preferences.
+- [ ] Confirm the header home link and category filter provide at least 44px touch targets.
 
 ## Evidence and release gate
 
