@@ -33,7 +33,7 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 
 - [ ] Run `node --check script.js` using Node.js 22 or newer.
 - [ ] Run `node --test` and retain the complete output.
-- [ ] Run the GitHub Actions manual workflow after runner availability is confirmed.
+- [ ] After the complete application implementation is finished and the repository owner re-enables CI, run the code-quality workflows and retain their results.
 - [ ] Record browser/device versions and any defects found.
 - [ ] Do not package Android or submit to RuStore until source tests and required manual QA checks pass.
 
