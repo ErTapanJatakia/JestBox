@@ -161,3 +161,65 @@ select:focus-visible {
 .skip-link:focus {
   transform: translateY(0);
 }
+
+
+/* JestBox narrow-screen and touch-target refinements. */
+.jestbox,
+.jestbox .panel,
+.jestbox .locale-button,
+.jestbox .joke-content {
+  min-width: 0;
+}
+.jestbox .locale-button {
+  overflow-wrap: anywhere;
+}
+.jestbox .joke-actions button {
+  min-height: 44px;
+}
+.jestbox :focus-visible,
+.jestbox:focus {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+@media (max-width: 380px) {
+  .jestbox {
+    width: calc(100% - 1.25rem);
+    padding-top: .75rem;
+    padding-bottom: 2rem;
+  }
+  .jestbox .hero.compact {
+    padding: 1rem 0 .75rem;
+  }
+  .jestbox h1 {
+    font-size: clamp(2rem, 11vw, 2.6rem);
+    letter-spacing: -.04em;
+  }
+  .jestbox .panel {
+    padding: 1rem;
+  }
+  .jestbox .locale-button {
+    gap: .6rem;
+    padding: .75rem;
+  }
+  .jestbox .joke-content {
+    padding-inline: .25rem;
+  }
+  .jestbox .joke-content h2 {
+    font-size: clamp(1.3rem, 7vw, 1.7rem);
+  }
+  .jestbox .joke-actions {
+    grid-template-columns: 1fr;
+  }
+  .jestbox .joke-actions button:first-child {
+    grid-column: auto;
+  }
+}
+@media (max-height: 480px) and (orientation: landscape) {
+  .jestbox .hero.compact {
+    padding-block: .75rem;
+  }
+  .jestbox .joke-content {
+    min-height: 130px;
+    padding-top: 2rem;
+  }
+}
