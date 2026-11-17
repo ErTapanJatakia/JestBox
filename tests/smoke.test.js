@@ -16,7 +16,7 @@ function makeElement(value = "") {
 
 function bootApp() {
   const ids = [
-    "locale-label", "headline", "eyebrow", "intro", "locale-eyebrow",
+    "locale-label", "skip-link", "home-link", "headline", "eyebrow", "intro", "locale-eyebrow",
     "locale-heading", "locale-buttons", "daily-label", "category-label",
     "category", "joke-heading", "joke-category", "status", "another-label",
     "copy-label", "share-label", "privacy-note", "footer-line",
@@ -76,6 +76,22 @@ test("live joke updates are announced and the main landmark is programmatically 
   assert.match(html, /<p class="status-text" id="status" role="status" aria-live="polite">/);
 });
 
+test("decorative action glyphs are hidden from assistive technology", () => {
+  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  for (const id of ["another-button", "copy-button", "share-button"]) {
+    const button = html.match(new RegExp(`<button[^>]*id="${id}"[^>]*>([\\s\\S]*?)</button>`));
+    assert.ok(button, `Missing button: ${id}`);
+    assert.match(button[1], /<span aria-hidden="true">/);
+  }
+});
+
+test("narrow-screen layout rules preserve usable action targets", () => {
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  assert.match(css, /@media \\(max-width: 380px\\)/);
+  assert.match(css, /min-height: 44px/);
+  assert.match(css, /orientation: landscape/);
+});
+
 test("both locales contain 20 original jokes and all five categories", () => {
   const { context } = bootApp();
   for (const locale of ["en-US", "ru-RU"]) {
@@ -90,7 +106,7 @@ test("both locales contain 20 original jokes and all five categories", () => {
 test("Russian selection localizes the document, controls, and category filter", () => {
   const app = bootApp();
   app.localeButtons[1].listeners.click();
-  assert.equal(app.root.lang, "ru-RU");
+  assert.equal(app.root.lang, "ru-RU");\n  assert.equal(app.elements["skip-link"].textContent, "Перейти к основному содержимому");\n  assert.equal(app.elements["home-link"].attributes["aria-label"], "На главную JestBox");
   assert.equal(app.elements["locale-buttons"].attributes["aria-label"], "Выберите язык шуток");
   assert.equal(app.elements["another-label"].textContent, "Ещё шутку");
   app.elements.category.value = "food";
