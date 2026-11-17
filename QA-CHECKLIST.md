@@ -24,9 +24,9 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 ## Accessibility and responsive checks
 
 - [ ] Complete all controls using keyboard only; focus must remain visible.
-- [ ] Confirm locale buttons expose the correct pressed state to assistive technology.
+- [ ] Confirm locale buttons expose the correct pressed state to assistive technology.\n- [ ] Confirm the skip link and home link have localized accessible names after switching locales.\n- [ ] Confirm decorative action glyphs are ignored by assistive technology.
 - [ ] Confirm daily, random, and category-filtered joke updates are announced by a screen reader.\n- [ ] Confirm locale changes announce the updated joke in the newly selected document language.\n- [ ] Confirm the skip link moves keyboard focus to the main landmark.
-- [ ] Check narrow phone, portrait tablet, landscape tablet, and desktop layouts for clipping, overlap, and horizontal scrolling.
+- [ ] Check 320px-wide phones, narrow phones, portrait tablet, landscape tablet, and desktop layouts for clipping, overlap, and horizontal scrolling.\n- [ ] Check short landscape viewports and 200% text zoom; action controls must remain usable.
 - [ ] Check text zoom and reduced-motion preferences.
 
 ## Evidence and release gate
