@@ -88,7 +88,7 @@ test("decorative action glyphs are hidden from assistive technology", () => {
 
 test("narrow-screen layout rules preserve usable action targets", () => {
   const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  assert.match(css, /@media \\(max-width: 380px\\)/);
+  assert.match(css, /@media \(max-width: 380px\)/);
   assert.match(css, /\.jestbox \.joke-actions button\s*\{\s*min-height: 44px;/);
   assert.match(css, /\.jestbox \.category-control select\s*\{\s*min-height: 44px;/);
   assert.match(css, /\.site-header a\s*\{[^}]*min-height: 44px;/);
