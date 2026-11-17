@@ -64,3 +64,7 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Do not package Android or submit to RuStore until source tests and required manual QA checks pass.
 
 **Status:** checklist prepared; no manual QA item is claimed complete by this document.
+
+## Content integrity
+- [ ] Review all 40 jokes for cultural naturalness, spelling, punctuation, repeated punchlines, and locale-appropriate humour.
+- [ ] Confirm each locale has 20 distinct jokes and the intended category distribution.
