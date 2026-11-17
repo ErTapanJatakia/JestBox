@@ -130,6 +130,7 @@ function stableIndex(seed, length) {
 }
 
 function renderJoke(joke, selection = "daily") {
+  pendingAction += 1;
   currentJoke = joke;
   elements.daily.textContent = copy[locale][selection];
   elements.joke.textContent = joke.text;
