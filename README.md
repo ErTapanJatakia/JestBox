@@ -30,6 +30,13 @@ JestBox is a lightweight, offline-first joke application with two distinct conte
 
 Open `index.html` in a modern browser or serve the repository directory with a static HTTP server. No build step or package installation is required.
 
+To run the dependency-free source checks locally with Node.js 22 or newer:
+
+```sh
+node --check script.js
+node --test
+```
+
 ## Validation status
 
 The source is a browser application prototype. Verify both locales, all categories, daily-joke stability, clipboard/share behavior, responsive layouts, keyboard operation and screen-reader announcements in target browsers before release. Android packaging and RuStore submission are separate release activities; this repository update does not itself certify an Android build or store approval.
