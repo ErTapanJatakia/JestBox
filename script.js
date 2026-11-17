@@ -111,9 +111,13 @@ function getFilteredJokes() {
   return jokes[locale].filter((joke) => selected === "all" || joke.category === selected);
 }
 
-function daySeed() {
+function localDateKey() {
   const now = new Date();
-  return [now.getFullYear(), now.getMonth() + 1, now.getDate(), locale].join("-");
+  return [now.getFullYear(), now.getMonth() + 1, now.getDate()].join("-");
+}
+
+function daySeed() {
+  return [localDateKey(), locale].join("-");
 }
 
 function stableIndex(seed, length) {
@@ -132,10 +136,21 @@ function renderJoke(joke) {
   elements.status.textContent = "";
 }
 
+let displayedDate = localDateKey();
+
 function showDailyJoke() {
   const filtered = getFilteredJokes();
   if (!filtered.length) return;
+  displayedDate = localDateKey();
   renderJoke(filtered[stableIndex(daySeed() + elements.category.value, filtered.length)]);
+}
+
+function refreshDailyJokeAfterDateChange() {
+  if (document.visibilityState === "hidden") return;
+  const today = localDateKey();
+  if (today === displayedDate) return;
+  previousIndex = -1;
+  showDailyJoke();
 }
 
 function showRandomJoke() {
@@ -200,6 +215,8 @@ elements.category.addEventListener("change", () => {
   previousIndex = -1;
   showDailyJoke();
 });
+document.addEventListener("visibilitychange", refreshDailyJokeAfterDateChange);
+window.addEventListener("focus", refreshDailyJokeAfterDateChange);
 document.querySelector("#another-button").addEventListener("click", showRandomJoke);
 
 document.querySelector("#copy-button").addEventListener("click", async () => {
