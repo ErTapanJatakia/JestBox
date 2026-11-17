@@ -69,6 +69,13 @@ test("the page provides a keyboard skip link to its main landmark", () => {
     /\.skip-link:focus\s*\{\s*transform: translateY\(0\);/);
 });
 
+test("live joke updates are announced and the main landmark is programmatically focusable", () => {
+  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(html, /<main id="main"[^>]*tabindex="-1"/);
+  assert.match(html, /<div class="joke-content" aria-live="polite" aria-atomic="true">/);
+  assert.match(html, /<p class="status-text" id="status" role="status" aria-live="polite">/);
+});
+
 test("both locales contain 20 original jokes and all five categories", () => {
   const { context } = bootApp();
   for (const locale of ["en-US", "ru-RU"]) {
