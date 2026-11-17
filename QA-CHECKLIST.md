@@ -17,8 +17,8 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Confirm a native share failure (other than user cancellation) falls back to clipboard and reports the fallback accurately.
 - [ ] Confirm a successful native share reports success without invoking clipboard fallback.
 
-- [ ] Start a clipboard copy, switch locales before the clipboard operation completes, and confirm the completion message remains in the locale active when Copy was selected.
-- [ ] Start native sharing, switch locales before the share sheet completes, and confirm the completion message remains in the locale active when Share was selected.
+- [ ] Start a clipboard copy, switch locales before the clipboard operation completes, and confirm the stale completion does not overwrite the newly localized interface.
+- [ ] Start native sharing, switch locales before the share sheet completes, and confirm the stale completion does not overwrite the newly localized interface.
 
 ## Privacy and offline checks
 
