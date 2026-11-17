@@ -135,3 +135,12 @@ footer { padding: 2rem; color: var(--muted); border-top: 1px solid var(--border)
   .joke-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .joke-actions button:first-child { grid-column: 1 / -1; }
 }
+
+
+/* Clear keyboard focus for every interactive control. */
+button:focus-visible,
+a:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
