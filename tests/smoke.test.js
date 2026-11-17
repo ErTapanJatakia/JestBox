@@ -85,6 +85,19 @@ test("Russian selection localizes the document, controls, and category filter", 
     joke.category === "food" && joke.text === app.elements["joke-heading"].textContent));
 });
 
+test("the daily joke is stable for the same locale and device-local date", () => {
+  const first = bootApp();
+  const second = bootApp();
+  assert.equal(first.elements["joke-heading"].textContent,
+    second.elements["joke-heading"].textContent);
+
+  first.localeButtons[1].listeners.click();
+  second.localeButtons[1].listeners.click();
+  assert.equal(first.root.lang, "ru-RU");
+  assert.equal(first.elements["joke-heading"].textContent,
+    second.elements["joke-heading"].textContent);
+});
+
 test("random selection respects the active category", () => {
   const app = bootApp();
   app.elements.category.value = "tech";
