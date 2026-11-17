@@ -139,6 +139,7 @@ function showRandomJoke() {
   const filtered = getFilteredJokes();
   if (!filtered.length) return;
   let index = Math.floor(Math.random() * filtered.length);
+  if (filtered.length > 1 && filtered[index] === currentJoke) index = (index + 1) % filtered.length;
   if (filtered.length > 1 && index === previousIndex) index = (index + 1) % filtered.length;
   previousIndex = index;
   renderJoke(filtered[index]);
@@ -185,7 +186,10 @@ document.querySelectorAll("[data-locale]").forEach((button) => {
   });
 });
 
-elements.category.addEventListener("change", showDailyJoke);
+elements.category.addEventListener("change", () => {
+  previousIndex = -1;
+  showDailyJoke();
+});
 document.querySelector("#another-button").addEventListener("click", showRandomJoke);
 
 document.querySelector("#copy-button").addEventListener("click", async () => {
