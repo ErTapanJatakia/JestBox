@@ -101,6 +101,14 @@ test("decorative action glyphs are hidden from assistive technology", () => {
 test("narrow-screen layout rules preserve usable action targets", () => {
   const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
   assert.match(css, /@media \(max-width: 380px\)/);
+  assert.match(css, /@media \(max-width: 560px\)/);
+  assert.match(css, /\.locale-buttons\s*\{\s*grid-template-columns: 1fr;/);
+  assert.match(css, /\.joke-toolbar\s*\{\s*align-items: flex-start;\s*flex-direction: column;/);
+  assert.match(css, /\.joke-actions\s*\{\s*display: grid;\s*grid-template-columns: 1fr 1fr;/);
+  assert.match(css, /h1, h2, h3, p\s*\{\s*overflow-wrap: anywhere;/);
+  assert.match(css, /\.jestbox \.locale-button\s*\{\s*overflow-wrap: anywhere;/);
+  assert.match(css, /\.jestbox \.joke-content h2\s*\{[^}]*overflow-wrap: anywhere;/);
+
   assert.match(css, /\.jestbox \.joke-actions button\s*\{\s*min-height: 44px;/);
   assert.match(css, /\.jestbox \.category-control select\s*\{\s*min-height: 44px;/);
   assert.match(css, /\.site-header a\s*\{[^}]*min-height: 44px;/);
@@ -416,6 +424,7 @@ test("interactive component boundaries meet the 3:1 non-text contrast threshold"
     return match[1];
   };
   const border = token("border");
+  const page = token("page");
   const text = token("text");
   const muted = token("muted");
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
@@ -437,7 +446,7 @@ test("interactive component boundaries meet the 3:1 non-text contrast threshold"
     return (values[0] + 0.05) / (values[1] + 0.05);
   };
 
-  for (const surface of ["#111f33", "#0c1727"]) {
+  for (const surface of [page, "#111f33", "#0c1727"]) {
     assert.ok(ratio(border, surface) >= 3,
       `Border contrast against ${surface} must be at least 3:1`);
     assert.ok(ratio(text, surface) >= 4.5,
