@@ -406,3 +406,26 @@ test("a pending native share does not report completion after the displayed joke
 
   assert.equal(app.elements.status.textContent, "");
 });
+
+
+test("interactive component boundaries meet the 3:1 non-text contrast threshold", () => {
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  const border = css.match(/--border:\\s*(#[0-9a-fA-F]{6})/);
+  assert.ok(border, "Missing six-digit --border color token");
+
+  const luminance = (hex) => {
+    const channels = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
+    const linear = channels.map((channel) =>
+      channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+  };
+  const ratio = (first, second) => {
+    const values = [luminance(first), luminance(second)].sort((a, b) => b - a);
+    return (values[0] + 0.05) / (values[1] + 0.05);
+  };
+
+  for (const surface of ["#111f33", "#0c1727"]) {
+    assert.ok(ratio(border[1], surface) >= 3,
+      `Border contrast against ${surface} must be at least 3:1`);
+  }
+});
