@@ -85,11 +85,15 @@ test("random selection respects the active category", () => {
     joke.category === "tech" && joke.text === app.elements["joke-heading"].textContent));
 });
 
-test("another joke does not repeat the currently displayed joke", () => {
+test("consecutive random selections do not repeat the currently displayed joke", () => {
   const app = bootApp();
-  const firstJoke = app.elements["joke-heading"].textContent;
-  app.elements["another-button"].listeners.click();
-  assert.notEqual(app.elements["joke-heading"].textContent, firstJoke);
+  let previous = app.elements["joke-heading"].textContent;
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    app.elements["another-button"].listeners.click();
+    const current = app.elements["joke-heading"].textContent;
+    assert.notEqual(current, previous);
+    previous = current;
+  }
 });
 
 test("copy and share use clipboard only after explicit user actions", async () => {
