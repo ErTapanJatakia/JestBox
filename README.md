@@ -39,4 +39,4 @@ node --test
 
 ## Validation status
 
-The source is a browser application prototype. Verify both locales, all categories, daily-joke stability, clipboard/share behavior, responsive layouts, keyboard operation and screen-reader announcements in target browsers before release. Android packaging and RuStore submission are separate release activities; this repository update does not itself certify an Android build or store approval.
+The source is a browser application prototype. Verify both locales, all categories, daily-joke stability, clipboard/share behavior, responsive layouts, keyboard operation and screen-reader announcements in target browsers before release. The GitHub Actions smoke-test workflow is temporarily set to manual dispatch while runner assignment is investigated; the tests remain in place and are not disabled. Android packaging and RuStore submission are separate release activities; this repository update does not itself certify an Android build or store approval.
