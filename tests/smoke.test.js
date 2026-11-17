@@ -51,6 +51,16 @@ function bootApp() {
   return { elements, localeButtons, root, navigator, clipboardWrites, context };
 }
 
+test("every JavaScript ID selector exists in the HTML document", () => {
+  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const selectors = [...source.matchAll(/querySelector\\("#([a-z0-9-]+)"\\)/g)]
+    .map((match) => match[1]);
+  assert.ok(selectors.length > 0);
+  for (const id of selectors) {
+    assert.match(html, new RegExp(`\\\\bid="${id}"`), `Missing HTML id: ${id}`);
+  }
+});
+
 test("both locales contain 20 original jokes and all five categories", () => {
   const { context } = bootApp();
   for (const locale of ["en-US", "ru-RU"]) {
