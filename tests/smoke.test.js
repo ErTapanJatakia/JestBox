@@ -410,7 +410,7 @@ test("a pending native share does not report completion after the displayed joke
 
 test("interactive component boundaries meet the 3:1 non-text contrast threshold", () => {
   const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  const border = css.match(/--border:\\s*(#[0-9a-fA-F]{6})/);
+  const border = css.match(/--border:\s*(#[0-9a-fA-F]{6})/);
   assert.ok(border, "Missing six-digit --border color token");
 
   const luminance = (hex) => {
