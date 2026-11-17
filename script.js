@@ -138,11 +138,15 @@ function showDailyJoke() {
 function showRandomJoke() {
   const filtered = getFilteredJokes();
   if (!filtered.length) return;
-  let index = Math.floor(Math.random() * filtered.length);
-  if (filtered.length > 1 && filtered[index] === currentJoke) index = (index + 1) % filtered.length;
-  if (filtered.length > 1 && index === previousIndex) index = (index + 1) % filtered.length;
-  previousIndex = index;
-  renderJoke(filtered[index]);
+  const alternatives = filtered
+    .map((joke, index) => ({ joke, index }))
+    .filter((entry) => entry.joke !== currentJoke);
+  const candidates = alternatives.length ? alternatives : filtered.map((joke, index) => ({ joke, index }));
+  const withoutPrevious = candidates.filter((entry) => entry.index !== previousIndex);
+  const pool = withoutPrevious.length ? withoutPrevious : candidates;
+  const selected = pool[Math.floor(Math.random() * pool.length)];
+  previousIndex = selected.index;
+  renderJoke(selected.joke);
 }
 
 function renderLocale() {
