@@ -1,7 +1,7 @@
 /* JestBox — all joke content and interface logic run locally. No network requests or storage. */
 const copy = {
   "en-US": {
-    locale: "EN · US", eyebrow: "A LITTLE LAUGHTER, WHEREVER YOU ARE",
+    locale: "EN · US", skip: "Skip to main content", home: "JestBox home", eyebrow: "A LITTLE LAUGHTER, WHEREVER YOU ARE",
     headline: "Good jokes. No signal needed.",
     intro: "A pocket-sized laugh, with humour made for your corner of the world.",
     localeEyebrow: "CHOOSE YOUR HUMOUR", localeHeading: "Where should the jokes come from?", localeGroupLabel: "Choose joke language",
@@ -15,7 +15,7 @@ const copy = {
     categoryNames: { everyday: "Everyday life", work: "Work & study", tech: "Tech & internet", food: "Food & drink", wordplay: "Wordplay" }
   },
   "ru-RU": {
-    locale: "RU · РФ", eyebrow: "НЕМНОГО ЮМОРА — ГДЕ БЫ ВЫ НИ БЫЛИ",
+    locale: "RU · РФ", skip: "Перейти к основному содержимому", home: "На главную JestBox", eyebrow: "НЕМНОГО ЮМОРА — ГДЕ БЫ ВЫ НИ БЫЛИ",
     headline: "Хорошие шутки. Интернет не нужен.",
     intro: "Порция хорошего настроения с юмором, понятным именно здесь.",
     localeEyebrow: "ВЫБЕРИТЕ СВОЙ ЮМОР", localeHeading: "Откуда будут шутки?", localeGroupLabel: "Выберите язык шуток",
@@ -79,7 +79,7 @@ const jokes = {
 
 const elements = {
   root: document.documentElement,
-  localeLabel: document.querySelector("#locale-label"),
+  localeLabel: document.querySelector("#locale-label"),\n  skipLink: document.querySelector("#skip-link"),\n  homeLink: document.querySelector("#home-link"),
   headline: document.querySelector("#headline"),
   eyebrow: document.querySelector("#eyebrow"),
   intro: document.querySelector("#intro"),
@@ -154,7 +154,7 @@ function renderLocale() {
   elements.root.lang = locale;
   elements.root.dir = "ltr";
   document.title = locale === "ru-RU" ? "JestBox — Немного хорошего настроения" : "JestBox — A little laughter, wherever you are";
-  elements.localeLabel.textContent = text.locale;
+  elements.localeLabel.textContent = text.locale;\n  elements.skipLink.textContent = text.skip;\n  elements.homeLink.setAttribute("aria-label", text.home);
   elements.eyebrow.textContent = text.eyebrow;
   elements.headline.textContent = text.headline;
   elements.intro.textContent = text.intro;
