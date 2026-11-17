@@ -34,6 +34,7 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 ## Accessibility and responsive checks
 
 - [ ] Complete all controls using keyboard only; focus must remain visible.
+- [ ] Tab through the page from the browser document start; confirm the skip link is first, each locale/action control is reached once in a logical order, and focus is never obscured or trapped.
 - [ ] Check the visible focus outline against the dark page and panel surfaces; verify it remains clear on locale buttons, action buttons, links, the category selector, and the focused main landmark.
 - [ ] Confirm visible boundaries of locale buttons, secondary action buttons, panels, and the category selector remain distinguishable from their adjacent surfaces at normal and high-contrast display settings.
 - [ ] Verify primary, muted, and accent text plus accent-filled button labels maintain WCAG AA text contrast in the rendered app, including hover and focus states.
