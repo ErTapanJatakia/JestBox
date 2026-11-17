@@ -371,6 +371,10 @@ test("a failed native share falls back to clipboard and reports the fallback", a
 
 test("interactive controls expose accessible names, states, and visible focus styles", () => {
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(html, /<section class="locale-picker panel" aria-labelledby="locale-heading">/);
+  assert.match(html, /<section class="joke-panel panel" aria-labelledby="joke-heading">/);
+  assert.match(html, /<a class="skip-link" id="skip-link" href="#main">/);
+  assert.match(html, /<main id="main" class="container jestbox" tabindex="-1">/);
   assert.match(html, /<div class="locale-buttons" id="locale-buttons" role="group" aria-label="Choose joke language">/);
   assert.match(html, /data-locale="en-US" aria-pressed="true">[\s\S]*?<strong>American English<\/strong>/);
   assert.match(html, /data-locale="ru-RU" aria-pressed="false">[\s\S]*?<strong>Русский<\/strong>/);
@@ -382,6 +386,8 @@ test("interactive controls expose accessible names, states, and visible focus st
   const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
   assert.match(css, /button:focus-visible,[\s\n]*a:focus-visible,[\s\n]*select:focus-visible[\s\S]*?outline: 3px solid var\(--accent\)/);
   assert.match(css, /\.jestbox :focus-visible,[\s\n]*\.jestbox:focus[\s\S]*?outline: 3px solid var\(--accent\)/);
+  assert.match(css, /a:focus-visible/);
+  assert.match(css, /\.skip-link:focus\s*\{\s*transform: translateY\(0\);/);
 });
 
 
