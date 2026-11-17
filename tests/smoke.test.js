@@ -207,7 +207,7 @@ test("cancelling the native share sheet does not report success or copy the joke
 });
 
 
-test("copy completion keeps the locale captured when the action began", async () => {
+test("a pending copy does not overwrite the interface after a locale change", async () => {
   const app = bootApp();
   let completeWrite;
   app.navigator.clipboard.writeText = () => new Promise((resolve) => {
@@ -220,10 +220,10 @@ test("copy completion keeps the locale captured when the action began", async ()
   await pendingCopy;
 
   assert.equal(app.root.lang, "ru-RU");
-  assert.equal(app.elements.status.textContent, "Copied!");
+  assert.equal(app.elements.status.textContent, "");
 });
 
-test("native share completion keeps the locale captured when the action began", async () => {
+test("a pending native share does not overwrite the interface after a locale change", async () => {
   const app = bootApp();
   let completeShare;
   let payload;
@@ -241,7 +241,7 @@ test("native share completion keeps the locale captured when the action began", 
 
   assert.equal(payload.title, "A joke from JestBox");
   assert.equal(app.root.lang, "ru-RU");
-  assert.equal(app.elements.status.textContent, "Ready to share.");
+  assert.equal(app.elements.status.textContent, "");
 });
 
 test("the app has no network or persistent-storage integration", () => {
