@@ -12,6 +12,7 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Confirm the daily joke remains stable after reload on the same device-local date; after crossing device-local midnight, reload and confirm the date-based selection is recalculated. Confirm locale and category changes also recalculate the selection.
 - [ ] Keep the app open across device-local midnight, return to it or make it visible, and confirm the daily joke refreshes without a manual reload.
 - [ ] Confirm a hidden app defers the rollover update until it becomes visible.
+- [ ] Select “Another joke” and confirm the card label changes from the daily-joke label to the random-joke label in both locales; changing locale or category should restore the daily label.
 - [ ] Select “Another joke” repeatedly; consecutive results should differ whenever more than one joke is available.
 - [ ] Confirm Copy reports success only after a successful clipboard write; test the unavailable-permission fallback.
 - [ ] Confirm Share invokes the platform share sheet where supported; dismissing it should not report a successful share.
