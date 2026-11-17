@@ -25,7 +25,7 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 
 - [ ] Complete all controls using keyboard only; focus must remain visible.
 - [ ] Confirm locale buttons expose the correct pressed state to assistive technology.
-- [ ] Confirm joke updates and copy/share status messages are announced by a screen reader.
+- [ ] Confirm daily, random, and category-filtered joke updates are announced by a screen reader.\n- [ ] Confirm locale changes announce the updated joke in the newly selected document language.\n- [ ] Confirm the skip link moves keyboard focus to the main landmark.
 - [ ] Check narrow phone, portrait tablet, landscape tablet, and desktop layouts for clipping, overlap, and horizontal scrolling.
 - [ ] Check text zoom and reduced-motion preferences.
 
