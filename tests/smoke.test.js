@@ -14,7 +14,7 @@ function makeElement(value = "") {
   };
 }
 
-function bootApp() {
+function bootApp(now = new Date()) {
   const ids = [
     "locale-label", "skip-link", "home-link", "headline", "eyebrow", "intro", "locale-eyebrow",
     "locale-heading", "locale-buttons", "daily-label", "category-label",
@@ -46,9 +46,18 @@ function bootApp() {
   const navigator = { clipboard: { async writeText(value) { clipboardWrites.push(value); } } };
   const deterministicMath = Object.create(Math);
   deterministicMath.random = () => 0;
-  const context = { document, navigator, Date, Math: deterministicMath };
-  vm.runInNewContext(source + "
-globalThis.__testJokes = jokes;", context);
+  class FixedDate extends Date {
+    constructor(...args) {
+      if (args.length) super(...args);
+      else super(now.getTime());
+    }
+    static now() { return now.getTime(); }
+  }
+  const context = { document, navigator, Date: FixedDate, Math: deterministicMath };
+  vm.runInNewContext(
+    source + "\nglobalThis.__testJokes = jokes; globalThis.__testDailySeed = () => daySeed() + elements.category.value;",
+    context
+  );
   return { elements, localeButtons, root, navigator, clipboardWrites, context };
 }
 
@@ -134,6 +143,20 @@ test("the daily joke is stable for the same locale and device-local date", () =>
   assert.equal(first.root.lang, "ru-RU");
   assert.equal(first.elements["joke-heading"].textContent,
     second.elements["joke-heading"].textContent);
+});
+
+test("the daily-joke seed changes with local date, locale, and category", () => {
+  const app = bootApp(new Date(2026, 0, 2, 12, 0, 0));
+  const originalSeed = app.context.__testDailySeed();
+
+  const nextDay = bootApp(new Date(2026, 0, 3, 12, 0, 0));
+  assert.notEqual(nextDay.context.__testDailySeed(), originalSeed);
+
+  app.elements.category.value = "food";
+  assert.notEqual(app.context.__testDailySeed(), originalSeed);
+
+  app.localeButtons[1].listeners.click();
+  assert.notEqual(app.context.__testDailySeed(), originalSeed);
 });
 
 test("random selection respects the active category", () => {
