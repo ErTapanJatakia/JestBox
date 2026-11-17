@@ -206,6 +206,44 @@ test("cancelling the native share sheet does not report success or copy the joke
   assert.equal(app.elements.status.textContent, "");
 });
 
+
+test("copy completion keeps the locale captured when the action began", async () => {
+  const app = bootApp();
+  let completeWrite;
+  app.navigator.clipboard.writeText = () => new Promise((resolve) => {
+    completeWrite = resolve;
+  });
+
+  const pendingCopy = app.elements["copy-button"].listeners.click();
+  app.localeButtons[1].listeners.click();
+  completeWrite();
+  await pendingCopy;
+
+  assert.equal(app.root.lang, "ru-RU");
+  assert.equal(app.elements.status.textContent, "Copied!");
+});
+
+test("native share completion keeps the locale captured when the action began", async () => {
+  const app = bootApp();
+  let completeShare;
+  let payload;
+  app.navigator.share = (value) => {
+    payload = value;
+    return new Promise((resolve) => {
+      completeShare = resolve;
+    });
+  };
+
+  const pendingShare = app.elements["share-button"].listeners.click();
+  app.localeButtons[1].listeners.click();
+  completeShare();
+  await pendingShare;
+
+  assert.equal(payload.title, "A joke from JestBox");
+  assert.equal(app.root.lang, "ru-RU");
+  assert.equal(app.elements.status.textContent, "Ready to share.");
+});
+
 test("the app has no network or persistent-storage integration", () => {
   assert.doesNotMatch(source,
     /\b(?:fetch|XMLHttpRequest|WebSocket|sendBeacon)\s*\(|\b(?:localStorage|sessionStorage|indexedDB)\b|document\.cookie/);
