@@ -202,31 +202,35 @@ document.querySelector("#another-button").addEventListener("click", showRandomJo
 
 document.querySelector("#copy-button").addEventListener("click", async () => {
   if (!currentJoke) return;
+  const actionLocale = locale;
+  const jokeText = currentJoke.text;
   try {
-    await navigator.clipboard.writeText(currentJoke.text);
-    elements.status.textContent = copy[locale].copied;
+    await navigator.clipboard.writeText(jokeText);
+    elements.status.textContent = copy[actionLocale].copied;
   } catch {
-    elements.status.textContent = copy[locale].copyFailed;
+    elements.status.textContent = copy[actionLocale].copyFailed;
   }
 });
 
 document.querySelector("#share-button").addEventListener("click", async () => {
   if (!currentJoke) return;
-  const title = locale === "ru-RU" ? "Шутка от JestBox" : "A joke from JestBox";
+  const actionLocale = locale;
+  const jokeText = currentJoke.text;
+  const title = actionLocale === "ru-RU" ? "Шутка от JestBox" : "A joke from JestBox";
   if (navigator.share) {
     try {
-      await navigator.share({ title, text: currentJoke.text });
-      elements.status.textContent = copy[locale].shared;
+      await navigator.share({ title, text: jokeText });
+      elements.status.textContent = copy[actionLocale].shared;
       return;
     } catch (error) {
       if (error && error.name === "AbortError") return;
     }
   }
   try {
-    await navigator.clipboard.writeText(currentJoke.text);
-    elements.status.textContent = copy[locale].shareFallback;
+    await navigator.clipboard.writeText(jokeText);
+    elements.status.textContent = copy[actionLocale].shareFallback;
   } catch {
-    elements.status.textContent = copy[locale].copyFailed;
+    elements.status.textContent = copy[actionLocale].copyFailed;
   }
 });
 
