@@ -104,6 +104,7 @@ const elements = {
 let locale = "en-US";
 let currentJoke = null;
 let previousIndex = -1;
+let pendingAction = 0;
 
 function getFilteredJokes() {
   const selected = elements.category.value;
@@ -188,6 +189,7 @@ function renderLocale() {
 document.querySelectorAll("[data-locale]").forEach((button) => {
   button.addEventListener("click", () => {
     if (button.dataset.locale === locale) return;
+    pendingAction += 1;
     locale = button.dataset.locale;
     elements.category.value = "all";
     renderLocale();
@@ -202,35 +204,42 @@ document.querySelector("#another-button").addEventListener("click", showRandomJo
 
 document.querySelector("#copy-button").addEventListener("click", async () => {
   if (!currentJoke) return;
-  const actionLocale = locale;
+  const actionId = ++pendingAction;
   const jokeText = currentJoke.text;
   try {
     await navigator.clipboard.writeText(jokeText);
-    elements.status.textContent = copy[actionLocale].copied;
+    if (actionId !== pendingAction) return;
+    elements.status.textContent = copy[locale].copied;
   } catch {
-    elements.status.textContent = copy[actionLocale].copyFailed;
+    if (actionId !== pendingAction) return;
+    elements.status.textContent = copy[locale].copyFailed;
   }
 });
 
 document.querySelector("#share-button").addEventListener("click", async () => {
   if (!currentJoke) return;
+  const actionId = ++pendingAction;
   const actionLocale = locale;
   const jokeText = currentJoke.text;
   const title = actionLocale === "ru-RU" ? "Шутка от JestBox" : "A joke from JestBox";
   if (navigator.share) {
     try {
       await navigator.share({ title, text: jokeText });
-      elements.status.textContent = copy[actionLocale].shared;
+      if (actionId !== pendingAction) return;
+      elements.status.textContent = copy[locale].shared;
       return;
     } catch (error) {
       if (error && error.name === "AbortError") return;
+      if (actionId !== pendingAction) return;
     }
   }
   try {
     await navigator.clipboard.writeText(jokeText);
-    elements.status.textContent = copy[actionLocale].shareFallback;
+    if (actionId !== pendingAction) return;
+    elements.status.textContent = copy[locale].shareFallback;
   } catch {
-    elements.status.textContent = copy[actionLocale].copyFailed;
+    if (actionId !== pendingAction) return;
+    elements.status.textContent = copy[locale].copyFailed;
   }
 });
 
