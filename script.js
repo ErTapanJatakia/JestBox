@@ -51,6 +51,7 @@ const jokes = {
     { category: "wordplay", text: "I used to be a baker, but I couldn't make enough dough." },
     { category: "wordplay", text: "I wondered why the baseball was getting bigger. Then it hit me." },
     { category: "wordplay", text: "The calendar's days are numbered. It knows exactly when its time is up." },
+    { category: "wordplay", text: "I tried writing a joke about punctuation; it had too many commas and no point." },
     { category: "wordplay", text: "I used to hate facial hair, but then it grew on me." }
   ],
   "ru-RU": [
