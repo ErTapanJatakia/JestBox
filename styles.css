@@ -1,4 +1,4 @@
-:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --page: #08111f; --surface: #111f33; --surface-2: #172a43; --text: #f5f8fc; --muted: #a7b5c8; --border: #2b405d; --danger: #ff9b9b; }
+:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --page: #08111f; --surface: #111f33; --surface-2: #172a43; --text: #f5f8fc; --muted: #a7b5c8; --border: #60758e; --danger: #ff9b9b; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; min-height: 100vh; color: var(--text); background: radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 34%), var(--page); }
