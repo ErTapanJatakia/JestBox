@@ -159,6 +159,16 @@ test("both locale dictionaries have identical complete interface and category ke
   }
 });
 
+test("joke text is unique within each locale after whitespace normalization", () => {
+  const { context } = bootApp();
+  for (const locale of ["en-US", "ru-RU"]) {
+    const normalized = context.__testJokes[locale].map((joke) =>
+      joke.text.normalize("NFC").replace(/\\s+/g, " ").trim().toLocaleLowerCase(locale)
+    );
+    assert.equal(new Set(normalized).size, normalized.length, `${locale} contains duplicate joke text`);
+  }
+});
+
 test("each locale has the intended 20-joke category distribution", () => {
   const { context } = bootApp();
   const expected = { everyday: 5, work: 4, tech: 4, food: 3, wordplay: 4 };
