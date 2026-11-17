@@ -47,7 +47,8 @@ function bootApp() {
   const deterministicMath = Object.create(Math);
   deterministicMath.random = () => 0;
   const context = { document, navigator, Date, Math: deterministicMath };
-  vm.runInNewContext(source + "\nglobalThis.__testJokes = jokes;", context);
+  vm.runInNewContext(source + "
+globalThis.__testJokes = jokes;", context);
   return { elements, localeButtons, root, navigator, clipboardWrites, context };
 }
 
@@ -106,7 +107,9 @@ test("both locales contain 20 original jokes and all five categories", () => {
 test("Russian selection localizes the document, controls, and category filter", () => {
   const app = bootApp();
   app.localeButtons[1].listeners.click();
-  assert.equal(app.root.lang, "ru-RU");\n  assert.equal(app.elements["skip-link"].textContent, "Перейти к основному содержимому");\n  assert.equal(app.elements["home-link"].attributes["aria-label"], "На главную JestBox");
+  assert.equal(app.root.lang, "ru-RU");
+  assert.equal(app.elements["skip-link"].textContent, "Перейти к основному содержимому");
+  assert.equal(app.elements["home-link"].attributes["aria-label"], "На главную JestBox");
   assert.equal(app.elements["locale-buttons"].attributes["aria-label"], "Выберите язык шуток");
   assert.equal(app.elements["another-label"].textContent, "Ещё шутку");
   app.elements.category.value = "food";
