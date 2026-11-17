@@ -33,7 +33,8 @@ function bootApp(now = new Date()) {
   });
   const root = { lang: "", dir: "" };
   const document = {
-    documentElement: root, title: "",
+    documentElement: root, title: "", visibilityState: "visible", listeners: {},
+    addEventListener(name, callback) { this.listeners[name] = callback; },
     querySelector(selector) {
       if (selector === "#locale-buttons") return elements["locale-buttons"];
       return elements[selector.slice(1)];
@@ -53,12 +54,13 @@ function bootApp(now = new Date()) {
     }
     static now() { return now.getTime(); }
   }
-  const context = { document, navigator, Date: FixedDate, Math: deterministicMath };
+  const window = { listeners: {}, addEventListener(name, callback) { this.listeners[name] = callback; } };
+  const context = { document, window, navigator, Date: FixedDate, Math: deterministicMath };
   vm.runInNewContext(
     source + "\nglobalThis.__testJokes = jokes; globalThis.__testDailySeed = () => daySeed() + elements.category.value;",
     context
   );
-  return { elements, localeButtons, root, navigator, clipboardWrites, context };
+  return { elements, localeButtons, root, navigator, clipboardWrites, document, window, context };
 }
 
 test("every JavaScript ID selector exists in the HTML document", () => {
@@ -157,6 +159,35 @@ test("the daily-joke seed changes with local date, locale, and category", () => 
 
   app.localeButtons[1].listeners.click();
   assert.notEqual(app.context.__testDailySeed(), originalSeed);
+});
+
+test("the daily joke refreshes after local midnight when the app becomes visible", () => {
+  const deviceDate = new Date(2026, 0, 2, 23, 59, 0);
+  const app = bootApp(deviceDate);
+  const nextDay = bootApp(new Date(2026, 0, 3, 0, 1, 0));
+  const originalJoke = app.elements["joke-heading"].textContent;
+
+  deviceDate.setTime(new Date(2026, 0, 3, 0, 1, 0).getTime());
+  app.document.listeners.visibilitychange();
+
+  assert.equal(app.elements["joke-heading"].textContent,
+    nextDay.elements["joke-heading"].textContent);
+  assert.notEqual(app.elements["joke-heading"].textContent, originalJoke);
+});
+
+test("a hidden app defers daily-joke rollover until it becomes visible", () => {
+  const deviceDate = new Date(2026, 0, 2, 23, 59, 0);
+  const app = bootApp(deviceDate);
+  const originalJoke = app.elements["joke-heading"].textContent;
+
+  deviceDate.setTime(new Date(2026, 0, 3, 0, 1, 0).getTime());
+  app.document.visibilityState = "hidden";
+  app.document.listeners.visibilitychange();
+  assert.equal(app.elements["joke-heading"].textContent, originalJoke);
+
+  app.document.visibilityState = "visible";
+  app.document.listeners.visibilitychange();
+  assert.notEqual(app.elements["joke-heading"].textContent, originalJoke);
 });
 
 test("random selection respects the active category", () => {
