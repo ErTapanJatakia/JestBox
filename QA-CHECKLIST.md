@@ -9,7 +9,7 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Switch back to American English and confirm the same fields return to English.
 - [ ] Confirm changing locale resets the category filter to all jokes and updates the document title.
 - [ ] Check all five categories in both locales; every displayed joke must match the selected category.
-- [ ] Confirm the daily joke remains stable after reload on the same device-local date and changes only when the date/locale/category inputs change.
+- [ ] Confirm the daily joke remains stable after reload on the same device-local date; after crossing device-local midnight, reload and confirm the date-based selection is recalculated. Confirm locale and category changes also recalculate the selection.
 - [ ] Select “Another joke” repeatedly; consecutive results should differ whenever more than one joke is available.
 - [ ] Confirm Copy reports success only after a successful clipboard write; test the unavailable-permission fallback.
 - [ ] Confirm Share invokes the platform share sheet where supported; dismissing it should not report a successful share.
