@@ -85,7 +85,8 @@ test("live joke updates are announced and the main landmark is programmatically 
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
   assert.match(html, /<main id="main"[^>]*tabindex="-1"/);
   assert.match(html, /<div class="joke-content" aria-live="polite" aria-atomic="true">/);
-  assert.match(html, /<p class="status-text" id="status" role="status" aria-live="polite">/);
+  assert.match(html, /<p class="status-text" id="status" role="status">/);
+  assert.doesNotMatch(html, /id="status"[^>]*aria-live=/);
 });
 
 test("decorative action glyphs are hidden from assistive technology", () => {
@@ -357,4 +358,20 @@ test("a failed native share falls back to clipboard and reports the fallback", a
   assert.deepEqual(app.clipboardWrites, [joke]);
   assert.equal(app.elements.status.textContent,
     "Sharing isn't available here. The joke has been copied instead.");
+});
+
+
+test("interactive controls expose accessible names, states, and visible focus styles", () => {
+  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(html, /<div class="locale-buttons" id="locale-buttons" role="group" aria-label="Choose joke language">/);
+  assert.match(html, /data-locale="en-US" aria-pressed="true">[\s\S]*?<strong>American English<\/strong>/);
+  assert.match(html, /data-locale="ru-RU" aria-pressed="false">[\s\S]*?<strong>Русский<\/strong>/);
+  assert.match(html, /<label class="category-control" for="category">[\s\S]*?<select id="category">/);
+  for (const id of ["another-label", "copy-label", "share-label"]) {
+    assert.match(html, new RegExp(`<span id="${id}">[^<]+<\/span>`));
+  }
+
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  assert.match(css, /button:focus-visible,[\s\n]*a:focus-visible,[\s\n]*select:focus-visible[\s\S]*?outline: 3px solid var\(--accent\)/);
+  assert.match(css, /\.jestbox :focus-visible,[\s\n]*\.jestbox:focus[\s\S]*?outline: 3px solid var\(--accent\)/);
 });
