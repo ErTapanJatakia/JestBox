@@ -64,7 +64,7 @@ test("every JavaScript ID selector exists in the HTML document", () => {
 
 test("the page provides a keyboard skip link to its main landmark", () => {
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  assert.match(html, /<a\\b(?=[^>]*\\bclass="skip-link")(?=[^>]*\\bid="skip-link")(?=[^>]*\\bhref="#main")[^>]*>Skip to main content<\\/a>/);
+  assert.match(html, /<a class="skip-link" id="skip-link" href="#main">Skip to main content<\/a>/);
   assert.match(html, /<main id="main"/);
   assert.match(fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8"),
     /\.skip-link:focus\s*\{\s*transform: translateY\(0\);/);
