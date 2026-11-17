@@ -187,3 +187,45 @@ test("the app has no network or persistent-storage integration", () => {
   assert.doesNotMatch(source,
     /\b(?:fetch|XMLHttpRequest|WebSocket|sendBeacon)\s*\(|\b(?:localStorage|sessionStorage|indexedDB)\b|document\.cookie/);
 });
+
+test("switching locale resets the category and updates document language and title", () => {
+  const app = bootApp();
+  app.elements.category.value = "food";
+  app.elements.category.listeners.change();
+
+  app.localeButtons[1].listeners.click();
+
+  assert.equal(app.elements.category.value, "all");
+  assert.equal(app.root.lang, "ru-RU");
+  assert.equal(app.context.document.title, "JestBox — Немного хорошего настроения");
+  assert.ok(app.context.__testJokes["ru-RU"].some((joke) =>
+    joke.text === app.elements["joke-heading"].textContent));
+});
+
+test("clipboard failure is reported without claiming a successful copy", async () => {
+  const app = bootApp();
+  app.navigator.clipboard.writeText = async () => {
+    throw new Error("Clipboard unavailable");
+  };
+
+  await app.elements["copy-button"].listeners.click();
+
+  assert.equal(app.clipboardWrites.length, 0);
+  assert.equal(app.elements.status.textContent,
+    "Copy unavailable here. You can select the joke and copy it.");
+});
+
+test("successful native sharing reports success without using clipboard", async () => {
+  const app = bootApp();
+  let sharedPayload;
+  app.navigator.share = async (payload) => {
+    sharedPayload = payload;
+  };
+
+  await app.elements["share-button"].listeners.click();
+
+  assert.equal(sharedPayload.text, app.elements["joke-heading"].textContent);
+  assert.equal(sharedPayload.title, "A joke from JestBox");
+  assert.deepEqual(app.clipboardWrites, []);
+  assert.equal(app.elements.status.textContent, "Ready to share.");
+});
