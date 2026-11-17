@@ -21,6 +21,7 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Confirm a successful native share reports success without invoking clipboard fallback.
 
 - [ ] Start a clipboard copy, switch locales before the clipboard operation completes, and confirm the stale completion does not overwrite the newly localized interface.
+- [ ] Start Copy or Share, change the displayed joke or category before the operation completes, and confirm stale feedback for the previous joke is ignored.
 - [ ] Start native sharing, switch locales before the share sheet completes, and confirm the stale completion does not overwrite the newly localized interface.
 
 ## Privacy and offline checks
