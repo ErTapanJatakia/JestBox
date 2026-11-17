@@ -43,7 +43,6 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Confirm daily, random, and category-filtered joke updates are announced by a screen reader.
 - [ ] Confirm the joke panel is announced as one polite, atomic update without repeating the separate category or decorative quotation mark.
 - [ ] Confirm locale changes announce the updated joke in the newly selected document language without a duplicate status announcement.
-- [ ] Confirm locale changes announce the updated joke in the newly selected document language.
 - [ ] Confirm the skip link moves keyboard focus to the main landmark.
 - [ ] Check a 320px-wide viewport and narrower effective widths produced by 200% browser/text zoom; confirm the header can wrap, the category label and filter stack cleanly, and no content is clipped.
 - [ ] Check narrow phones, portrait tablet, landscape tablet, and desktop layouts for clipping, overlap, and horizontal scrolling.
