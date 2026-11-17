@@ -410,8 +410,16 @@ test("a pending native share does not report completion after the displayed joke
 
 test("interactive component boundaries meet the 3:1 non-text contrast threshold", () => {
   const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  const border = css.match(/--border:\s*(#[0-9a-fA-F]{6})/);
-  assert.ok(border, "Missing six-digit --border color token");
+  const token = (name) => {
+    const match = css.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`));
+    assert.ok(match, `Missing six-digit --${name} color token`);
+    return match[1];
+  };
+  const border = token("border");
+  const text = token("text");
+  const muted = token("muted");
+  const accent = "#6ee7f2";
+  const buttonText = "#06131b";
 
   const luminance = (hex) => {
     const channels = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
@@ -425,7 +433,15 @@ test("interactive component boundaries meet the 3:1 non-text contrast threshold"
   };
 
   for (const surface of ["#111f33", "#0c1727"]) {
-    assert.ok(ratio(border[1], surface) >= 3,
+    assert.ok(ratio(border, surface) >= 3,
       `Border contrast against ${surface} must be at least 3:1`);
+    assert.ok(ratio(text, surface) >= 4.5,
+      `Primary text contrast against ${surface} must be at least 4.5:1`);
+    assert.ok(ratio(muted, surface) >= 4.5,
+      `Muted text contrast against ${surface} must be at least 4.5:1`);
+    assert.ok(ratio(accent, surface) >= 4.5,
+      `Accent text/focus contrast against ${surface} must be at least 4.5:1`);
   }
+  assert.ok(ratio(buttonText, accent) >= 4.5,
+    "Button label contrast against the accent fill must be at least 4.5:1");
 });
