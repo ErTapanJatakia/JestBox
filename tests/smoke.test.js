@@ -200,6 +200,25 @@ test("random selection respects the active category", () => {
     joke.category === "tech" && joke.text === app.elements["joke-heading"].textContent));
 });
 
+test("the joke label distinguishes random selections and resets for daily selections", () => {
+  const app = bootApp();
+  assert.equal(app.elements["daily-label"].textContent, "TODAY'S LITTLE LAUGH");
+
+  app.elements["another-button"].listeners.click();
+  assert.equal(app.elements["daily-label"].textContent, "ANOTHER LITTLE LAUGH");
+
+  app.elements.category.value = "food";
+  app.elements.category.listeners.change();
+  assert.equal(app.elements["daily-label"].textContent, "TODAY'S LITTLE LAUGH");
+
+  app.elements["another-button"].listeners.click();
+  app.localeButtons[1].listeners.click();
+  assert.equal(app.elements["daily-label"].textContent, "ШУТКА НА СЕГОДНЯ");
+
+  app.elements["another-button"].listeners.click();
+  assert.equal(app.elements["daily-label"].textContent, "ЕЩЁ ОДНА ШУТКА");
+});
+
 test("consecutive random selections do not repeat the currently displayed joke", () => {
   const app = bootApp();
   let previous = app.elements["joke-heading"].textContent;
