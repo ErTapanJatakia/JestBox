@@ -61,6 +61,14 @@ test("every JavaScript ID selector exists in the HTML document", () => {
   }
 });
 
+test("the page provides a keyboard skip link to its main landmark", () => {
+  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(html, /<a class="skip-link" href="#main">Skip to main content<\/a>/);
+  assert.match(html, /<main id="main"/);
+  assert.match(fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8"),
+    /\.skip-link:focus\s*\{\s*transform: translateY\(0\);/);
+});
+
 test("both locales contain 20 original jokes and all five categories", () => {
   const { context } = bootApp();
   for (const locale of ["en-US", "ru-RU"]) {
