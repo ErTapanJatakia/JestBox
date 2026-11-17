@@ -223,3 +223,14 @@ select:focus-visible {
     padding-top: 2rem;
   }
 }
+
+
+/* Keep compact navigation and filter controls comfortably operable by touch. */
+.site-header a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.jestbox .category-control select {
+  min-height: 44px;
+}
