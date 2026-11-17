@@ -79,7 +79,9 @@ const jokes = {
 
 const elements = {
   root: document.documentElement,
-  localeLabel: document.querySelector("#locale-label"),\n  skipLink: document.querySelector("#skip-link"),\n  homeLink: document.querySelector("#home-link"),
+  localeLabel: document.querySelector("#locale-label"),
+  skipLink: document.querySelector("#skip-link"),
+  homeLink: document.querySelector("#home-link"),
   headline: document.querySelector("#headline"),
   eyebrow: document.querySelector("#eyebrow"),
   intro: document.querySelector("#intro"),
@@ -154,7 +156,9 @@ function renderLocale() {
   elements.root.lang = locale;
   elements.root.dir = "ltr";
   document.title = locale === "ru-RU" ? "JestBox — Немного хорошего настроения" : "JestBox — A little laughter, wherever you are";
-  elements.localeLabel.textContent = text.locale;\n  elements.skipLink.textContent = text.skip;\n  elements.homeLink.setAttribute("aria-label", text.home);
+  elements.localeLabel.textContent = text.locale;
+  elements.skipLink.textContent = text.skip;
+  elements.homeLink.setAttribute("aria-label", text.home);
   elements.eyebrow.textContent = text.eyebrow;
   elements.headline.textContent = text.headline;
   elements.intro.textContent = text.intro;
