@@ -57,7 +57,7 @@ function bootApp(now = new Date()) {
   const window = { listeners: {}, addEventListener(name, callback) { this.listeners[name] = callback; } };
   const context = { document, window, navigator, Date: FixedDate, Math: deterministicMath };
   vm.runInNewContext(
-    source + "\nglobalThis.__testJokes = jokes; globalThis.__testDailySeed = () => daySeed() + elements.category.value;",
+    source + "\nglobalThis.__testJokes = jokes; globalThis.__testCopy = copy; globalThis.__testDailySeed = () => daySeed() + elements.category.value;",
     context
   );
   return { elements, localeButtons, root, navigator, clipboardWrites, document, window, context };
@@ -127,6 +127,47 @@ test("both locales contain 20 original jokes and all five categories", () => {
     assert.deepEqual([...new Set(jokes.map((joke) => joke.category))].sort(),
       ["everyday", "food", "tech", "wordplay", "work"]);
     assert.ok(jokes.every((joke) => typeof joke.text === "string" && joke.text.trim()));
+  }
+});
+
+test("both locale dictionaries have identical complete interface and category keys", () => {
+  const { context } = bootApp();
+  const english = context.__testCopy["en-US"];
+  const russian = context.__testCopy["ru-RU"];
+  assert.deepEqual(Object.keys(russian).sort(), Object.keys(english).sort());
+
+  for (const key of Object.keys(english)) {
+    if (key === "categories" || key === "categoryNames") continue;
+    assert.equal(typeof english[key], "string", `English ${key} must be a string`);
+    assert.ok(english[key].trim(), `English ${key} must not be empty`);
+    assert.equal(typeof russian[key], "string", `Russian ${key} must be a string`);
+    assert.ok(russian[key].trim(), `Russian ${key} must not be empty`);
+  }
+
+  const expectedCategoryKeys = ["all", "everyday", "food", "tech", "wordplay", "work"];
+  assert.deepEqual(Object.keys(english.categories).sort(), expectedCategoryKeys);
+  assert.deepEqual(Object.keys(russian.categories).sort(), expectedCategoryKeys);
+  assert.deepEqual(Object.keys(english.categoryNames).sort(), expectedCategoryKeys.slice(1));
+  assert.deepEqual(Object.keys(russian.categoryNames).sort(), expectedCategoryKeys.slice(1));
+  for (const key of expectedCategoryKeys) {
+    assert.ok(english.categories[key].trim(), `Missing English category label: ${key}`);
+    assert.ok(russian.categories[key].trim(), `Missing Russian category label: ${key}`);
+    if (key !== "all") {
+      assert.ok(english.categoryNames[key].trim(), `Missing English joke category: ${key}`);
+      assert.ok(russian.categoryNames[key].trim(), `Missing Russian joke category: ${key}`);
+    }
+  }
+});
+
+test("each locale has the intended 20-joke category distribution", () => {
+  const { context } = bootApp();
+  const expected = { everyday: 5, work: 4, tech: 4, food: 3, wordplay: 4 };
+  for (const locale of ["en-US", "ru-RU"]) {
+    const counts = context.__testJokes[locale].reduce((result, joke) => {
+      result[joke.category] = (result[joke.category] || 0) + 1;
+      return result;
+    }, {});
+    assert.deepEqual(counts, expected, locale);
   }
 });
 
