@@ -375,3 +375,34 @@ test("interactive controls expose accessible names, states, and visible focus st
   assert.match(css, /button:focus-visible,[\s\n]*a:focus-visible,[\s\n]*select:focus-visible[\s\S]*?outline: 3px solid var\(--accent\)/);
   assert.match(css, /\.jestbox :focus-visible,[\s\n]*\.jestbox:focus[\s\S]*?outline: 3px solid var\(--accent\)/);
 });
+
+
+test("a pending copy does not report completion after the displayed joke changes", async () => {
+  const app = bootApp();
+  let completeWrite;
+  app.navigator.clipboard.writeText = () => new Promise((resolve) => {
+    completeWrite = resolve;
+  });
+
+  const pendingCopy = app.elements["copy-button"].listeners.click();
+  app.elements["another-button"].listeners.click();
+  completeWrite();
+  await pendingCopy;
+
+  assert.equal(app.elements.status.textContent, "");
+});
+
+test("a pending native share does not report completion after the displayed joke changes", async () => {
+  const app = bootApp();
+  let completeShare;
+  app.navigator.share = () => new Promise((resolve) => {
+    completeShare = resolve;
+  });
+
+  const pendingShare = app.elements["share-button"].listeners.click();
+  app.elements["another-button"].listeners.click();
+  completeShare();
+  await pendingShare;
+
+  assert.equal(app.elements.status.textContent, "");
+});
