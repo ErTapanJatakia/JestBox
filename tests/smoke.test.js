@@ -64,7 +64,7 @@ test("every JavaScript ID selector exists in the HTML document", () => {
 
 test("the page provides a keyboard skip link to its main landmark", () => {
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  assert.match(html, /<a class="skip-link" href="#main">Skip to main content<\/a>/);
+  assert.match(html, /<a\\b(?=[^>]*\\bclass="skip-link")(?=[^>]*\\bid="skip-link")(?=[^>]*\\bhref="#main")[^>]*>Skip to main content<\\/a>/);
   assert.match(html, /<main id="main"/);
   assert.match(fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8"),
     /\.skip-link:focus\s*\{\s*transform: translateY\(0\);/);
@@ -111,6 +111,8 @@ test("Russian selection localizes the document, controls, and category filter", 
   assert.equal(app.elements["skip-link"].textContent, "Перейти к основному содержимому");
   assert.equal(app.elements["home-link"].attributes["aria-label"], "На главную JestBox");
   assert.equal(app.elements["locale-buttons"].attributes["aria-label"], "Выберите язык шуток");
+  assert.equal(app.localeButtons[0].attributes["aria-pressed"], "false");
+  assert.equal(app.localeButtons[1].attributes["aria-pressed"], "true");
   assert.equal(app.elements["another-label"].textContent, "Ещё шутку");
   app.elements.category.value = "food";
   app.elements.category.listeners.change();
