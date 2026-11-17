@@ -3,17 +3,69 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Random Joke Generator</title>
+    <meta name="theme-color" content="#08111f" />
+    <meta name="description" content="A little laughter, wherever you are. Original jokes in American English and Russian." />
+    <title>JestBox — A little laughter, wherever you are</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body style="--accent: #6ee7f2">
-    <header class="site-header"><a href="#main">022</a><span>Beginner</span></header>
-    <main id="main" class="container">
-      <section class="hero compact"><p class="eyebrow">Project 022 · Beginner</p><h1>Random Joke Generator</h1><p class="lede">Generate a fresh result and copy it for later.</p></section>
-      <section class="workspace centered"><article class="panel generator"><div id="random-output" class="big-output">Select generate to begin.</div><div class="button-row"><button id="generate">Generate</button><button id="copy" class="secondary">Copy</button></div><p id="copy-status" aria-live="polite"></p></article></section>
-      <p class="lede" role="note">Jokes are built into this demo; no external joke service is contacted.</p>
+    <header class="site-header">
+      <a href="#main" aria-label="JestBox home">JESTBOX</a>
+      <span id="locale-label">EN · US</span>
+    </header>
+    <main id="main" class="container jestbox">
+      <section class="hero compact">
+        <p class="eyebrow" id="eyebrow">A LITTLE LAUGHTER, WHEREVER YOU ARE</p>
+        <h1 id="headline">Good jokes. No signal needed.</h1>
+        <p class="lede" id="intro">A pocket-sized laugh, with humour made for your corner of the world.</p>
+      </section>
+
+      <section class="locale-picker panel" aria-labelledby="locale-heading">
+        <div>
+          <p class="eyebrow" id="locale-eyebrow">CHOOSE YOUR HUMOUR</p>
+          <h2 id="locale-heading">Where should the jokes come from?</h2>
+        </div>
+        <div class="locale-buttons" role="group" aria-label="Choose joke language">
+          <button type="button" class="locale-button active" data-locale="en-US" aria-pressed="true">
+            <span aria-hidden="true">🇺🇸</span><span><strong>American English</strong><small>United States · en-US</small></span>
+          </button>
+          <button type="button" class="locale-button secondary" data-locale="ru-RU" aria-pressed="false">
+            <span aria-hidden="true">🇷🇺</span><span><strong>Русский</strong><small>Российская Федерация · ru-RU</small></span>
+          </button>
+        </div>
+      </section>
+
+      <section class="joke-panel panel" aria-labelledby="joke-heading">
+        <div class="joke-toolbar">
+          <span class="daily-label" id="daily-label">TODAY'S LITTLE LAUGH</span>
+          <label class="category-control" for="category">
+            <span id="category-label">Category</span>
+            <select id="category">
+              <option value="all">All jokes</option>
+              <option value="everyday">Everyday life</option>
+              <option value="work">Work &amp; study</option>
+              <option value="tech">Tech &amp; internet</option>
+              <option value="food">Food &amp; drink</option>
+              <option value="wordplay">Wordplay</option>
+            </select>
+          </label>
+        </div>
+        <div class="joke-content" aria-live="polite" aria-atomic="true">
+          <span class="joke-mark" aria-hidden="true">“</span>
+          <h2 id="joke-heading">Loading a smile…</h2>
+        </div>
+        <p class="joke-category" id="joke-category"></p>
+        <div class="joke-actions">
+          <button type="button" id="another-button"><span aria-hidden="true">↻</span><span id="another-label">Another joke</span></button>
+          <button type="button" class="secondary" id="copy-button"><span aria-hidden="true">▢</span><span id="copy-label">Copy</span></button>
+          <button type="button" class="secondary" id="share-button"><span aria-hidden="true">↗</span><span id="share-label">Share</span></button>
+        </div>
+        <p class="status-text" id="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <p class="privacy-note" id="privacy-note">Made for offline smiles. No accounts, tracking, or personal data collection.</p>
     </main>
-    <footer><p>Project 022 · Built with HTML, CSS, and JavaScript.</p></footer>
+    <footer><p>JestBox <span aria-hidden="true">·</span> <span id="footer-line">Two locales. Locally stored laughs. Zero fuss.</span></p></footer>
     <script src="script.js"></script>
   </body>
 </html>
