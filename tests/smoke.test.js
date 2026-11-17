@@ -104,6 +104,10 @@ test("narrow-screen layout rules preserve usable action targets", () => {
   assert.match(css, /\.jestbox \.category-control select\s*\{\s*min-height: 44px;/);
   assert.match(css, /\.site-header a\s*\{[^}]*min-height: 44px;/);
   assert.match(css, /orientation: landscape/);
+  assert.match(css, /\.site-header\s*\{\s*flex-wrap: wrap;/);
+  assert.match(css, /\.jestbox \.category-control\s*\{\s*align-items: stretch;\s*flex-direction: column;/);
+  assert.match(css, /\.jestbox \.category-control select\s*\{\s*width: 100%;\s*max-width: 100%;/);
+  assert.match(css, /\.jestbox\s*\{\s*padding-top: \.5rem;\s*padding-bottom: 1rem;/);
 });
 
 test("both locales contain 20 original jokes and all five categories", () => {
