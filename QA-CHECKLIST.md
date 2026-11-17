@@ -14,6 +14,7 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Confirm Copy reports success only after a successful clipboard write; test the unavailable-permission fallback.
 - [ ] Confirm Share invokes the platform share sheet where supported; dismissing it should not report a successful share.
 - [ ] Confirm the fallback behavior when native sharing is unavailable.
+- [ ] Confirm a native share failure (other than user cancellation) falls back to clipboard and reports the fallback accurately.
 - [ ] Confirm a successful native share reports success without invoking clipboard fallback.
 
 ## Privacy and offline checks
