@@ -35,6 +35,7 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 
 - [ ] Complete all controls using keyboard only; focus must remain visible.
 - [ ] Check the visible focus outline against the dark page and panel surfaces; verify it remains clear on locale buttons, action buttons, links, the category selector, and the focused main landmark.
+- [ ] Confirm visible boundaries of locale buttons, secondary action buttons, panels, and the category selector remain distinguishable from their adjacent surfaces at normal and high-contrast display settings.
 - [ ] Confirm locale buttons expose the correct pressed state to assistive technology.
 - [ ] After switching locales, confirm keyboard focus remains on the activated locale button and its updated pressed state is announced.
 - [ ] After changing the category, confirm focus remains on the category selector; after choosing another joke, confirm focus remains on that action button.
