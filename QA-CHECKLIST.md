@@ -33,10 +33,16 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 ## Accessibility and responsive checks
 
 - [ ] Complete all controls using keyboard only; focus must remain visible.
+- [ ] Check the visible focus outline against the dark page and panel surfaces; verify it remains clear on locale buttons, action buttons, links, the category selector, and the focused main landmark.
 - [ ] Confirm locale buttons expose the correct pressed state to assistive technology.
+- [ ] After switching locales, confirm keyboard focus remains on the activated locale button and its updated pressed state is announced.
+- [ ] After changing the category, confirm focus remains on the category selector; after choosing another joke, confirm focus remains on that action button.
+- [ ] After Copy or Share completes (including fallback and failure), confirm focus remains on the activated button and the status message is announced once.
 - [ ] Confirm the skip link and home link have localized accessible names after switching locales.
 - [ ] Confirm decorative action glyphs are ignored by assistive technology.
 - [ ] Confirm daily, random, and category-filtered joke updates are announced by a screen reader.
+- [ ] Confirm the joke panel is announced as one polite, atomic update without repeating the separate category or decorative quotation mark.
+- [ ] Confirm locale changes announce the updated joke in the newly selected document language without a duplicate status announcement.
 - [ ] Confirm locale changes announce the updated joke in the newly selected document language.
 - [ ] Confirm the skip link moves keyboard focus to the main landmark.
 - [ ] Check a 320px-wide viewport and narrower effective widths produced by 200% browser/text zoom; confirm the header can wrap, the category label and filter stack cleanly, and no content is clipped.
