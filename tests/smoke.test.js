@@ -418,8 +418,13 @@ test("interactive component boundaries meet the 3:1 non-text contrast threshold"
   const border = token("border");
   const text = token("text");
   const muted = token("muted");
-  const accent = "#6ee7f2";
-  const buttonText = "#06131b";
+  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const accentMatch = html.match(/--accent:\\s*(#[0-9a-fA-F]{6})/);
+  const buttonTextMatch = css.match(/button, \.button \\{[^}]*color:\\s*(#[0-9a-fA-F]{6})/);
+  assert.ok(accentMatch, "Missing six-digit page accent color");
+  assert.ok(buttonTextMatch, "Missing six-digit button label color");
+  const accent = accentMatch[1];
+  const buttonText = buttonTextMatch[1];
 
   const luminance = (hex) => {
     const channels = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
