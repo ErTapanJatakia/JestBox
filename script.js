@@ -5,7 +5,7 @@ const copy = {
     headline: "Good jokes. No signal needed.",
     intro: "A pocket-sized laugh, with humour made for your corner of the world.",
     localeEyebrow: "CHOOSE YOUR HUMOUR", localeHeading: "Where should the jokes come from?", localeGroupLabel: "Choose joke language",
-    daily: "TODAY'S LITTLE LAUGH", category: "Category",
+    daily: "TODAY'S LITTLE LAUGH", random: "ANOTHER LITTLE LAUGH", category: "Category",
     categories: { all: "All jokes", everyday: "Everyday life", work: "Work & study", tech: "Tech & internet", food: "Food & drink", wordplay: "Wordplay" },
     another: "Another joke", copy: "Copy", share: "Share",
     privacy: "Made for offline smiles. No accounts, tracking, or personal data collection.",
@@ -19,7 +19,7 @@ const copy = {
     headline: "Хорошие шутки. Интернет не нужен.",
     intro: "Порция хорошего настроения с юмором, понятным именно здесь.",
     localeEyebrow: "ВЫБЕРИТЕ СВОЙ ЮМОР", localeHeading: "Откуда будут шутки?", localeGroupLabel: "Выберите язык шуток",
-    daily: "ШУТКА НА СЕГОДНЯ", category: "Категория",
+    daily: "ШУТКА НА СЕГОДНЯ", random: "ЕЩЁ ОДНА ШУТКА", category: "Категория",
     categories: { all: "Все шутки", everyday: "Повседневная жизнь", work: "Работа и учёба", tech: "Технологии и интернет", food: "Еда и напитки", wordplay: "Игра слов" },
     another: "Ещё шутку", copy: "Копировать", share: "Поделиться",
     privacy: "Улыбайтесь даже без интернета. Без аккаунтов, слежки и сбора личных данных.",
@@ -129,8 +129,9 @@ function stableIndex(seed, length) {
   return (hash >>> 0) % length;
 }
 
-function renderJoke(joke) {
+function renderJoke(joke, selection = "daily") {
   currentJoke = joke;
+  elements.daily.textContent = copy[locale][selection];
   elements.joke.textContent = joke.text;
   elements.jokeCategory.textContent = copy[locale].categoryNames[joke.category];
   elements.status.textContent = "";
@@ -164,7 +165,7 @@ function showRandomJoke() {
   const pool = withoutPrevious.length ? withoutPrevious : candidates;
   const selected = pool[Math.floor(Math.random() * pool.length)];
   previousIndex = selected.index;
-  renderJoke(selected.joke);
+  renderJoke(selected.joke, "random");
 }
 
 function renderLocale() {
