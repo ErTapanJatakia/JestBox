@@ -144,3 +144,20 @@ select:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
 }
+
+
+/* Keyboard users can bypass repeated site navigation. */
+.skip-link {
+  position: absolute;
+  z-index: 10;
+  top: .75rem;
+  left: .75rem;
+  padding: .75rem 1rem;
+  color: #06131b;
+  background: var(--accent);
+  border-radius: .5rem;
+  transform: translateY(-160%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
