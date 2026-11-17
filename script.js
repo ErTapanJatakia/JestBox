@@ -4,7 +4,7 @@ const copy = {
     locale: "EN · US", eyebrow: "A LITTLE LAUGHTER, WHEREVER YOU ARE",
     headline: "Good jokes. No signal needed.",
     intro: "A pocket-sized laugh, with humour made for your corner of the world.",
-    localeEyebrow: "CHOOSE YOUR HUMOUR", localeHeading: "Where should the jokes come from?",
+    localeEyebrow: "CHOOSE YOUR HUMOUR", localeHeading: "Where should the jokes come from?", localeGroupLabel: "Choose joke language",
     daily: "TODAY'S LITTLE LAUGH", category: "Category",
     categories: { all: "All jokes", everyday: "Everyday life", work: "Work & study", tech: "Tech & internet", food: "Food & drink", wordplay: "Wordplay" },
     another: "Another joke", copy: "Copy", share: "Share",
@@ -18,7 +18,7 @@ const copy = {
     locale: "RU · РФ", eyebrow: "НЕМНОГО ЮМОРА — ГДЕ БЫ ВЫ НИ БЫЛИ",
     headline: "Хорошие шутки. Интернет не нужен.",
     intro: "Порция хорошего настроения с юмором, понятным именно здесь.",
-    localeEyebrow: "ВЫБЕРИТЕ СВОЙ ЮМОР", localeHeading: "Откуда будут шутки?",
+    localeEyebrow: "ВЫБЕРИТЕ СВОЙ ЮМОР", localeHeading: "Откуда будут шутки?", localeGroupLabel: "Выберите язык шуток",
     daily: "ШУТКА НА СЕГОДНЯ", category: "Категория",
     categories: { all: "Все шутки", everyday: "Повседневная жизнь", work: "Работа и учёба", tech: "Технологии и интернет", food: "Еда и напитки", wordplay: "Игра слов" },
     another: "Ещё шутку", copy: "Копировать", share: "Поделиться",
@@ -85,6 +85,7 @@ const elements = {
   intro: document.querySelector("#intro"),
   localeEyebrow: document.querySelector("#locale-eyebrow"),
   localeHeading: document.querySelector("#locale-heading"),
+  localeButtons: document.querySelector("#locale-buttons"),
   daily: document.querySelector("#daily-label"),
   categoryLabel: document.querySelector("#category-label"),
   category: document.querySelector("#category"),
@@ -154,6 +155,7 @@ function renderLocale() {
   elements.intro.textContent = text.intro;
   elements.localeEyebrow.textContent = text.localeEyebrow;
   elements.localeHeading.textContent = text.localeHeading;
+  elements.localeButtons.setAttribute("aria-label", text.localeGroupLabel);
   elements.daily.textContent = text.daily;
   elements.categoryLabel.textContent = text.category;
   elements.another.textContent = text.another;
