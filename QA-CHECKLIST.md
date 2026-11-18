@@ -21,16 +21,19 @@
 - [ ] On supported browsers, confirm Share uses the native Web Share API.
 - [ ] Cancel the share panel and confirm cancellation is not reported as a successful share.
 - [ ] Confirm unsupported sharing presents an explicit copy alternative without silently copying.
-- [ ] Confirm the launch screen appears on every fresh launch, remains for five seconds by default, and dismisses on tap or keyboard activation.
+- [ ] Confirm the launch screen appears on every fresh launch, remains for five seconds by default, dismisses on tap or keyboard activation, and fits both portrait and landscape phone layouts.
+- [ ] Confirm the dashboard begins with the locale and joke panels without the two launch-only marketing lines.
+- [ ] Confirm locale and category menus open on the first tap, list every option, and sort options alphabetically.
 - [ ] Confirm the mascot mark and consistent tagline appear on the launch screen.
-- [ ] Confirm all ten themes update page, panel, input, dialog, button, focus, and footer colours consistently.
+- [ ] Confirm all ten theme buttons appear inside Settings below Accessibility, each uses its own palette, and the active theme is clearly indicated.
+- [ ] Confirm the header contains only the Settings gear control.
+- [ ] Confirm text size ranges from 50% to 200%, defaults to 85%, and remains usable at the extremes.
+- [ ] Confirm extra contrast, reduced motion, underlined links, larger touch targets, increased line spacing, and stronger focus outlines work.
 - [ ] Confirm theme changes do not reduce text or non-text contrast below the relevant WCAG 2.2 AA thresholds.
 
 ## Settings and accessibility
 
-- [ ] Confirm larger-text setting visibly increases text and preserves usable controls.
-- [ ] Confirm high-contrast setting improves visibility without hiding state or focus.
-- [ ] Confirm reduced-motion setting suppresses non-essential animation and transitions.
+- [ ] Confirm every accessibility preference and selected theme persists after closing and reopening the app.
 - [ ] Complete all actions using keyboard only; verify logical order, visible focus, Escape behavior, and no keyboard trap.
 - [ ] Test searchable combobox/listbox controls with keyboard arrows, Enter, Escape, and screen readers.
 - [ ] Confirm dialog names, close buttons, focus entry, focus containment, and focus restoration.
@@ -46,7 +49,7 @@
 
 - [ ] Verify the core experience works offline after app assets have loaded.
 - [ ] Inspect network activity; app logic must not call external APIs or telemetry endpoints.
-- [ ] Inspect cookies and browser storage; app logic must not create cookies, localStorage, sessionStorage, or IndexedDB entries.
+- [ ] Inspect browser storage; only the `jestbox.preferences.v1` local preference record may be written. Confirm it contains display/accessibility preferences only and is not transmitted or synced.
 - [ ] Confirm no account, sign-in, analytics, advertising, tracking, or personal-data prompt appears.
 - [ ] Confirm the app does not read existing clipboard contents.
 - [ ] Confirm sharing is initiated only after an explicit user action and the user chooses the destination app.
@@ -54,7 +57,7 @@
 
 ## Documentation and release gates
 
-- [ ] Verify all six localized Privacy Policies and Accessibility Statements match the current build.
+- [ ] Verify all six Privacy Policies and all six Accessibility Statements are translated into their matching language locale and describe the current build.
 - [ ] Verify developer/support, DPO, and WCAG auditor contact details.
 - [ ] Verify Proprietary / All Rights Reserved licence remains in place.
 - [ ] Verify Security Policy, Code of Conduct, Contributing Guidelines, and product documentation are current.
