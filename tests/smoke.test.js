@@ -20,3 +20,15 @@ test("footer exposes privacy and accessibility links and a locally bundled WCAG 
 test("app remains local-first and does not use network or persistent browser storage",()=>{assert.doesNotMatch(js,/\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(/);assert.doesNotMatch(js,/\b(?:localStorage|sessionStorage|indexedDB)\b|document\.cookie/)});
 test("keyboard focus, reduced motion, forced-colors, and text resizing remain implemented",()=>{assert.match(html,/class="skip-link"/);assert.match(css,/:focus-visible/);assert.match(css,/@media\s*\(prefers-reduced-motion:\s*reduce\)/);assert.match(css,/@media\s*\(forced-colors:\s*active\)/);assert.match(css,/body\.large-text/)});
 test("the splash and app use the same locally bundled JestBox mascot",()=>{assert.match(html,/launch-card[\s\S]*assets\/jestbox-mark\.svg/);assert.match(html,/id="home-link"[\s\S]*assets\/jestbox-mark\.svg/);assert.match(read("assets/jestbox-mark.svg"),/<svg/)});
+
+test("every theme meets WCAG AA text contrast and 3:1 component-boundary contrast",()=>{
+ const match=js.match(/const THEMES=(\\[[\\s\\S]*?\\]);/);assert.ok(match,"Theme palette source must be present");
+ const box={};vm.runInNewContext("globalThis.palettes="+match[1],box);
+ const lum=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);return .2126*v[0]+.7152*v[1]+.0722*v[2]};
+ const ratio=(a,b)=>{const [x,y]=[lum(a),lum(b)].sort((m,n)=>n-m);return (x+.05)/(y+.05)};
+ assert.equal(box.palettes.length,10);
+ box.palettes.forEach((p,i)=>{const ink=i===8?"#ffffff":i===9?"#000000":"#061a1b";for(const surface of [p[1],p[2]]){assert.ok(ratio(p[3],surface)>=4.5,p[0]+" primary text");assert.ok(ratio(p[4],surface)>=4.5,p[0]+" muted text");assert.ok(ratio(p[5],surface)>=3,p[0]+" boundaries");assert.ok(ratio(p[6],surface)>=4.5,p[0]+" accent");}assert.ok(ratio(ink,p[6])>=4.5,p[0]+" button text")});
+});
+test("six locale policy and accessibility documents include the required contact routes",()=>{
+ for(const locale of ["es-PE","es-ES","en-IN","hi-IN"]){const policy=read("PRIVACY-POLICY."+locale+".md");const statement=read("ACCESSIBILITY-STATEMENT."+locale+".md");assert.match(policy,/cyber\\.litigation\\.advisor@gmail\\.com/);assert.match(policy,/ertapanjatakia@yandex\\.com/);assert.match(policy,/tapan_ditu_17\\.20@outlook\\.com/);assert.match(statement,/cyber\\.litigation\\.advisor@gmail\\.com/);assert.match(statement,/assets\\/wcag22aa-blue\\.svg/g);}
+});
