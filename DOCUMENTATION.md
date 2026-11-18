@@ -19,6 +19,10 @@ JestBox is an offline-first joke application with six regional language experien
 
 English (`en-US`) is selected by default. The current content library contains 100 jokes per locale (600 total), with 20 jokes in each of five categories, including Wordplay. Automated checks validate counts, category balance, uniqueness, and the expected writing system for each locale. Regional humour quality still benefits from native-speaker review.
 
+## Brand identity and assets
+
+The canonical JestBox logo is `assets/JestBox-Original.png`: the laughing jester character emerging from a blue gift box. The same original artwork is used on the web launch screen, home header, repository README, and Android launcher icon. The earlier geometric SVG mascot is not the primary JestBox logo.
+
 ## 2. User-facing features
 
 - Searchable language/region picker with locale code and country.
