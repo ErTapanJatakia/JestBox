@@ -1,6 +1,7 @@
 package com.ertapanjatakia.jestbox
 
 import android.app.Activity
+import android.content.pm.ApplicationInfo
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -71,7 +72,9 @@ class MainActivity : Activity() {
         }
         setContentView(webView)
         webView.loadUrl("file:///android_asset/www/index.html")
-        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
+        WebView.setWebContentsDebuggingEnabled(
+            (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        )
     }
 
     private fun routeNavigation(uri: Uri): Boolean {
