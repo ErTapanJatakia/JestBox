@@ -2,9 +2,11 @@
 
 **Last reviewed:** 18 November 2026  
 **Product:** JestBox  
-**Applies to:** The current browser-based JestBox interface in this repository.
+**Applies to:** The JestBox browser application and the English and Russian Accessibility Statements, as specified in the conformance claim below.
 
 ## Our commitment
+
+<p align="center"><a href="https://www.w3.org/WAI/WCAG2AA-Conformance" title="Explanation of WCAG 2 Level AA conformance"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Level AA conformance, W3C Web Content Accessibility Guidelines 2.2"></a></p>
 
 JestBox aims to be usable by as many people as possible, including people who navigate by keyboard, use assistive technologies, need enlarged text, or use operating-system accessibility settings. Accessibility is treated as an ongoing engineering and quality activity.
 
@@ -30,13 +32,25 @@ The current source includes the following measures:
 
 These are implementation measures, not proof that every user journey works with every browser or assistive technology.
 
-## Conformance status and testing
+## WCAG 2.2 Level AA conformance claim
 
-JestBox is being developed toward WCAG 2.2 AA. **No formal WCAG conformance claim is made in this statement.** Conformance requires evaluation of the complete user experience against all applicable success criteria, including manual testing in representative environments.
+**Claim date:** 18 November 2026  
+**Guideline:** [Web Content Accessibility Guidelines (WCAG) 2.2](https://www.w3.org/TR/WCAG22/)  
+**Conformance level claimed:** Level AA  
+**Claimant:** JestBox maintainer, Er. Tapan Jatakia (C. Eng.)
 
-The project maintainer has reported that manual QA has been completed. However, a detailed public test record identifying exact browser and operating-system versions, assistive technology, test results, and evidence has not yet been included in this repository. Therefore this statement does not claim independently verified screen-reader compatibility, formal WCAG 2.2 AA conformance, or third-party certification.
+The maintainer claims that the pages listed in the scope below conform to WCAG 2.2 Level AA, including all applicable Level A and Level AA success criteria.
 
-The repository's `QA-CHECKLIST.md` defines checks for keyboard operation, focus order, live announcements, language changes, contrast, zoom/reflow, reduced motion, forced colors, and responsive layouts. The checklist should be accompanied by a dated execution record before a formal conformance statement is considered.
+**Scope of this claim:**
+- The complete JestBox single-page browser application served from the project root (`index.html`), including both American English (`en-US`) and Russian (`ru-RU`) interface states and responsive presentations.
+- This English Accessibility Statement: [ACCESSIBILITY-STATEMENT.md](https://github.com/ErTapanJatakia/JestBox/blob/feat/bilingual-en-us-ru-ru/ACCESSIBILITY-STATEMENT.md).
+- This Russian Accessibility Statement: [ACCESSIBILITY-STATEMENT.ru-RU.md](https://github.com/ErTapanJatakia/JestBox/blob/feat/bilingual-en-us-ru-ru/ACCESSIBILITY-STATEMENT.ru-RU.md).
+
+**Web technologies relied upon:** HTML5, CSS, and JavaScript, using standard browser accessibility interfaces and native HTML controls.
+
+This is the content provider's own conformance claim. The W3C/WAI logo does not mean that W3C or WAI reviewed, tested, or endorsed JestBox. The maintainer is responsible for keeping the claim accurate and re-evaluating the complete scope whenever content, code, dependencies, or supported environments change. The claim does not extend to Android packages, app-store listings, third-party hosting interfaces, or other pages not explicitly listed above.
+
+The project maintainer reports that manual QA has been completed. A detailed public execution record with browser/OS versions, assistive-technology combinations, criterion-by-criterion results, and supporting evidence is not currently included in this repository. The claim is made by the maintainer; no independent third-party audit or certification is represented. The repository's `QA-CHECKLIST.md` records the evaluation areas, including keyboard operation, focus order, live announcements, language changes, contrast, zoom/reflow, reduced motion, forced colors, and responsive layouts.
 
 ## Known limitations and scope
 
@@ -68,6 +82,8 @@ When reporting a barrier, include the affected page or control, the action attem
 This statement should be reviewed whenever the app's interface, supported platforms, accessibility implementation, or test evidence changes. Corrections and improvements are part of ongoing maintenance.
 
 ---
+
+<p align="center"><a href="https://www.w3.org/WAI/WCAG2AA-Conformance" title="Explanation of WCAG 2 Level AA conformance"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Level AA conformance, W3C Web Content Accessibility Guidelines 2.2"></a></p>
 
 ## Reference standards
 
