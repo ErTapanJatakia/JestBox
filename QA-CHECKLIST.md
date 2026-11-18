@@ -52,7 +52,8 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Check narrow phones, portrait tablet, landscape tablet, and desktop layouts for clipping, overlap, and horizontal scrolling.
 - [ ] At 200% browser zoom, verify the 560px responsive breakpoint stacks the locale choices and joke toolbar cleanly, while long Russian headings, labels, and joke text wrap without horizontal scrolling.
 - [ ] Check short landscape viewports; confirm vertical spacing is compact and all joke actions remain reachable by scrolling.
-- [ ] Check text zoom and reduced-motion preferences.
+- [ ] Check 400% browser zoom at a 320 CSS-pixel viewport (or equivalent 1280px-to-320px reflow); confirm no two-dimensional scrolling or clipped content.
+- [ ] Check text zoom, reduced-motion preferences, and Windows/browser forced-colors high-contrast mode; confirm control boundaries and keyboard focus remain visible.
 - [ ] Confirm the header home link and category filter provide at least 44px touch targets.
 
 ## Evidence and release gate
