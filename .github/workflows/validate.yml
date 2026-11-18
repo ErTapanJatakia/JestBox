@@ -22,5 +22,7 @@ jobs:
           node-version: 22
       - name: Check JavaScript syntax
         run: node --check script.js
+          node --check jokes.js
+          node --check share-bridge.entry.js
       - name: Run offline smoke tests
         run: node --test
