@@ -16,7 +16,7 @@ This policy describes the application behavior visible in the repository. It is 
 
 JestBox is maintained as an independent, non-monetized project by its repository owner. The repository is [ErTapanJatakia/JestBox](https://github.com/ErTapanJatakia/JestBox).
 
-A dedicated privacy email address has not been published in the project documentation. For a privacy question, use the repository's published contact route to request a private contact channel. **Do not put personal, sensitive, or account information in a public issue.** A dedicated private contact address should be published before broad public distribution.
+For privacy questions and data-protection requests, use the designated contact details in sections 10 and 11 below. The DPO contact is a project-designated contact point; this policy does not imply that a statutory DPO appointment is legally required or that the project is certified compliant in any jurisdiction. **Do not put personal, sensitive, or account information in a public issue.**
 
 ## 3. Information handled by the app
 
