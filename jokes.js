@@ -178,18 +178,48 @@ const JESTBOX_JOKES_BATCH_5={
 ["wordplay","Ascendieron al bibliotecario: tenía muchos méritos entre páginas."],["wordplay","La fábrica de relojes cerró porque sus empleados siempre se tomaban su tiempo."],["wordplay","El lápiz roto no tenía punta, pero sí un buen argumento."],["wordplay","El monólogo del cómico sobre escaleras estuvo un peldaño por encima."]
 ],
 "en-IN":[
-["everyday","I bought a reusable shopping bag. It now carries five other reusable bags. Sustainability has luggage."],["everyday","My keys have a secret schedule. They appear exactly after I book a cab."],["everyday","I tried a morning routine. It worked beautifully until the morning arrived."],["everyday","The delivery app says the rider is nearby. Nearby is doing a lot of work in this traffic."],
-["work","The office announced a meeting-free hour. The calendar sent ten invites to celebrate it."],["work","I was asked to align with the roadmap. I stood beside the whiteboard and nodded."],["work","The minutes say 'action items'. Mine say 'chai, then revisit'."],["work","The desk plant is thriving. It has better work-life balance than our whole team."],
-["tech","The app asked me to accept cookies. I was hoping for the bakery kind."],["tech","Autocorrect changed 'thanks' to 'thaaaanks'. Even my phone is being dramatic."],["tech","The cloud sounds fluffy, but the storage warning is a full monsoon alert."],["tech","I updated all my apps. Each one found a fresh way to ask for attention."],
-["food","I made pancakes shaped like a map. Breakfast declared independence."],["food","The pickle jar refused to open. It has a very strong preserving attitude."],["food","The pasta was al dente. My patience was fully overcooked."],["food","I bought premium ghee. My toast now has a better lifestyle than I do."],
-["wordplay","The librarian got promoted because she had a shelf of achievements."],["wordplay","The clock factory closed because everyone kept taking time off."],["wordplay","A broken pencil is pointless, but it can still make a sharp observation."],["wordplay","The comedian's staircase routine was a step above the competition."]
+["everyday","I packed an umbrella for the monsoon. The forecast changed, but the umbrella has already made travel plans."],
+["everyday","The auto driver asked for the exact address. My directions began with 'near the big tree' and lost all credibility."],
+["everyday","I went downstairs for a quick parcel. The security guard knew its delivery history better than I did."],
+["everyday","The lift stopped on every floor. By the time I reached home, I had made three new neighbours."],
+["work","The office chai break was scheduled for ten minutes. The kettle, at least, respected the deadline."],
+["work","My manager said 'let us take this offline'. The office Wi-Fi took it literally and disappeared."],
+["work","The team planned a quick sync. Even the calendar knew that 'quick' was only a suggestion."],
+["work","I added 'flexible with priorities' to my review. My task list immediately became more flexible than me."],
+["tech","UPI made paying so quick that my wallet has started questioning its role in the family."],
+["tech","The OTP arrived just after the payment screen timed out. Excellent timing, as always."],
+["tech","My phone switched to battery saver during the cab ride. Even the device wanted to save money."],
+["tech","The monsoon slowed the internet. My video call became a slideshow with weather effects."],
+["food","I ordered one plate of pani puri. The vendor asked how many, and my answer became a negotiation."],
+["food","The last biscuit fell into my chai. It has now completed its journey from snack to dip."],
+["food","I asked for less spice. The cook smiled politely and treated it as a creative suggestion."],
+["food","The tiffin was packed for later. The aroma opened it before lunchtime."],
+["wordplay","The chai stall's business is steeped in success."],
+["wordplay","The auto-rickshaw comedian always gets a fare laugh."],
+["wordplay","The monsoon cloud became a musician because it had great rain-ge."],
+["wordplay","The dosa tried stand-up comedy, but its best jokes kept rolling."]
 ],
 "hi-IN":[
-["everyday","कपड़े का थैला खरीदा। अब उसमें पाँच और कपड़े के थैले रहते हैं—थैले के अंदर थैला।"],["everyday","मेरी चाबियों का अपना टाइमटेबल है। कैब बुक करने के बाद ही मिलती हैं।"],["everyday","सुबह की दिनचर्या बनाई। सब ठीक था, जब तक सुबह सच में नहीं आ गई।"],["everyday","डिलीवरी ऐप कहता है राइडर पास है। ट्रैफ़िक में 'पास' का मतलब अलग ही होता है।"],
-["work","ऑफिस ने मीटिंग-फ्री घंटा घोषित किया। कैलेंडर ने जश्न मनाने के लिए दस मीटिंग भेज दीं।"],["work","रोडमैप के साथ अलाइन होने को कहा। मैं व्हाइटबोर्ड के पास खड़ा होकर सिर हिलाने लगा।"],["work","मीटिंग नोट्स में एक्शन आइटम हैं। मेरे नोट्स में चाय और फिर से सोचने की बात है।"],["work","मेरी मेज़ का पौधा खूब फल-फूल रहा है। उसका वर्क-लाइफ़ बैलेंस पूरी टीम से अच्छा है।"],
-["tech","ऐप ने कुकीज़ स्वीकार करने को कहा। मैं चॉकलेट वाली कुकी की उम्मीद कर रहा था।"],["tech","ऑटोकरेक्ट ने 'धन्यवाद' को 'धन्यवाद जी' कर दिया। फ़ोन भी अब संस्कारी हो गया।"],["tech","क्लाउड मुलायम लगता है, पर स्टोरेज की चेतावनी पूरी मानसून अलर्ट है।"],["tech","सभी ऐप अपडेट किए। अब हर ऐप ध्यान खींचने का नया तरीका जानता है।"],
-["food","नक्शे के आकार के पैनकेक बनाए। नाश्ते ने अपनी आज़ादी घोषित कर दी।"],["food","अचार का डिब्बा खुला ही नहीं। उसका रवैया बहुत अचार-संरक्षित था।"],["food","पास्ता अल-देंटे बना। मेरा धैर्य पूरी तरह गल गया।"],["food","प्रीमियम घी खरीदा। अब टोस्ट की जीवनशैली मुझसे बेहतर है।"],
-["wordplay","लाइब्रेरियन का प्रमोशन हुआ—उसकी उपलब्धियाँ शेल्फ़ भर थीं।"],["wordplay","घड़ी की फ़ैक्टरी बंद हुई, क्योंकि कर्मचारी हमेशा समय निकाल लेते थे।"],["wordplay","टूटी पेंसिल बेकार है, पर उसकी बात में अब भी नुकीलापन है।"],["wordplay","कॉमेडियन का सीढ़ियों वाला शो बाकियों से एक पायदान ऊपर था।"]
+["everyday","बारिश के लिए छाता खरीदा। बारिश नहीं आई, मगर छाता रोज़ बाहर घूमने की ज़िद करता है।"],
+["everyday","ऑटो वाले ने पता पूछा। मैंने कहा, बड़े पेड़ के पास—फिर मुझे अपनी दिशा-बुद्धि पर शक हुआ।"],
+["everyday","पार्सल लेने नीचे गया था। चौकीदार को उसकी पूरी यात्रा मुझसे पहले पता थी।"],
+["everyday","लिफ़्ट हर मंज़िल पर रुकी। घर पहुँचते-पहुँचते तीन नए पड़ोसी मिल गए।"],
+["work","ऑफिस की चाय दस मिनट की थी। चाय की केतली ने ही समय की पाबंदी निभाई।"],
+["work","मैनेजर ने कहा, इसे बाद में देखते हैं। इंटरनेट ने बात मानकर अभी ही जाना बेहतर समझा।"],
+["work","टीम ने छोटी-सी बैठक रखी। कैलेंडर पहले से जानता था कि छोटी सिर्फ़ लिखावट होगी।"],
+["work","काम की प्राथमिकताएँ बदलने में मैं इतना लचीला हूँ कि अब मेरी सूची ही मुझे चला रही है।"],
+["tech","यूपीआई से भुगतान इतना जल्दी होता है कि बटुआ अब अपनी उपयोगिता पर सवाल करता है।"],
+["tech","ओटीपी भुगतान की समय-सीमा खत्म होने के बाद आया। समय का चुनाव कमाल का था।"],
+["tech","कैब में बैठते ही फ़ोन ने बैटरी बचाने का संदेश दिया। उसे भी किराये की चिंता थी।"],
+["tech","बारिश में इंटरनेट धीमा हुआ। वीडियो कॉल मौसम के साथ चित्रों की किताब बन गई।"],
+["food","पानीपुरी की एक प्लेट माँगी। दुकानदार ने पूछा कितनी—मेरी भूख ने बातचीत अपने हाथ में ले ली।"],
+["food","चाय में आख़िरी बिस्कुट गिर गया। अब वह नाश्ता नहीं, तैराकी सीख रहा है।"],
+["food","कम तीखा बनाने को कहा। रसोइए ने मुस्कराकर इसे सुझाव समझा, निर्देश नहीं।"],
+["food","टिफ़िन दोपहर के लिए रखा था। खुशबू ने उसे समय से पहले खोल दिया।"],
+["wordplay","चाय की दुकान का कारोबार खूब उबल रहा है।"],
+["wordplay","ऑटो वाला इतना मज़ेदार था कि हर सवारी हँसते-हँसते उतरती थी।"],
+["wordplay","बादल ने संगीत शुरू किया—उसकी हर धुन में बारिश की ताल थी।"],
+["wordplay","डोसे ने हास्य मंच पर जाने की कोशिश की, मगर उसके चुटकुले लुढ़कते ही रहे।"]
 ]
 };
 for(const locale of Object.keys(JESTBOX_JOKES_BATCH_5))window.JESTBOX_JOKES[locale].push(...JESTBOX_JOKES_BATCH_5[locale]);
