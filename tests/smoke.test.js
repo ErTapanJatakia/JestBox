@@ -85,10 +85,10 @@ test("locale and country names are translated in every searchable locale selecto
  assert.match(js,/COUNTRY_LABELS\\[locale\\]\\[item\\.code\\]/);
 });
 test("accessibility names, fallback copy, and category heading follow the selected locale",()=>{
- for(const key of ["skipMain","close","loading","wcagTitle","wcagAlt"])assert.match(js,new RegExp(key+":"));
+ for(const key of ["skipMain","close","loading","wcagTitle","wcagAlt","description"])assert.match(js,new RegExp(key+":"));
  assert.match(js,/\\$\\("#category-label"\\)\\.textContent=x\\.category/);
  assert.match(js,/\\$\\("#wcag-mark-image"\\)\\.alt=x\\.wcagAlt/);
- assert.match(js,/\\$\\("#wcag-mark-link"\\)\\.title=x\\.wcagTitle/);
+ assert.match(js,/\\$\\("#wcag-mark-link"\\)\\.title=x\\.wcagTitle/);assert.match(js,/meta\\[name="description"\\]/);
  assert.match(html,/id="wcag-mark-link"/);
  assert.match(html,/id="wcag-mark-image"/);
  assert.doesNotMatch(html,/certified giggle/i);
