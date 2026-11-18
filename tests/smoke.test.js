@@ -22,8 +22,8 @@ test("keyboard focus, reduced motion, forced-colors, and text resizing remain im
 test("the splash and app use the same locally bundled JestBox mascot",()=>{assert.match(html,/launch-card[\s\S]*assets\/jestbox-mark\.svg/);assert.match(html,/id="home-link"[\s\S]*assets\/jestbox-mark\.svg/);assert.match(read("assets/jestbox-mark.svg"),/<svg/)});
 
 test("every theme meets WCAG AA text contrast and 3:1 component-boundary contrast",()=>{
- const match=js.match(/const THEMES=(\\[[\\s\\S]*?\\]);/);assert.ok(match,"Theme palette source must be present");
- const box={};vm.runInNewContext("globalThis.palettes="+match[1],box);
+ const start=js.indexOf("const THEMES=")+"const THEMES=".length;const end=js.indexOf("];",start)+1;assert.ok(start>0&&end>start,"Theme palette source must be present");
+ const box={};vm.runInNewContext("globalThis.palettes="+js.slice(start,end),box);
  const lum=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);return .2126*v[0]+.7152*v[1]+.0722*v[2]};
  const ratio=(a,b)=>{const [x,y]=[lum(a),lum(b)].sort((m,n)=>n-m);return (x+.05)/(y+.05)};
  assert.equal(box.palettes.length,10);
