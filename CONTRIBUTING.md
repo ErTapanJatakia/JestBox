@@ -11,6 +11,8 @@ Supported locales:
 - `es-ES` — Spanish (Spain)
 - `en-IN` — Indian English
 - `hi-IN` — Indian Hindi
+- `ur-IN` — Indian Urdu (Republic of India)
+- `ur-PK` — Pakistani Urdu (Islamic Republic of Pakistan)
 
 The current joke data foundation has 100 jokes per locale. The product target is 100+ unique, locally written/adapted jokes per locale, ideally balanced across five categories. Do not submit literal translations that ignore regional usage, filler content, or duplicate punchlines.
 
@@ -18,7 +20,7 @@ The current joke data foundation has 100 jokes per locale. The product target is
 
 - Preserve offline-first operation and local bundling.
 - Do not add accounts, analytics, advertising, trackers, telemetry, remote APIs, or remote/synced user data. Local-only display and accessibility preferences are permitted; any other persistent storage requires explicit approval and privacy/security review.
-- Keep all interface strings localised across all six locales.
+- Keep all interface strings localised across all eight locales, including right-to-left layout for Urdu.
 - Preserve keyboard access, screen-reader names and announcements, visible focus, responsive reflow, text resizing, reduced motion, and forced-colors support.
 - Keep themes accessible; verify text and non-text contrast for every palette.
 - Never weaken or delete tests to make a change pass.
