@@ -13,7 +13,7 @@ JestBox is a lightweight, offline-first joke app with six independently localise
 | `en-IN` | Indian English — Republic of India |
 | `hi-IN` | Indian Hindi — Republic of India |
 
-The language selector is searchable. English (`en-US`) is the default. Joke text is written for its regional audience rather than mechanically translated. The current content foundation contains 100 jokes per locale; the approved content target is at least 100 per locale.
+The language selector is searchable. English (`en-US`) is the default. Joke text is written for its regional audience rather than mechanically translated. The current content library contains 100 original jokes per locale (600 total), with 20 jokes in each of five categories, including Wordplay. Joke text follows the selected locale's language and writing system; regional references are tailored to each audience.
 
 ## Project documentation
 
