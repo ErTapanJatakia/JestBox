@@ -1,0 +1,9 @@
+{
+  "appId": "com.ertapanjatakia.jestbox",
+  "appName": "JestBox",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": false
+  }
+}
