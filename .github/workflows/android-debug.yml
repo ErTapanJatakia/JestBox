@@ -5,6 +5,7 @@ on:
   pull_request:
     branches:
       - main
+      - feat/capacitor-android-shell
   workflow_dispatch:
 
 permissions:
@@ -28,7 +29,10 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check script.js
+          node --check jokes.js
+          node --check share-bridge.entry.js
           node --check scripts/prepare-web.mjs
+          node --check scripts/prepare-android-branding.mjs
       - name: Run dependency-free regression tests
         run: node --test
       - name: Set up Java
@@ -46,14 +50,29 @@ jobs:
         run: npm run prepare:web
       - name: Generate Android platform project
         run: npx cap add android
+      - name: Apply original JestBox launcher artwork
+        run: node scripts/prepare-android-branding.mjs
       - name: Synchronize native project
         run: npx cap sync android
       - name: Assemble debug APK
         run: cd android && ./gradlew --no-daemon assembleDebug
-      - name: Upload debug APK
+      - name: Verify APK signature, alignment, and checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          APKSIGNER="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          ZIPALIGN="$ANDROID_HOME/build-tools/36.0.0/zipalign"
+          test -s "$APK"
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+          "$ZIPALIGN" -c -v 4 "$APK"
+          sha256sum "$APK" | tee "$APK.sha256"
+      - name: Upload debug APK and checksum
         uses: actions/upload-artifact@v4
         with:
           name: jestbox-android-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/apk/debug/app-debug.apk.sha256
           if-no-files-found: error
           retention-days: 14

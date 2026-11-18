@@ -2,7 +2,7 @@
   "name": "jestbox",
   "version": "1.0.0",
   "private": true,
-  "description": "Offline-first bilingual joke application",
+  "description": "Offline-first six-locale joke application",
   "scripts": {
     "prepare:web": "node scripts/prepare-web.mjs",
     "android:add": "npm run prepare:web && cap add android",
@@ -12,6 +12,11 @@
   "devDependencies": {
     "@capacitor/android": "8.6.2",
     "@capacitor/cli": "8.6.2",
-    "@capacitor/core": "8.6.2"
-  }
+    "@capacitor/core": "8.6.2",
+    "esbuild": "0.28.2"
+  },
+  "dependencies": {
+    "@capacitor/share": "8.0.3"
+  },
+  "type": "module"
 }
