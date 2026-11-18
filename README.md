@@ -18,8 +18,8 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 ## Project documentation
 
 - [Product and Technical Documentation](DOCUMENTATION.md)
-- [Privacy Policy — English](PRIVACY-POLICY.md) · [Russian](PRIVACY-POLICY.ru-RU.md)
-- [Accessibility Statement — English](ACCESSIBILITY-STATEMENT.md) · [Russian](ACCESSIBILITY-STATEMENT.ru-RU.md)
+- Privacy Policies: [en-US](PRIVACY-POLICY.md) · [es-PE](PRIVACY-POLICY.es-PE.md) · [ru-RU](PRIVACY-POLICY.ru-RU.md) · [es-ES](PRIVACY-POLICY.es-ES.md) · [en-IN](PRIVACY-POLICY.en-IN.md) · [hi-IN](PRIVACY-POLICY.hi-IN.md)
+- Accessibility Statements: [en-US](ACCESSIBILITY-STATEMENT.md) · [es-PE](ACCESSIBILITY-STATEMENT.es-PE.md) · [ru-RU](ACCESSIBILITY-STATEMENT.ru-RU.md) · [es-ES](ACCESSIBILITY-STATEMENT.es-ES.md) · [en-IN](ACCESSIBILITY-STATEMENT.en-IN.md) · [hi-IN](ACCESSIBILITY-STATEMENT.hi-IN.md)
 - [Release QA Checklist](QA-CHECKLIST.md)
 - [Proprietary Licence — All Rights Reserved](LICENSE)
 - [Security Policy](SECURITY.md)
