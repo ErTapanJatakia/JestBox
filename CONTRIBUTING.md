@@ -78,11 +78,12 @@ node --check script.js
 node --test
 ```
 
-**Execution is currently gated.** Regression tests may be authored or updated,
-but do not execute tests, trigger CI workflows, troubleshoot runners, or run
-Android packaging/validation until the repository owner explicitly authorizes
-the relevant validation phase. CI workflows are intentionally deferred during
-implementation. Do not describe unexecuted tests as passing.
+**Validation workflow:** GitHub Actions automatically runs the repository's
+source checks on pushes and pull requests targeting `main`. Review the logs and
+report the exact commit and result. Do not manually dispatch or repeatedly
+rerun a failing workflow without first diagnosing the failure. Android
+packaging/validation remains a separate release activity and requires explicit
+maintainer authorization. Do not describe unexecuted tests as passing.
 
 ## Implementation and content guidelines
 
