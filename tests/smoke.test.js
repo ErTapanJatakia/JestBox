@@ -368,7 +368,7 @@ test("a pending native share does not overwrite the interface after a locale cha
 
 test("the app has no network or persistent-storage integration", () => {
   assert.doesNotMatch(source,
-    /\b(?:fetch|XMLHttpRequest|WebSocket|sendBeacon)\s*\(|\b(?:localStorage|sessionStorage|indexedDB)\b|document\.cookie/);
+    /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(|\b(?:localStorage|sessionStorage|indexedDB)\b|document\.cookie/);
 });
 
 test("switching locale resets the category and updates document language and title", () => {
