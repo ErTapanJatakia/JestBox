@@ -73,6 +73,14 @@ test("every JavaScript ID selector exists in the HTML document", () => {
   }
 });
 
+test("startup is English by default and runtime uses no browser storage or network APIs", () => {
+  const app = bootApp();
+  assert.equal(app.root.lang, "en-US");
+  assert.equal(app.elements["daily-label"].textContent, app.context.__testCopy["en-US"].daily);
+  assert.doesNotMatch(source, /\\b(?:localStorage|sessionStorage|indexedDB)\\b|document\\.cookie/);
+  assert.doesNotMatch(source, /\\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\\s*\\(/);
+});
+
 test("the page provides a keyboard skip link to its main landmark", () => {
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
   assert.match(html, /<a class="skip-link" id="skip-link" href="#main">Skip to main content<\/a>/);
@@ -163,7 +171,7 @@ test("joke text is unique within each locale after whitespace normalization", ()
   const { context } = bootApp();
   for (const locale of ["en-US", "ru-RU"]) {
     const normalized = context.__testJokes[locale].map((joke) =>
-      joke.text.normalize("NFC").replace(/\\s+/g, " ").trim().toLocaleLowerCase(locale)
+      joke.text.normalize("NFC").replace(/\s+/g, " ").trim().toLocaleLowerCase(locale)
     );
     assert.equal(new Set(normalized).size, normalized.length, `${locale} contains duplicate joke text`);
   }
