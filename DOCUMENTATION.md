@@ -104,7 +104,7 @@ See [Privacy Policy](PRIVACY-POLICY.md) for the user-facing explanation and impo
 
 The source includes semantic landmarks, skip navigation, native controls, visible focus, localized accessible names, live announcements, responsive reflow, touch-target refinements, reduced-motion support, and forced-colors styling.
 
-The project's evaluation target is WCAG 2.2 AA. That target must not be confused with a formal conformance claim. Browser/device/assistive-technology results should be recorded in `QA-CHECKLIST.md`. See [Accessibility Statement](ACCESSIBILITY-STATEMENT.md).
+The maintainer publishes an **owner-declared WCAG 2.2 Level AA conformance claim** for the browser application in both supported locales and the two accessibility statements. This is the maintainer's own claim, not W3C/WAI endorsement or independent third-party certification. The locally bundled SVG is a locally rendered conformance-mark graphic; it should not be represented as an image file supplied or approved by W3C. The claim scope, exclusions, and limitations are documented in the [English Accessibility Statement](ACCESSIBILITY-STATEMENT.md) and [Russian Accessibility Statement](ACCESSIBILITY-STATEMENT.ru-RU.md). The maintainer reports that manual QA has been completed, but a detailed browser/device/assistive-technology execution record and supporting evidence are not currently included in this repository. Keep `QA-CHECKLIST.md` execution fields unmarked until those results are documented; source review and authored assertions are not substitutes for observed results.
 
 ## 8. Local development and source checks
 
@@ -141,4 +141,4 @@ The currently documented product scope is the two-locale joke application descri
 Any future platform build must be reviewed independently for its runtime permissions, embedded SDKs, network behavior, accessibility, and store-specific declarations.
 ## 11. Repository governance
 
-The repository also publishes its [Proprietary Licence](LICENSE), [Contributing Guidelines](CONTRIBUTING.md), and [Code of Conduct](CODE_OF_CONDUCT.md). The private vulnerability-reporting channel will be documented in [SECURITY.md](SECURITY.md) before that policy is published.
+The repository publishes its [Proprietary Licence](LICENSE), [Security Policy](SECURITY.md), [Contributing Guidelines](CONTRIBUTING.md), and [Code of Conduct](CODE_OF_CONDUCT.md). `SECURITY.md` contains the private vulnerability-reporting instructions and all three designated disclosure email addresses.
