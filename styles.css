@@ -8,3 +8,5 @@
 .combo-option span{font-size:.82rem;font-weight:800}
 .combo-option small{font-size:.7rem;color:var(--muted);font-weight:500}
 .category-options{top:calc(100% + .15rem)}
+
+body.reduce-motion *,body.reduce-motion *::before,body.reduce-motion *::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
