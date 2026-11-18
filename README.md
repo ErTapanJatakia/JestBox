@@ -13,7 +13,7 @@ JestBox is a lightweight, offline-first joke app with six independently localise
 | `en-IN` | Indian English — Republic of India |
 | `hi-IN` | Indian Hindi — Republic of India |
 
-The language selector is searchable. English (`en-US`) is the default. Joke text is written for its regional audience rather than mechanically translated. The current content foundation contains 80 jokes per locale; the approved content target is at least 100 per locale.
+The language selector is searchable. English (`en-US`) is the default. Joke text is written for its regional audience rather than mechanically translated. The current content foundation contains 100 jokes per locale; the approved content target is at least 100 per locale.
 
 ## Project documentation
 
@@ -58,6 +58,6 @@ node --test
 
 ## Validation and release boundaries
 
-The new six-locale experience is under development on a review branch. Its current starter content is 80 jokes per locale; reaching and validating 100+ per locale remains an open acceptance item. New changes require fresh CI and manual verification. The WCAG logo is a conformance-mark graphic, not W3C approval or an independent audit. Do not infer AA conformance from the logo or source assertions alone.
+The new six-locale experience is under development on a review branch. Its current starter content is 100 jokes per locale; reaching and validating 100+ per locale remains an open acceptance item. New changes require fresh CI and manual verification. The WCAG logo is a conformance-mark graphic, not W3C approval or an independent audit. Do not infer AA conformance from the logo or source assertions alone.
 
 Android integration is maintained separately. A successful debug build does not establish device compatibility, native accessibility, release signing, or RuStore acceptance. The proprietary licence remains in force; public source visibility grants no general reuse rights.
