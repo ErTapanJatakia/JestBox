@@ -12,7 +12,7 @@ Supported locales:
 - `en-IN` — Indian English
 - `hi-IN` — Indian Hindi
 
-The current joke data foundation has 60 jokes per locale. The product target is 100+ unique, locally written/adapted jokes per locale, ideally balanced across five categories. Do not submit machine-translated filler or duplicate punchlines.
+The current joke data foundation has 80 jokes per locale. The product target is 100+ unique, locally written/adapted jokes per locale, ideally balanced across five categories. Do not submit machine-translated filler or duplicate punchlines.
 
 ## Engineering principles
 
