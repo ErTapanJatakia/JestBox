@@ -1,43 +1,43 @@
 # Política de privacidad de JestBox
 
-**Vigente desde:** 18 de noviembre de 2026  
-**Locales:** `en-US`, `es-PE`, `ru-RU`, `es-ES`, `en-IN` y `hi-IN`
+**Fecha de vigencia:** 19 de noviembre de 2026  
+**Producto:** JestBox
 
-## 1. Resumen
+## 1. En pocas palabras
 
-JestBox es una aplicación de chistes diseñada para funcionar sin conexión una vez cargados sus archivos. El código actual no implementa cuentas, inicio de sesión, analítica, publicidad, rastreadores, llamadas a API externas, cookies ni almacenamiento persistente del navegador. La app no solicita datos personales.
+JestBox es una aplicación de chistes que funciona sin conexión. Sus funciones principales utilizan archivos incluidos en la propia aplicación. No crea cuentas, solicita datos personales, muestra publicidad, utiliza analítica o herramientas de seguimiento ni consulta API externas.
 
-## 2. Datos y funcionamiento
+## 2. Información que permanece en tu dispositivo
 
-El idioma, la categoría y el chiste actual se mantienen temporalmente en la memoria de la página. La selección diaria usa la fecha local del dispositivo, el idioma y la categoría. Al volver a abrir la app, el idioma predeterminado es inglés estadounidense (`en-US`).
+El idioma de los chistes, la categoría elegida y el chiste actual se mantienen temporalmente en la memoria de la aplicación. La app guarda únicamente tus preferencias de visualización y accesibilidad en tu dispositivo: tema, tamaño del texto, contraste adicional, movimiento reducido, enlaces subrayados, zonas táctiles más grandes, espaciado entre líneas y visibilidad del foco. Estas preferencias permanecen en ese dispositivo; JestBox no las recibe ni las sincroniza con una cuenta. Puedes cambiarlas en Ajustes y superpoderes o borrar los datos locales de la app desde los ajustes del dispositivo o navegador.
 
-La app no solicita nombres, correos, teléfonos, ubicación, contactos, fotos, archivos, cámara ni micrófono. No lee el contenido existente del portapapeles.
+La aplicación no solicita tu nombre, correo electrónico, número de teléfono, ubicación, contactos, fotos, archivos, cámara ni micrófono. Tampoco lee el contenido que ya tengas en el portapapeles.
 
 ## 3. Copiar y compartir
 
-Al elegir **Copiar**, la app solicita al navegador que copie el texto del chiste. Al elegir **Compartir**, abre un cuadro de diálogo y, si el usuario lo solicita, invoca el panel nativo de compartir del navegador o sistema operativo. El usuario elige la aplicación de destino. La aplicación receptora y el sistema operativo aplican sus propias políticas; JestBox no recibe la lista de destinatarios ni el resultado posterior.
+Al elegir Copiar, el texto del chiste se coloca en el portapapeles del sistema. Al elegir Compartir, JestBox solicita al navegador o al sistema operativo que abra el panel para compartir. Tú eliges la aplicación destinataria. El sistema operativo y esa aplicación gestionan el contenido según sus propias prácticas de privacidad. JestBox no recibe los datos de los destinatarios.
 
-## 4. Red, alojamiento y terceros
+## 4. Alojamiento y servicios de la plataforma
 
-Las funciones principales no requieren conexión después de cargar los archivos. El alojamiento web, la tienda de aplicaciones, el navegador, el sistema operativo y el operador de red pueden procesar datos técnicos de conexión o seguridad conforme a sus propias políticas. Esa actividad de terceros no debe confundirse con la lógica de la app. Cualquier versión Android debe revisarse según el paquete exacto y sus SDK/permisos.
+El navegador, el sistema operativo, la tienda de aplicaciones, el alojamiento web o el proveedor de red pueden procesar información técnica necesaria para prestar, proteger u operar sus servicios. Ese tratamiento es independiente de las funciones locales de JestBox y se rige por los avisos de cada proveedor. Antes de publicar una versión para Android, deben revisarse por separado el paquete y sus componentes de plataforma.
 
 ## 5. Menores, seguridad y cambios
 
-JestBox es una aplicación de humor para público general. No solicita edad ni crea perfiles. No compartas información sensible en incidencias públicas. Si cambian las prácticas de datos, esta política debe actualizarse antes o junto con la versión correspondiente.
+JestBox está pensado para público general y no crea perfiles de usuario. No publiques información sensible en los canales públicos de soporte. Si cambian las funciones o las prácticas relacionadas con los datos, actualizaremos esta política para explicar esos cambios.
 
-## 6. Contacto del desarrollador y soporte
+## 6. Contacto de desarrollo y soporte
 
 - **Nombre:** Er. Tapan Jatakia (C. Eng.)
-- **Correo — Rusia:** [ertapanjatakia@yandex.com](mailto:ertapanjatakia@yandex.com)
-- **Correo — demás regiones:** [tapan_ditu_17.20@outlook.com](mailto:tapan_ditu_17.20@outlook.com)
+- **Correo:** ertapanjatakia@yandex.com
+- **Correo:** tapan_ditu_17.20@outlook.com
 - **Teléfono:** [+91 9664332984](tel:+919664332984)
-- **Web:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
+- **Sitio web:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-## 7. Delegado de Protección de Datos (DPO)
+## 7. Contacto de privacidad
 
 - **Nombre:** Er. Tapan Jatakia (C. Eng.)
 - **Correo:** [cyber.litigation.advisor@gmail.com](mailto:cyber.litigation.advisor@gmail.com)
 - **Teléfono:** [+91 9664332984](tel:+919664332984)
-- **Web:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
+- **Sitio web:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-La publicación de este contacto no determina por sí sola si una ley exige un nombramiento formal de DPO ni constituye una certificación de cumplimiento legal.
+Para consultas o inquietudes sobre privacidad, escribe al contacto indicado en esta sección.
