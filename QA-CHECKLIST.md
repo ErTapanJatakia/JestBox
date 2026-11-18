@@ -70,3 +70,37 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 - [ ] Review all 40 jokes for cultural naturalness, spelling, punctuation, repeated punchlines, and locale-appropriate humour.
 - [ ] Confirm each locale has 20 distinct jokes and the intended category distribution.
 - [ ] Confirm language selection is session-only: a fresh page load starts in `en-US`; no browser storage or cookies are introduced.
+## Manual QA execution record
+
+Create one record per browser/device configuration. Use **Pass**, **Fail**, or **Blocked**; do not use Pass based only on source inspection. Keep screenshots, screen recordings, console/network observations, and assistive-technology notes in the associated evidence location. Record failures as issues before retesting.
+
+| Field | Record |
+|---|---|
+| Run ID | |
+| Date and time (include time zone) | |
+| Tester | |
+| Device and OS version | |
+| Browser and exact version | |
+| Viewport dimensions and orientation | |
+| Browser zoom / text scaling | |
+| Locale under test (en-US / ru-RU) | |
+| Assistive technology and version (if applicable) | |
+| Checklist item IDs / test area | |
+| Result (Pass / Fail / Blocked) | |
+| Observed behavior and expected behavior | |
+| Evidence reference(s) | |
+| Defect / issue reference | |
+| Retest date and result | |
+
+### Release-gate sign-off
+
+- [ ] Functional checks recorded for both locales.
+- [ ] Offline and privacy checks recorded.
+- [ ] Keyboard, screen-reader, contrast, reflow, zoom, reduced-motion and forced-colors checks recorded.
+- [ ] Content integrity checks recorded.
+- [ ] Required source tests executed by the repository owner after explicit authorization, with complete output retained.
+- [ ] Android package validation completed only after the preceding gates are satisfied and separately authorized.
+- [ ] RuStore submission readiness reviewed separately; store approval is not implied by app QA.
+- [ ] Repository owner explicitly approved any PR merge.
+
+A source review, authored regression assertion, or calculated color-token ratio is not a substitute for a recorded browser/device observation.
