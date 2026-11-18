@@ -46,6 +46,14 @@ function renderMarkdown(markdown) {
   flushP(); flushL(); return out.join("\n");
 }
 const locales = ["en-US", "es-PE", "ru-RU", "es-ES", "en-IN", "hi-IN"];
+const localizedTitles = {
+  "en-US": { privacy: "Privacy Policy", accessibility: "Accessibility Statement" },
+  "en-IN": { privacy: "Privacy Policy", accessibility: "Accessibility Statement" },
+  "es-PE": { privacy: "Política de privacidad", accessibility: "Declaración de accesibilidad" },
+  "es-ES": { privacy: "Política de privacidad", accessibility: "Declaración de accesibilidad" },
+  "ru-RU": { privacy: "Политика конфиденциальности", accessibility: "Заявление о доступности" },
+  "hi-IN": { privacy: "गोपनीयता नीति", accessibility: "सुगम्यता वक्तव्य" }
+};
 for (const locale of locales) {
   const suffix = locale === "en-US" ? "" : `.${locale}`;
   for (const [kind, prefix, title] of [
@@ -55,9 +63,10 @@ for (const locale of locales) {
     const source = `${prefix}${suffix}.md`;
     const markdown = await readFile(source, "utf8");
     const body = renderMarkdown(markdown);
+    const localizedTitle = localizedTitles[locale][kind];
     const page = `<!doctype html>
 <html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="dark light"><title>${title} — JestBox</title>
+<meta name="color-scheme" content="dark light"><title>${localizedTitle} — JestBox</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light dark}
 body{margin:0;background:#101827;color:#f8f9ff;line-height:1.65}
