@@ -1,72 +1,14 @@
 <!doctype html>
-<html lang="en-US">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#08111f" />
-    <meta name="description" content="A little laughter, wherever you are. Original jokes in American English and Russian." />
-    <title>JestBox — A little laughter, wherever you are</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body style="--accent: #6ee7f2">
-    <a class="skip-link" id="skip-link" href="#main">Skip to main content</a>
-    <header class="site-header">
-      <a id="home-link" href="#main" aria-label="JestBox home">JESTBOX</a>
-      <span id="locale-label">EN · US</span>
-    </header>
-    <main id="main" class="container jestbox" tabindex="-1">
-      <section class="hero compact">
-        <p class="eyebrow" id="eyebrow">A LITTLE LAUGHTER, WHEREVER YOU ARE</p>
-        <h1 id="headline">Good jokes. No signal needed.</h1>
-        <p class="lede" id="intro">A pocket-sized laugh, with humour made for your corner of the world.</p>
-      </section>
-
-      <section class="locale-picker panel" aria-labelledby="locale-heading">
-        <div>
-          <p class="eyebrow" id="locale-eyebrow">CHOOSE YOUR HUMOUR</p>
-          <h2 id="locale-heading">Where should the jokes come from?</h2>
-        </div>
-        <div class="locale-buttons" id="locale-buttons" role="group" aria-label="Choose joke language">
-          <button type="button" class="locale-button active" data-locale="en-US" aria-pressed="true">
-            <span aria-hidden="true">🇺🇸</span><span><strong>American English</strong><small>United States · en-US</small></span>
-          </button>
-          <button type="button" class="locale-button secondary" data-locale="ru-RU" aria-pressed="false">
-            <span aria-hidden="true">🇷🇺</span><span><strong>Русский</strong><small>Российская Федерация · ru-RU</small></span>
-          </button>
-        </div>
-      </section>
-
-      <section class="joke-panel panel" aria-labelledby="joke-heading">
-        <div class="joke-toolbar">
-          <span class="daily-label" id="daily-label">TODAY'S LITTLE LAUGH</span>
-          <label class="category-control" for="category">
-            <span id="category-label">Category</span>
-            <select id="category">
-              <option value="all">All jokes</option>
-              <option value="everyday">Everyday life</option>
-              <option value="work">Work &amp; study</option>
-              <option value="tech">Tech &amp; internet</option>
-              <option value="food">Food &amp; drink</option>
-              <option value="wordplay">Wordplay</option>
-            </select>
-          </label>
-        </div>
-        <div class="joke-content" aria-live="polite" aria-atomic="true">
-          <span class="joke-mark" aria-hidden="true">“</span>
-          <h2 id="joke-heading">Loading a smile…</h2>
-        </div>
-        <p class="joke-category" id="joke-category"></p>
-        <div class="joke-actions">
-          <button type="button" id="another-button"><span aria-hidden="true">↻</span><span id="another-label">Another joke</span></button>
-          <button type="button" class="secondary" id="copy-button"><span aria-hidden="true">▢</span><span id="copy-label">Copy</span></button>
-          <button type="button" class="secondary" id="share-button"><span aria-hidden="true">↗</span><span id="share-label">Share</span></button>
-        </div>
-        <p class="status-text" id="status" role="status"></p>
-      </section>
-
-      <p class="privacy-note" id="privacy-note">Made for offline smiles. No accounts, tracking, or personal data collection.</p>
-    </main>
-    <footer><p>JestBox <span aria-hidden="true">·</span> <span id="footer-line">Two locales. Jokes bundled in the app. Zero fuss.</span></p><a class="wcag-conformance-mark" href="https://www.w3.org/WAI/WCAG2AA-Conformance" title="Explanation of WCAG 2 Level AA conformance"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Level AA conformance, W3C Web Content Accessibility Guidelines 2.2" /></a></footer>
-    <script src="script.js"></script>
-  </body>
-</html>
+<html lang="en-US"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101827"><meta name="description" content="JestBox: locally packed laughs, made for your language and offline moments."><title>JestBox — Small box. Big laughs.</title><link rel="stylesheet" href="styles.css"></head>
+<body><a class="skip-link" href="#main">Skip to the good stuff</a>
+<section id="launch-screen" class="launch-screen" aria-label="JestBox welcome" tabindex="0"><div class="launch-card"><img src="assets/jestbox-mark.svg" width="112" height="112" alt=""><p class="launch-brand">JESTBOX</p><h1 id="launch-tagline">Small box. Big laughs. Offline, on your side of the world.</h1><p id="launch-hint">Tap anywhere to skip the grand entrance.</p></div></section>
+<header class="site-header"><a id="home-link" href="#main" aria-label="JestBox home"><img src="assets/jestbox-mark.svg" width="34" height="34" alt=""><span>JESTBOX</span></a><div class="header-actions"><button type="button" class="icon-button" id="theme-button" aria-label="Choose theme" title="Choose theme">◐</button><button type="button" class="icon-button" id="settings-button" aria-label="Settings" title="Settings">⚙</button></div></header>
+<main id="main" class="container jestbox" tabindex="-1">
+<section class="hero compact"><p class="eyebrow" id="eyebrow">THE DAILY DOSE OF HA-HA</p><h1 id="headline">Tiny app. Ridiculously large grin.</h1><p class="lede" id="intro">Local laughs, zero signal drama. Your phone's funniest offline passenger.</p></section>
+<section class="locale-picker panel" aria-labelledby="locale-heading"><div><p class="eyebrow" id="locale-eyebrow">PICK YOUR COMEDY ZIP CODE</p><h2 id="locale-heading">Where should we borrow the punchlines from?</h2></div><label class="search-control" for="locale-search"><span id="locale-label">Joke language and region</span><input id="locale-search" list="locale-options" autocomplete="off" value="American English (en-US) — United States of America" aria-describedby="locale-help"><datalist id="locale-options"><option value="American English (en-US) — United States of America"></option><option value="Peruvian Spanish (es-PE) — Republic of Peru"></option><option value="Russian Russian (ru-RU) — Russian Federation"></option><option value="Spanish Spanish (es-ES) — Kingdom of Spain"></option><option value="Indian English (en-IN) — Republic of India"></option><option value="Indian Hindi (hi-IN) — Republic of India"></option></datalist><small id="locale-help">Search by language, locale code, or country.</small></label></section>
+<section class="joke-panel panel" aria-labelledby="joke-heading"><div class="joke-toolbar"><span class="daily-label" id="daily-label">TODAY'S DOSE OF HA-HA</span><div class="category-control"><label for="category-search" id="category-label">Comedy aisle</label><input id="category-search" list="category-options" autocomplete="off" value="All Jokes"><datalist id="category-options"><option value="All Jokes"></option><option value="Everyday Life"></option><option value="Work &amp; Study"></option><option value="Tech &amp; Internet"></option><option value="Food &amp; Drink"></option><option value="Wordplay"></option></datalist></div></div><div class="joke-content" aria-live="polite" aria-atomic="true"><span class="joke-mark" aria-hidden="true">“</span><h2 id="joke-heading">Loading a certified giggle…</h2></div><p class="joke-category" id="joke-category"></p><div class="joke-actions"><button type="button" id="another-button"><span aria-hidden="true">↻</span><span id="another-label">Hit me with another</span></button><button type="button" class="secondary" id="copy-button"><span aria-hidden="true">▢</span><span id="copy-label">Copy</span></button><button type="button" class="secondary" id="share-button"><span aria-hidden="true">↗</span><span id="share-label">Share the giggle</span></button></div><p class="status-text" id="status" role="status" aria-live="polite"></p></section></main>
+<footer class="site-footer"><a id="privacy-link" href="PRIVACY-POLICY.md">How JestBox handles your data</a><a id="accessibility-link" href="ACCESSIBILITY-STATEMENT.md">Accessibility Statement</a><a class="wcag-conformance-mark" href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 guidance"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 Level AA conformance mark"></a><p id="footer-line">No accounts. No tracking. Just jokes that travelled with you.</p></footer>
+<dialog id="theme-dialog" aria-labelledby="theme-title"><div class="dialog-heading"><h2 id="theme-title">Pick your flavour of fabulous</h2><button type="button" class="icon-button close-dialog" data-close="theme-dialog" aria-label="Close">×</button></div><div id="theme-options" class="theme-grid"></div></dialog>
+<dialog id="settings-dialog" aria-labelledby="settings-title"><div class="dialog-heading"><h2 id="settings-title">Settings &amp; superpowers</h2><button type="button" class="icon-button close-dialog" data-close="settings-dialog" aria-label="Close">×</button></div><section class="settings-section"><h3 id="accessibility-title">Accessibility</h3><label class="setting-row"><span id="large-text-label">Larger text</span><input id="large-text" type="checkbox"></label><label class="setting-row"><span id="high-contrast-label">Extra contrast</span><input id="high-contrast" type="checkbox"></label><label class="setting-row"><span id="reduce-motion-label">Reduce motion</span><input id="reduce-motion" type="checkbox"></label></section><p class="settings-note" id="settings-note">Your choices stay in this session only.</p></dialog>
+<dialog id="share-dialog" aria-labelledby="share-title"><div class="dialog-heading"><h2 id="share-title">Send this giggle into the world</h2><button type="button" class="icon-button close-dialog" data-close="share-dialog" aria-label="Close">×</button></div><p id="share-preview"></p><button type="button" id="native-share-button">Open device sharing apps</button><button type="button" class="secondary" id="share-copy-button">Copy joke text</button><p class="status-text" id="share-status" role="status" aria-live="polite"></p></dialog>
+<script src="jokes.js"></script><script src="script.js"></script></body></html>
