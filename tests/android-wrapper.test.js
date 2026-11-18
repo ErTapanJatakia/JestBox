@@ -8,16 +8,16 @@ const gradle = read("../android/app/build.gradle.kts");
 const activity = read("../android/app/src/main/java/com/ertapanjatakia/jestbox/MainActivity.kt");
 
 test("Android manifest requests no network or sensitive runtime permissions", () => {
-  assert.doesNotMatch(manifest, /<uses-permission\\b/i);
+  assert.equal(manifest.includes("<uses-permission"), false);
   assert.match(manifest, /android:allowBackup="false"/);
   assert.match(manifest, /android:usesCleartextTraffic="false"/);
 });
 
 test("Android wrapper uses the canonical bundled web entry point", () => {
-  assert.match(activity, /file:\/\/\/android_asset\/www\/index\\.html/);
+  assert.ok(activity.includes('webView.loadUrl("file:///android_asset/www/index.html")'));
   assert.match(gradle, /syncJestBoxWebAssets/);
-  assert.match(gradle, /include\("index\\.html", "script\\.js", "styles\\.css"\)/);
-  assert.match(gradle, /into\("www\/assets"\)/);
+  assert.ok(gradle.includes('include("index.html", "script.js", "styles.css")'));
+  assert.ok(gradle.includes('into("www/assets")'));
 });
 
 test("WebView disables persistent storage and unsafe cross-origin file access", () => {
