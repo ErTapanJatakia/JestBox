@@ -22,28 +22,28 @@ try {
 
 function inlineMarkdown(value) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/\\[([^\\]]+)\\]\\((https?:\\/\\/[^ )]+|mailto:[^ )]+|tel:[^ )]+)\\)/g, '<a href="$2">$1</a>')
-    .replace(/\\*\\*([^*]+)\\*\\*/g, "<strong>$1</strong>")
-    .replace(/\\*([^*]+)\\*/g, "<em>$1</em>");
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^ )]+|mailto:[^ )]+|tel:[^ )]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
 }
 function renderMarkdown(markdown) {
-  const lines = markdown.replaceAll("assets/wcag22aa-blue.svg", "../assets/wcag22aa-blue.svg").split(/\\r?\\n/);
+  const lines = markdown.replaceAll("assets/wcag22aa-blue.svg", "../assets/wcag22aa-blue.svg").split(/\r?\n/);
   const out = []; let paragraph = []; let list = null;
   const flushP = () => { if (paragraph.length) { out.push("<p>" + inlineMarkdown(paragraph.join(" ")) + "</p>"); paragraph = []; } };
   const flushL = () => { if (list) { out.push("</" + list + ">"); list = null; } };
   for (const line of lines) {
     if (!line.trim()) { flushP(); flushL(); continue; }
     if (/^<[^>]+>/.test(line.trim())) { flushP(); flushL(); out.push(line); continue; }
-    const h = line.match(/^(#{1,6})\\s+(.+)$/);
+    const h = line.match(/^(#{1,6})\s+(.+)$/);
     if (h) { flushP(); flushL(); const n = h[1].length; out.push("<h" + n + ">" + inlineMarkdown(h[2]) + "</h" + n + ">"); continue; }
-    if (/^\\s*---+\\s*$/.test(line)) { flushP(); flushL(); out.push("<hr>"); continue; }
-    const li = line.match(/^\\s*[-*]\\s+(.+)$/);
+    if (/^\s*---+\s*$/.test(line)) { flushP(); flushL(); out.push("<hr>"); continue; }
+    const li = line.match(/^\s*[-*]\s+(.+)$/);
     if (li) { flushP(); if (list !== "ul") { flushL(); list = "ul"; out.push("<ul>"); } out.push("<li>" + inlineMarkdown(li[1]) + "</li>"); continue; }
-    const oi = line.match(/^\\s*\\d+\\.\\s+(.+)$/);
+    const oi = line.match(/^\s*\d+\.\s+(.+)$/);
     if (oi) { flushP(); if (list !== "ol") { flushL(); list = "ol"; out.push("<ol>"); } out.push("<li>" + inlineMarkdown(oi[1]) + "</li>"); continue; }
     flushL(); paragraph.push(line.trim());
   }
-  flushP(); flushL(); return out.join("\\n");
+  flushP(); flushL(); return out.join("\n");
 }
 const locales = ["en-US", "es-PE", "ru-RU", "es-ES", "en-IN", "hi-IN"];
 for (const locale of locales) {
