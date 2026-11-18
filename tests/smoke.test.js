@@ -5,11 +5,11 @@ import vm from "node:vm";
 const read=(name)=>fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html=read("index.html"),js=read("script.js"),css=read("styles.css"),jokesSource=read("jokes.js");
 const dataContext={window:{}};vm.runInNewContext(jokesSource,dataContext);const jokes=dataContext.window.JESTBOX_JOKES;
-const locales=["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN"];
+const locales=["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN","ur-IN","ur-PK"];
 const categories=["everyday","work","tech","food","wordplay"];
 
 test("all app script selectors exist in the page",()=>{for(const [,id] of js.matchAll(/\$\("#([a-z0-9-]+)"\)/g))assert.ok(html.includes('id="'+id+'"'),"Missing HTML id "+id)});
-test("English is the default locale and all six requested locale choices are searchable",()=>{assert.match(html,/<html lang="en-US">/);for(const label of ["American English","Peruvian Spanish","Russian","Spanish","Indian English","Indian Hindi"])assert.ok(js.includes(label),label);for(const code of locales)assert.ok(js.includes('"'+code+'"')||js.includes('["'+code+'"'))});
+test("English is the default locale and all eight requested locale choices are searchable",()=>{assert.match(html,/<html lang="en-US">/);for(const label of ["American English","Peruvian Spanish","Russian","Spanish","Indian English","Indian Hindi","Indian Urdu","Pakistani Urdu"])assert.ok(js.includes(label),label);for(const code of locales)assert.ok(js.includes('"'+code+'"')||js.includes('["'+code+'"'))});
 test("every locale has 100 regionally authored jokes with twenty per category in the current batch",()=>{assert.deepEqual(Object.keys(jokes).sort(),[...locales].sort());for(const locale of locales){assert.equal(jokes[locale].length,100,locale);const counts=Object.fromEntries(categories.map(c=>[c,jokes[locale].filter(j=>j[0]===c).length]));for(const c of categories)assert.equal(counts[c],20,locale+" "+c);const normalized=jokes[locale].map(j=>j[1].normalize("NFKC").toLocaleLowerCase().replace(/\s+/g," ").trim());assert.equal(new Set(normalized).size,normalized.length,locale+" duplicate joke") }});
 test("every joke uses the writing system of its selected language locale",()=>{for(const locale of locales){const text=jokes[locale].map(j=>j[1]).join(" ");if(locale==="ru-RU"){assert.match(text,/\p{Script=Cyrillic}/u);assert.doesNotMatch(text,/\p{Script=Latin}/u,"Latin-script intrusion in "+locale)}else if(locale==="hi-IN"){assert.match(text,/\p{Script=Devanagari}/u);assert.doesNotMatch(text,/\p{Script=Latin}/u,"Latin-script intrusion in "+locale)}else{assert.doesNotMatch(text,/\p{Script=Cyrillic}|\p{Script=Devanagari}/u,"non-Latin script intrusion in "+locale)}}});
 test("ten named themes define full-page color tokens",()=>{const start=js.indexOf("const THEMES=")+"const THEMES=".length;const end=js.indexOf("];",start)+1;const palettes=Function("return "+js.slice(start,end))();assert.equal(palettes.length,10);for(const token of ["--page","--surface","--text","--muted","--border","--accent"])assert.ok(css.includes(token))});
@@ -31,11 +31,11 @@ test("every theme meets WCAG AA text contrast and 3:1 component-boundary contras
  box.palettes.forEach((p,i)=>{const ink=i===8?"#ffffff":i===9?"#000000":"#061a1b";for(const surface of [p[1],p[2]]){assert.ok(ratio(p[3],surface)>=4.5,p[0]+" primary text");assert.ok(ratio(p[4],surface)>=4.5,p[0]+" muted text");assert.ok(ratio(p[5],surface)>=3,p[0]+" boundaries");assert.ok(ratio(p[6],surface)>=4.5,p[0]+" accent");}assert.ok(ratio(ink,p[6])>=4.5,p[0]+" button text")});
 });
 test("six locale policy and accessibility documents include the required contact routes",()=>{
- for(const locale of ["es-PE","es-ES","en-IN","hi-IN"]){const policy=read("PRIVACY-POLICY."+locale+".md");const statement=read("ACCESSIBILITY-STATEMENT."+locale+".md");assert.match(policy,/cyber\.litigation\.advisor@gmail\.com/);assert.match(policy,/ertapanjatakia@yandex\.com/);assert.match(policy,/tapan_ditu_17\.20@outlook\.com/);assert.match(statement,/cyber\.litigation\.advisor@gmail\.com/);assert.equal(statement.split("assets/wcag22aa-blue.svg").length-1,2);}
+ for(const locale of ["es-PE","es-ES","en-IN","hi-IN","ur-IN","ur-PK"]){const policy=read("PRIVACY-POLICY."+locale+".md");const statement=read("ACCESSIBILITY-STATEMENT."+locale+".md");assert.match(policy,/cyber\.litigation\.advisor@gmail\.com/);assert.match(policy,/ertapanjatakia@yandex\.com/);assert.match(policy,/tapan_ditu_17\.20@outlook\.com/);assert.match(statement,/cyber\.litigation\.advisor@gmail\.com/);assert.equal(statement.split("assets/wcag22aa-blue.svg").length-1,2);}
 });
 
 test("launch screen uses a prominent brand and short sentence-per-line localised copy",()=>{assert.match(html,/class="launch-brand">JESTBOX/);assert.match(html,/id="launch-tagline" class="launch-tagline"/);assert.match(css,/white-space:pre-line/);assert.match(css,/orientation:landscape/);assert.match(js,/\["#launch-tagline","launch"\]/);for(const phrase of ["Pocket-sized local laughs.","Risas locales de bolsillo.","Местный юмор всегда под рукой.","जेब में देसी हँसी।"])assert.ok(js.includes(phrase),phrase)});
-test("theme names are localised for all six selected locales",()=>{assert.match(js,/const THEME_NAMES=/);for(const locale of ["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN"])assert.ok(js.includes('"'+locale+'":['),"Missing theme translations: "+locale)});
+test("theme names are localised for all six selected locales",()=>{assert.match(js,/const THEME_NAMES=/);for(const locale of ["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN","ur-IN","ur-PK"])assert.ok(js.includes('"'+locale+'":['),"Missing theme translations: "+locale)});
 
 test("no exact joke text is reused across different locale collections",()=>{
  const owner=new Map();
@@ -51,14 +51,14 @@ test("no exact joke text is reused across different locale collections",()=>{
 test("dashboard omits launch-only marketing copy and starts with the two primary panels",()=>{const main=html.match(/<main id="main"[\s\S]*?<\/main>/)?.[0]||"";assert.doesNotMatch(html,/<section class="hero compact"/);assert.match(main,/class="locale-picker panel"[\s\S]*class="joke-panel panel"/);assert.doesNotMatch(main,/Pocket-sized local laughs|Local laughs, zero signal drama/)});
 test("locale and category menus sort alphabetically and open the complete option list on tap",()=>{assert.match(js,/localeDisplay\(a\.code\)\.localeCompare\(localeDisplay\(b\.code\),locale/);assert.match(js,/addEventListener\("click",\(\)=>renderLocaleOptions/);assert.match(js,/addEventListener\("click",\(\)=>renderCategoryOptions/)});
 test("accessibility preferences persist locally with a readable default text scale",()=>{assert.match(js,/textScale:85/);assert.match(html,/min="50" max="200"/);assert.match(js,/savePrefs\(\)/);assert.match(js,/applyPrefs\(\)/);assert.match(css,/body\.underline-links/);assert.match(css,/body\.larger-targets/);assert.match(css,/body\.more-line-spacing/);assert.match(css,/body\.enhanced-focus/)});
-test("all six privacy policies and accessibility statements are localized",()=>{for(const locale of locales){const suffix=locale==="en-US"?"":"."+locale;const policy=read("PRIVACY-POLICY"+suffix+".md");const statement=read("ACCESSIBILITY-STATEMENT"+suffix+".md");assert.match(policy,/19|noviembre|November|ноября|नवंबर/);assert.match(statement,/WCAG 2\.2/);assert.equal(statement.split("assets/wcag22aa-blue.svg").length-1,2);assert.match(statement,/cyber\.litigation\.advisor@gmail\.com/)}});
-test("generated legal pages use a translated document title for every locale",()=>{const build=read("scripts/prepare-web.mjs");for(const title of ["Política de privacidad","Declaración de accesibilidad","Политика конфиденциальности","Заявление о доступности","गोपनीयता नीति","सुगम्यता वक्तव्य"])assert.ok(build.includes(title),title);assert.match(build,/localizedTitle/)});
+test("all eight privacy policies and accessibility statements are localized",()=>{for(const locale of locales){const suffix=locale==="en-US"?"":"."+locale;const policy=read("PRIVACY-POLICY"+suffix+".md");const statement=read("ACCESSIBILITY-STATEMENT"+suffix+".md");assert.match(policy,/19|noviembre|November|ноября|नवंबर/);assert.match(statement,/WCAG 2\.2/);assert.equal(statement.split("assets/wcag22aa-blue.svg").length-1,2);assert.match(statement,/cyber\.litigation\.advisor@gmail\.com/)}});
+test("generated legal pages use a translated document title for every locale",()=>{const build=read("scripts/prepare-web.mjs");for(const title of ["Política de privacidad","Declaración de accesibilidad","Политика конфиденциальности","Заявление о доступности","गोपनीयता नीति","सुगम्यता वक्तव्य","رازداری کی پالیسی","رسائی پذیری کا بیان","رسائی کی سہولتوں کا بیان"])assert.ok(build.includes(title),title);assert.match(build,/localizedTitle/)});
 
 test("Android launcher branding is generated from the canonical original PNG",()=>{const branding=read("scripts/prepare-android-branding.mjs");assert.ok(branding.includes("assets/JestBox-Original.png"));assert.ok(branding.includes("drawable-nodpi/jestbox_icon.png"));assert.ok(branding.includes("jestbox_launcher"));const workflow=read(".github/workflows/android-debug.yml");assert.ok(workflow.includes("node scripts/prepare-android-branding.mjs"))});
 
 test("launch screen brand title, tagline, and skip hint use 20 percent larger default typography",()=>{assert.ok(css.includes(".launch-brand{margin:.1rem 0 .25rem;font-size:clamp(2.4rem,9.6vw,3.6rem)"));assert.ok(css.includes(".launch-tagline{max-width:30ch;margin:.25rem auto 0;color:var(--text);font-size:clamp(.984rem,2.88vw,1.2rem)"));assert.ok(css.includes(".launch-hint{margin:.25rem 0 0;color:var(--muted);font-size:.864rem"));assert.ok(css.includes(".launch-brand{grid-column:2;grid-row:1;font-size:clamp(1.68rem,6vh,2.4rem)}"));assert.ok(css.includes(".launch-tagline{grid-column:2;grid-row:2;max-width:none;margin:0;font-size:clamp(.864rem,2.76vh,1.08rem)"))});
 
-test("all six interface dictionaries expose the same complete set of non-empty translations",()=>{
+test("all eight interface dictionaries expose the same complete set of non-empty translations",()=>{
  const start=js.indexOf("const UI=")+ "const UI=".length;
  const end=js.indexOf("\n};",start)+2;
  const dictionaries=Function("return "+js.slice(start,end))();
@@ -92,4 +92,21 @@ test("accessibility names, fallback copy, and category heading follow the select
  assert.match(html,/id="wcag-mark-link"/);
  assert.match(html,/id="wcag-mark-image"/);
  assert.doesNotMatch(html,/certified giggle/i);
+});
+
+test("Urdu locales are independent, searchable, fully localized, and rendered right-to-left",()=>{
+ const localeStart=js.indexOf("const LOCALES="),localeEnd=js.indexOf("];",localeStart)+2;
+ const list=Function("return "+js.slice(js.indexOf("[",localeStart),localeEnd))();
+ assert.deepEqual(list.filter(x=>x.code.startsWith("ur-")).map(x=>x.code),["ur-IN","ur-PK"]);
+ assert.match(js,/document\.documentElement\.dir=\(locale==="ur-IN"\|\|locale==="ur-PK"\)\?"rtl":"ltr"/);
+ assert.match(css,/html\[dir="rtl"\]/);
+ for(const locale of ["ur-IN","ur-PK"]){
+  assert.equal(jokes[locale].length,100);
+  assert.equal(jokes[locale].filter(j=>j[0]==="wordplay").length,20);
+  assert.match(jokes[locale].map(j=>j[1]).join(" "),/\p{Script=Arabic}/u);
+  assert.match(read("PRIVACY-POLICY."+locale+".md"),/cyber\.litigation\.advisor@gmail\.com/);
+  assert.match(read("ACCESSIBILITY-STATEMENT."+locale+".md"),/WCAG 2\.2/);
+ }
+ const build=read("scripts/prepare-web.mjs");
+ assert.match(build,/locale\.startsWith\("ur-"\) \? "rtl" : "ltr"/);
 });
