@@ -56,9 +56,9 @@ const localizedTitles = {
 };
 for (const locale of locales) {
   const suffix = locale === "en-US" ? "" : `.${locale}`;
-  for (const [kind, prefix, title] of [
-    ["privacy", "PRIVACY-POLICY", "Privacy Policy"],
-    ["accessibility", "ACCESSIBILITY-STATEMENT", "Accessibility Statement"]
+  for (const [kind, prefix] of [
+    ["privacy", "PRIVACY-POLICY"],
+    ["accessibility", "ACCESSIBILITY-STATEMENT"]
   ]) {
     const source = `${prefix}${suffix}.md`;
     const markdown = await readFile(source, "utf8");
