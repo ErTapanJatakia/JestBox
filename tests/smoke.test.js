@@ -570,3 +570,23 @@ test("localized daily labels can wrap inside the narrow-screen joke toolbar", ()
   assert.ok(rule, "Missing narrow-screen responsive rule");
   assert.match(rule[1], /\.jestbox \.daily-label\s*\{[^}]*max-width:\s*100%;\s*overflow-wrap:\s*anywhere;/s);
 });
+
+
+test("WCAG 2.2 AA conformance mark is locally bundled and consistently placed", () => {
+  const root = new URL("../", import.meta.url);
+  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  const english = fs.readFileSync(new URL("../ACCESSIBILITY-STATEMENT.md", import.meta.url), "utf8");
+  const russian = fs.readFileSync(new URL("../ACCESSIBILITY-STATEMENT.ru-RU.md", import.meta.url), "utf8");
+  const logoPath = new URL("../assets/wcag22aa-blue.svg", import.meta.url);
+
+  assert.ok(fs.existsSync(logoPath), "The local WCAG logo asset must exist");
+  assert.match(fs.readFileSync(logoPath, "utf8"), /<svg[\s\S]*?WCAG[\s\S]*?2\.2 AA/);
+  assert.match(html, /<footer>[\s\S]*?class="wcag-conformance-mark"[\s\S]*?assets\/wcag22aa-blue\.svg/);
+  assert.match(html, /href="https:\/\/www\.w3\.org\/WAI\/WCAG2AA-Conformance"/);
+  assert.match(css, /\.wcag-conformance-mark\s*\{[^}]*justify-content:\s*center/s);
+  assert.equal((english.match(/assets\/wcag22aa-blue\.svg/g) || []).length, 2,
+    "English statement must show the logo at the top and bottom");
+  assert.equal((russian.match(/assets\/wcag22aa-blue\.svg/g) || []).length, 2,
+    "Russian statement must show the logo at the top and bottom");
+});
