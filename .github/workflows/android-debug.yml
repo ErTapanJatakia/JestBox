@@ -29,6 +29,7 @@ jobs:
         run: |
           node --check script.js
           node --check jokes.js
+          node --check share-bridge.entry.js
           node --check scripts/prepare-web.mjs
       - name: Run dependency-free regression tests
         run: node --test
