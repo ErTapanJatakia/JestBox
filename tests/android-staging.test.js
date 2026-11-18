@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { cp, mkdtemp, readFile, rm, symlink } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -19,7 +19,6 @@ test("Android staging script copies only the local web app and bundled assets", 
         await cp(`${name}${locale}.md`, join(fixture, `${name}${locale}.md`));
       }
     }
-    await symlink(join(process.cwd(), "node_modules"), join(fixture, "node_modules"), "dir");
     await cp("scripts/prepare-web.mjs", join(fixture, "prepare-web.mjs"));
     await execFileSync(process.execPath, [join(fixture, "prepare-web.mjs")], { cwd: fixture });
 
