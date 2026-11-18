@@ -8,7 +8,9 @@ JestBox is an offline-first joke application with six language-and-region experi
 - `styles.css` — responsive layouts, theme tokens, and accessibility presentation.
 - `script.js` — locale dictionaries, searchable pickers, joke selection, sharing, themes, and on-device preferences.
 - `jokes.js` — the bundled joke collections for all six locales.
-- `assets/` — locally bundled visual assets.
+- `assets/JestBox-Original.png` — canonical laughing jester gift-box logo used by the web app, browser icon, README, and generated Android launcher icon.
+- `assets/wcag22aa-blue.svg` — WCAG reference graphic used in accessibility materials.
+- `assets/` — other locally bundled visual assets.
 - `scripts/prepare-web.mjs` — prepares the offline web bundle and localized legal pages for Android.
 - `tests/` — source-level regression and Android staging tests.
 
