@@ -10,12 +10,13 @@ test("Android staging script copies only the local web app and bundled assets", 
   try {
     await cp("index.html", join(fixture, "index.html"));
     await cp("script.js", join(fixture, "script.js"));
+    await cp("jokes.js", join(fixture, "jokes.js"));
     await cp("styles.css", join(fixture, "styles.css"));
     await cp("assets", join(fixture, "assets"), { recursive: true });
     await cp("scripts/prepare-web.mjs", join(fixture, "prepare-web.mjs"));
     await execFileSync(process.execPath, [join(fixture, "prepare-web.mjs")], { cwd: fixture });
 
-    for (const file of ["index.html", "script.js", "styles.css"]) {
+    for (const file of ["index.html", "script.js", "jokes.js", "styles.css"]) {
       const source = await readFile(file, "utf8");
       const staged = await readFile(join(fixture, "www", file), "utf8");
       assert.equal(staged, source, `${file} must be copied byte-for-byte`);
