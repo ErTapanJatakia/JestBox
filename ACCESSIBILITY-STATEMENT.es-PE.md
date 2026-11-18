@@ -1,31 +1,43 @@
 # Declaración de accesibilidad de JestBox
 
-**Revisada:** 18 de noviembre de 2026  
-**Idiomas:** `en-US`, `es-PE`, `ru-RU`, `es-ES`, `en-IN`, `hi-IN`
+**Última revisión:** 19 de noviembre de 2026  
+**Producto:** JestBox
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Marca gráfica WCAG 2.2 nivel AA"></a></p>
+<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="Guía WCAG 2.2"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Gráfico de referencia de conformidad WCAG 2.2 nivel AA"></a></p>
 
 ## Nuestro compromiso
 
-JestBox busca ser usable por personas con distintas necesidades de acceso, incluidas las que navegan con teclado, usan lectores de pantalla o amplían el texto. WCAG 2.2 nivel AA es nuestra referencia de diseño y evaluación. El gráfico superior es una marca visual; no significa que W3C/WAI haya revisado, aprobado o certificado JestBox.
+JestBox busca ser fácil de usar para personas con distintas necesidades de acceso. La accesibilidad es un trabajo continuo de diseño, desarrollo y pruebas. Tomamos las WCAG 2.2 nivel AA como referencia para diseñar y evaluar. El gráfico es una marca de referencia; no significa que W3C o WAI haya revisado, aprobado o certificado JestBox.
 
-## Medidas de accesibilidad en desarrollo
+## Funciones de accesibilidad
 
-La interfaz incluye estructura semántica, enlace para saltar al contenido, controles con etiquetas, foco visible, avisos dinámicos, diseño adaptable, opciones de texto grande y contraste, compatibilidad con movimiento reducido y estilos para colores forzados. Hay diálogos para temas, ajustes y compartir. Estas características necesitan validación real con teclado, lectores de pantalla, navegadores y dispositivos.
+Ajustes y superpoderes ofrece tamaños de texto del 50 % al 200 %, contraste adicional, movimiento reducido, enlaces subrayados, áreas táctiles más grandes, mayor espacio entre líneas y contornos de foco más visibles para el teclado. Tus preferencias se guardan localmente en tu dispositivo. La app también incluye diez temas de color, estructura semántica, controles etiquetados, navegación con teclado, foco visible, avisos dinámicos, diseño adaptable y compatibilidad con las preferencias del sistema para reducir movimiento y usar colores forzados.
 
-## Estado de conformidad
+Los selectores de idioma y categoría permiten buscar texto y navegar con el teclado. La pantalla inicial se puede cerrar con un toque o con el teclado. Compartir siempre se inicia mediante una acción del usuario y la interfaz de la plataforma.
 
-La declaración anterior del responsable se refería a una versión web previa con dos idiomas. No se extiende automáticamente a este rediseño de seis idiomas, sus diálogos, diez temas ni al envoltorio Android. Esta versión está en reevaluación. No se afirma una auditoría independiente ni una certificación de W3C. Antes de declarar conformidad deben revisarse todos los idiomas, temas, contrastes, ampliación, redistribución, teclado, lector de pantalla, movimiento reducido y Android.
+## Estado de conformidad y pruebas
 
-## Informar de una barrera
+Estas funciones son medidas de implementación, no una prueba de que todas las pantallas y combinaciones cumplan todos los criterios de las WCAG. No afirmamos contar con una auditoría independiente ni una certificación de W3C. El uso exclusivo del teclado, los anuncios para lectores de pantalla, la ampliación del texto, el reajuste del contenido, el contraste, todos los temas, los seis idiomas, los cuadros de diálogo y el comportamiento en Android necesitan pruebas prácticas en distintos dispositivos y tecnologías de asistencia. Cualquier criterio no verificado o que falle debe registrarse y resolverse antes de afirmar conformidad.
 
-Indica la pantalla o control, los pasos, el resultado esperado y el observado, el dispositivo/OS/navegador y la tecnología de asistencia utilizada. No incluyas datos personales sensibles.
+## Limitaciones conocidas
 
-## Contacto del auditor WCAG
+- Las interfaces para compartir del navegador, del sistema operativo y de las aplicaciones receptoras dependen de sus respectivas plataformas.
+- El comportamiento de las tecnologías de asistencia puede variar según el navegador, el sistema operativo, el dispositivo y el lector de pantalla.
+- El paquete de Android y sus integraciones nativas necesitan pruebas de accesibilidad específicas en dispositivos.
+
+## Cómo informar de una barrera de accesibilidad
+
+Indica la pantalla o el control afectado, los pasos para reproducir el problema, el resultado esperado y el obtenido, el dispositivo, el sistema operativo, el navegador y la tecnología de asistencia y su versión, si corresponde. No incluyas información personal sensible.
+
+## Contacto de accesibilidad
 
 - **Nombre:** Er. Tapan Jatakia (C. Eng.)
 - **Correo:** [cyber.litigation.advisor@gmail.com](mailto:cyber.litigation.advisor@gmail.com)
 - **Teléfono:** [+91 9664332984](tel:+919664332984)
-- **Web:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
+- **Sitio web:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Marca gráfica WCAG 2.2 nivel AA"></a></p>
+<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="Guía WCAG 2.2"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Gráfico de referencia de conformidad WCAG 2.2 nivel AA"></a></p>
+
+## Referencia
+
+[W3C — Pautas de Accesibilidad para el Contenido Web (WCAG) 2.2](https://www.w3.org/TR/WCAG22/)
