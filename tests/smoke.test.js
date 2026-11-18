@@ -428,6 +428,14 @@ test("a failed native share falls back to clipboard and reports the fallback", a
 });
 
 
+test("high-contrast mode retains visible control boundaries and system-color focus indicators", () => {
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  assert.match(css, /@media \(forced-colors: active\)/);
+  assert.match(css, /border: 1px solid CanvasText/);
+  assert.match(css, /outline: 3px solid Highlight/);
+  assert.match(css, /\.locale-button\.active\s*\{\s*outline: 2px solid Highlight;/);
+});
+
 test("interactive controls expose accessible names, states, and visible focus styles", () => {
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
   assert.match(html, /<section class="locale-picker panel" aria-labelledby="locale-heading">/);
