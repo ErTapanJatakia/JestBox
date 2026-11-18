@@ -86,11 +86,28 @@ The project is intended to minimize personal-data processing. This policy is inf
 
 If the app's data practices change, this policy and the app's privacy summary must be updated before or alongside the relevant release. The effective date at the top will be revised. Users should review the policy periodically.
 
-## 10. Contact and privacy requests
+## 10. App developer and support contact
 
-For questions, concerns, or a request relating to this policy, use the contact route published on the [JestBox GitHub repository](https://github.com/ErTapanJatakia/JestBox) and ask for a private channel. Do not disclose personal or sensitive information in a public issue.
+The contact information for the app developer and support team is:
 
-A dedicated, monitored private contact address should be added before public store distribution so that privacy requests can be handled confidentially.
+- **Name:** Er. Tapan Jatakia (C. Eng.)
+- **Email — Russia:** [ertapanjatakia@yandex.com](mailto:ertapanjatakia@yandex.com)
+- **Email — regions outside Russia:** [tapan_ditu_17.20@outlook.com](mailto:tapan_ditu_17.20@outlook.com)
+- **Phone:** [+91 9664332984](tel:+919664332984)
+- **Website:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
+
+## 11. Data Protection Officer (DPO) contact
+
+The contact information designated for the Data Protection Officer (DPO) is:
+
+- **Name:** Er. Tapan Jatakia (C. Eng.)
+- **Email:** [cyber.litigation.advisor@gmail.com](mailto:cyber.litigation.advisor@gmail.com)
+- **Phone:** [+91 9664332984](tel:+919664332984)
+- **Website:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
+
+For privacy questions, data-protection requests, or concerns about this policy, contact the DPO using the details above. For general app support, use the developer/support contact. Do not disclose passwords, account credentials, or unnecessary sensitive information in a public GitHub issue.
+
+The publication of these contact details identifies the project's designated points of contact; it does not, by itself, determine whether a statutory DPO appointment is legally required or establish compliance with any particular jurisdiction's data-protection law.
 
 ---
 
