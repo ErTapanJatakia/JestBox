@@ -47,11 +47,21 @@ The repository's `QA-CHECKLIST.md` defines checks for keyboard operation, focus 
 
 If you encounter a barrier, please report the affected page or control, the action you attempted, your browser/device and assistive-technology versions (if relevant), and the result you expected. Do not include sensitive personal information.
 
-## Feedback and contact
+## WCAG auditor contact information
 
-Accessibility feedback can be raised through the contact route published on the [JestBox GitHub repository](https://github.com/ErTapanJatakia/JestBox). Please request a private contact channel if your report contains personal information; do not post sensitive details in a public issue.
+The contact information for the WCAG auditor is:
 
-A dedicated, monitored accessibility contact address should be published before broad public distribution.
+- **Name:** Er. Tapan Jatakia (C. Eng.)
+- **Email — Russia:** [ertapanjatakia@yandex.com](mailto:ertapanjatakia@yandex.com)
+- **Email — regions outside Russia:** [tapan_ditu_17.20@outlook.com](mailto:tapan_ditu_17.20@outlook.com)
+- **Phone:** [+91 9664332984](tel:+919664332984)
+- **Website:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
+
+## Feedback and accessibility requests
+
+For accessibility barriers or questions about this statement, contact the WCAG auditor using the regional email address above or the telephone number. You may also use the [JestBox GitHub repository](https://github.com/ErTapanJatakia/JestBox).
+
+When reporting a barrier, include the affected page or control, the action attempted, the expected result, and browser/device or assistive-technology versions where relevant. Do not include passwords, account credentials, or other sensitive personal information in a public issue.
 
 ## Review
 
