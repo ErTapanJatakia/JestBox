@@ -37,48 +37,159 @@ const JESTBOX_JOKES_BATCH_2={
 ["wordplay","El panadero dejó el trabajo porque la situación estaba muy cruda."],["wordplay","El calendario pidió vacaciones: tenía los días contados."],["wordplay","El ascensor es optimista: siempre ve las cosas desde arriba."],["wordplay","El tomate fue al banco porque quería hacerse puré de capital."]
 ],
 "en-IN":[
-["everyday","I packed an umbrella for the monsoon. The forecast changed, but the umbrella has already made travel plans."],
-["everyday","The auto driver asked for the exact address. My directions began with 'near the big tree' and lost all credibility."],
-["everyday","I went downstairs for a quick parcel. The security guard knew its delivery history better than I did."],
-["everyday","The lift stopped on every floor. By the time I reached home, I had made three new neighbours."],
-["work","The office chai break was scheduled for ten minutes. The kettle, at least, respected the deadline."],
-["work","My manager said 'let us take this offline'. The office Wi-Fi took it literally and disappeared."],
-["work","The team planned a quick sync. Even the calendar knew that 'quick' was only a suggestion."],
-["work","I added 'flexible with priorities' to my review. My task list immediately became more flexible than me."],
-["tech","UPI made paying so quick that my wallet has started questioning its role in the family."],
-["tech","The OTP arrived just after the payment screen timed out. Excellent timing, as always."],
-["tech","My phone switched to battery saver during the cab ride. Even the device wanted to save money."],
-["tech","The monsoon slowed the internet. My video call became a slideshow with weather effects."],
-["food","I ordered one plate of pani puri. The vendor asked how many, and my answer became a negotiation."],
-["food","The last biscuit fell into my chai. It has now completed its journey from snack to dip."],
-["food","I asked for less spice. The cook smiled politely and treated it as a creative suggestion."],
-["food","The tiffin was packed for later. The aroma opened it before lunchtime."],
-["wordplay","The chai stall's business is steeped in success."],
-["wordplay","The auto-rickshaw comedian always gets a fare laugh."],
-["wordplay","The monsoon cloud became a musician because it had great rain-ge."],
-["wordplay","The dosa tried stand-up comedy, but its best jokes kept rolling."]
+["everyday","The Mumbai local was so punctual today that even my watch looked surprised."],["everyday","I carried an umbrella through the monsoon. The rain waited until I got into an auto."],["everyday","My tiffin box came back empty. Even the office pantry is asking for my secret."],["everyday","I tried to beat the traffic by leaving early. The traffic had the same idea."],
+["work","The meeting invite said 'quick sync'. My chai got cold waiting for the agenda."],["work","My manager said let's take this offline. I switched off Wi-Fi and went for a walk."],["work","I added 'multitasking' to my CV. I can ignore three notifications at once."],["work","The office lift stopped between floors. Finally, a meeting with no exit."],
+["tech","UPI payment was successful. My bank balance is still processing the emotional impact."],["tech","My phone's battery saver is more disciplined than my entire morning routine."],["tech","The Wi-Fi dropped during cricket highlights. Even the router wanted a strategic timeout."],["tech","My GPS asked me to make a U-turn. In Mumbai, that's a long-term project."],
+["food","The vada pav was so good that I forgot the meeting had started. Priorities were correctly aligned."],["food","My chai break was five minutes. The kettle and I negotiated an extension."],["food","I ordered extra spicy food. The menu asked if I had informed my insurance."],["food","The office samosa disappeared before the meeting minutes were approved."],
+["wordplay","The chai vendor is a great advisor: he always says, 'Let's brew this over.'"],["wordplay","The auto driver became a mathematician. He always finds a fare solution."],["wordplay","The cricket bat got promoted because it always made a good impact."],["wordplay","I told a joke about a train. It had a long platform and no punchline."]
 ],
 "hi-IN":[
-["everyday","बारिश के लिए छाता खरीदा। बारिश नहीं आई, मगर छाता रोज़ बाहर घूमने की ज़िद करता है।"],
-["everyday","ऑटो वाले ने पता पूछा। मैंने कहा, बड़े पेड़ के पास—फिर मुझे अपनी दिशा-बुद्धि पर शक हुआ।"],
-["everyday","पार्सल लेने नीचे गया था। चौकीदार को उसकी पूरी यात्रा मुझसे पहले पता थी।"],
-["everyday","लिफ़्ट हर मंज़िल पर रुकी। घर पहुँचते-पहुँचते तीन नए पड़ोसी मिल गए।"],
-["work","ऑफिस की चाय दस मिनट की थी। चाय की केतली ने ही समय की पाबंदी निभाई।"],
-["work","मैनेजर ने कहा, इसे बाद में देखते हैं। इंटरनेट ने बात मानकर अभी ही जाना बेहतर समझा।"],
-["work","टीम ने छोटी-सी बैठक रखी। कैलेंडर पहले से जानता था कि छोटी सिर्फ़ लिखावट होगी।"],
-["work","काम की प्राथमिकताएँ बदलने में मैं इतना लचीला हूँ कि अब मेरी सूची ही मुझे चला रही है।"],
-["tech","यूपीआई से भुगतान इतना जल्दी होता है कि बटुआ अब अपनी उपयोगिता पर सवाल करता है।"],
-["tech","ओटीपी भुगतान की समय-सीमा खत्म होने के बाद आया। समय का चुनाव कमाल का था।"],
-["tech","कैब में बैठते ही फ़ोन ने बैटरी बचाने का संदेश दिया। उसे भी किराये की चिंता थी।"],
-["tech","बारिश में इंटरनेट धीमा हुआ। वीडियो कॉल मौसम के साथ चित्रों की किताब बन गई।"],
-["food","पानीपुरी की एक प्लेट माँगी। दुकानदार ने पूछा कितनी—मेरी भूख ने बातचीत अपने हाथ में ले ली।"],
-["food","चाय में आख़िरी बिस्कुट गिर गया। अब वह नाश्ता नहीं, तैराकी सीख रहा है।"],
-["food","कम तीखा बनाने को कहा। रसोइए ने मुस्कराकर इसे सुझाव समझा, निर्देश नहीं।"],
-["food","टिफ़िन दोपहर के लिए रखा था। खुशबू ने उसे समय से पहले खोल दिया।"],
-["wordplay","चाय की दुकान का कारोबार खूब उबल रहा है।"],
-["wordplay","ऑटो वाला इतना मज़ेदार था कि हर सवारी हँसते-हँसते उतरती थी।"],
-["wordplay","बादल ने संगीत शुरू किया—उसकी हर धुन में बारिश की ताल थी।"],
-["wordplay","डोसे ने हास्य मंच पर जाने की कोशिश की, मगर उसके चुटकुले लुढ़कते ही रहे।"]
+["everyday","मुंबई लोकल आज समय पर आई। घड़ी ने शक जताया कि कहीं त्योहार तो नहीं है।"],["everyday","छाता लेकर निकला था। बारिश ने ऑटो में बैठते ही अपनी एंट्री मारी।"],["everyday","टिफ़िन खाली लौटा। अब घरवाले पूछ रहे हैं कि ऑफिस में कौन-सा जादू चलता है।"],["everyday","ट्रैफ़िक से बचने जल्दी निकला। ट्रैफ़िक भी मुझसे पहले पहुँच गया।"],
+["work","मीटिंग का नाम था 'क्विक सिंक'। मेरी चाय ठंडी हुई, एजेंडा अभी भी गर्म नहीं हुआ।"],["work","बॉस ने कहा, इसे ऑफ़लाइन लेते हैं। मैंने वाई-फ़ाई बंद किया और टहलने चला गया।"],["work","रिज़्यूमे में मल्टीटास्किंग लिखा है। मैं एक साथ तीन नोटिफ़िकेशन नज़रअंदाज़ कर सकता हूँ।"],["work","ऑफिस की लिफ़्ट दो मंज़िलों के बीच रुकी। पहली मीटिंग जहाँ सचमुच कोई बाहर नहीं जा सकता।"],
+["tech","यूपीआई भुगतान सफल हुआ। बैंक बैलेंस अभी भी इस सदमे से उबर रहा है।"],["tech","फ़ोन का बैटरी सेवर मेरी सुबह की दिनचर्या से ज़्यादा अनुशासित है।"],["tech","क्रिकेट हाइलाइट्स के बीच वाई-फ़ाई चला गया। राउटर ने भी रणनीतिक टाइम-आउट ले लिया।"],["tech","जीपीएस ने यू-टर्न लेने को कहा। मुंबई में यह तो पूरा प्रोजेक्ट है।"],
+["food","वड़ा पाव इतना स्वादिष्ट था कि मीटिंग शुरू होने की सूचना भी शर्माकर लौट गई।"],["food","चाय का ब्रेक पाँच मिनट का था। केतली और मैंने समय बढ़ाने पर समझौता किया।"],["food","बहुत तीखा खाना मँगाया। मेन्यू ने पूछा, बीमा कराया है क्या?"],["food","ऑफिस का समोसा मीटिंग के मिनट्स मंज़ूर होने से पहले ही गायब हो गया।"],
+["wordplay","चायवाला अच्छा सलाहकार है—कहता है, 'इस पर चाय के साथ विचार करते हैं।'"],["wordplay","ऑटोवाला गणितज्ञ बन गया। हर किराये का हल निकाल लेता है।"],["wordplay","क्रिकेट बैट को प्रमोशन मिला, क्योंकि उसका असर हमेशा दमदार था।"],["wordplay","ट्रेन पर चुटकुला सुनाया। प्लेटफ़ॉर्म लंबा था, पंचलाइन कहीं और चली गई।"]
+]
+};
+for(const locale of Object.keys(JESTBOX_JOKES_BATCH_2))window.JESTBOX_JOKES[locale].push(...JESTBOX_JOKES_BATCH_2[locale]);
+
+/* Batch 3: twenty additional original jokes per region. */
+const JESTBOX_JOKES_BATCH_3={
+"en-US":[
+["everyday","I bought a houseplant for some calm energy. It immediately developed trust issues with my watering schedule."],["everyday","My laundry basket is less of a basket and more of a fabric-based waiting room."],["everyday","I tried meal planning. The plan was excellent until the snacks held a surprise election."],["everyday","My neighbour's dog has a better social calendar than I do. He has three parks and a fan club."],
+["work","My inbox reached zero once. I took a screenshot because nobody would believe the historical event."],["work","The team agreed to think outside the box. We are now in a meeting about where the box went."],["work","My boss asked for a ballpark estimate. I sent a baseball and called it a visual aid."],["work","I made a to-do list so long it now has a table of contents and a sequel."],
+["tech","My phone asked me to enable face recognition. It saw my Monday face and requested a second opinion."],["tech","The printer says paper jam. I say we're both stuck in a difficult relationship."],["tech","My smart watch congratulated me for standing up. It has very low standards and I appreciate that."],["tech","I asked the chatbot for a break. It recommended a sandwich and a software update."],
+["food","The avocado was perfectly ripe for eleven minutes. I was in a meeting for twelve."],["food","I made a smoothie so healthy that my blender started giving me life advice."],["food","The cookie jar is empty again. We are investigating a very delicious inside job."],["food","I put leftovers in a labelled container. The label says 'mystery, season two'."],
+["wordplay","I used to be a baker, but I couldn't make enough dough to rise to the occasion."],["wordplay","The pencil was feeling pointless, so I gave it a sharp pep talk."],["wordplay","A bicycle can't stand on its own because it is two-tired."],["wordplay","The book about gravity was impossible to put down."]
+],
+"es-PE":[
+["everyday","Mi planta de interior ya tiene nombre, horario y más estabilidad emocional que yo."],["everyday","Ordené mis recibos por fecha. Ahora mi billetera parece archivo histórico."],["everyday","El mototaxi llegó tan rápido que mi GPS todavía estaba buscando la dirección."],["everyday","Mi alarma suena con tanta energía que sospecho que ella sí durmió ocho horas."],
+["work","Me pidieron un informe ejecutivo. Le puse corbata al archivo y lo envié."],["work","La reunión era para ahorrar tiempo. Duró tanto que el reloj pidió horas extra."],["work","Mi bandeja de entrada tiene más pendientes que una combi en hora punta."],["work","Dijeron que el plazo era flexible. El plazo se dobló, pero no se movió."],
+["tech","El celular reconoció mi cara y desbloqueó la pantalla. También debería reconocer cuándo necesito vacaciones."],["tech","La impresora dijo que no tenía papel. Yo tampoco tengo paciencia, estamos a mano."],["tech","Mi reloj inteligente contó mis pasos. No contó las veces que caminé a la cocina por gusto."],["tech","El GPS me recomendó una ruta rápida. Llegué antes, pero a la calle equivocada."],
+["food","El choclo tenía tantos granos que parecía una reunión de vecinos."],["food","El ají estaba tan bravo que hasta la cuchara pidió casco."],["food","Mi pan con palta desapareció. El desayuno fue breve, pero intenso."],["food","El arroz con leche estaba tan bueno que pedí la receta y una carta de recomendación."],
+["wordplay","El pan con chicharrón nunca llega tarde: siempre aparece en su mejor hora."],["wordplay","El cuy abrió una agencia de viajes: conoce todos los caminos cortos."],["wordplay","La cebolla estudió actuación porque siempre logra hacer llorar al público."],["wordplay","El calendario peruano tiene feriados con mucho carácter: no se mueve ni con tráfico."]
+],
+"ru-RU":[
+["everyday","Купил комнатное растение для уюта. Теперь мы оба переживаем, достаточно ли я его поливаю."],["everyday","Разобрал шкаф. Нашёл одежду, которую давно считал историческими артефактами."],["everyday","Будильник звенит так бодро, будто ему не нужно вставать на работу."],["everyday","Сходил за одной покупкой. Вернулся с пакетом, планом на неделю и вопросом к бюджету."],
+["work","Попросили краткий отчёт. Я сократил шрифт, и он стал короче визуально."],["work","На совещании предложили мыслить шире. Мы открыли окно, но идеи не проветрились."],["work","Мой список задач уже просит отдельный кабинет и секретаря."],["work","Срок назвали гибким. Он согнулся, но всё равно наступил."],
+["tech","Телефон распознал моё лицо. Камера попросила не пугать её по утрам."],["tech","Принтер сообщил о замятии бумаги. Я тоже застрял, но кнопки перезагрузки у меня нет."],["tech","Умные часы похвалили меня за прогулку до холодильника. Поддержка бывает разной."],["tech","Навигатор сказал «короткий путь». Видимо, он измеряет расстояние в приключениях."],
+["food","Пельмени закончились так быстро, будто у них был обратный билет."],["food","Огурец в салате был настолько свежим, что попросил открыть окно."],["food","Купил чай с бергамотом. Теперь кухня пахнет так, будто у неё важная встреча."],["food","Блины получились круглыми. Наконец-то в моей жизни что-то без углов."],
+["wordplay","У линейки хорошая перспектива: она всегда смотрит на вещи с меркой."],["wordplay","Книга о тишине стала бестселлером. О ней никто не спорил."],["wordplay","У будильника тяжёлый характер: он всегда будит тему."],["wordplay","Ключ потерялся, но не растерялся — нашёл себе замочную скважину."]
+],
+"es-ES":[
+["everyday","Compré una planta para dar vida al salón. Ahora la planta y yo competimos por quién necesita más cuidados."],["everyday","He ordenado los cajones. El cajón de los cables sigue siendo un misterio policial."],["everyday","Mi despertador tiene tanta energía por la mañana que sospecho que desayuna café doble."],["everyday","Salí a comprar una cosa y volví con una bolsa, tres ideas y ninguna de la lista."],
+["work","Me pidieron un resumen ejecutivo. Le puse una chaqueta al documento para que pareciera importante."],["work","La reunión era para ahorrar tiempo. El tiempo ha presentado una queja formal."],["work","Mi lista de tareas ya tiene más capítulos que una serie de sobremesa."],["work","El plazo era flexible. Se dobló, se estiró y acabó cayendo en viernes."],
+["tech","El móvil reconoció mi cara y desbloqueó la pantalla. También podría reconocer que necesito vacaciones."],["tech","La impresora se quedó sin papel. Yo me quedé sin paciencia: empate técnico."],["tech","Mi reloj inteligente contó mis pasos hasta la nevera. Dice que voy progresando."],["tech","El GPS me indicó un atajo. Ahora conozco una rotonda con nombre y apellidos."],
+["food","La croqueta estaba tan buena que pedí que la incluyeran en el patrimonio familiar."],["food","El gazpacho estaba tan frío que pidió una manta y una conversación seria."],["food","El café tenía tanta fuerza que me preguntó si había descansado bien."],["food","La paella salió tan redonda que la sartén pidió derechos de autor."],
+["wordplay","El calendario fue al psicólogo: tenía los días contados."],["wordplay","El queso se hizo famoso porque tenía mucho carácter y varias capas."],["wordplay","El ascensor estudió idiomas para subir de nivel."],["wordplay","La escoba dejó el trabajo porque estaba barriendo demasiado."]
+],
+"en-IN":[
+["everyday","I bought a balcony plant. It gets more fresh air than I do on most weekdays."],["everyday","My laundry has been sorted by colour. The socks are still running an independent operation."],["everyday","The pressure cooker whistles like it has breaking news and an urgent deadline."],["everyday","I left early to beat Bengaluru traffic. Bengaluru traffic had already booked the front seat."],
+["work","My calendar has back-to-back meetings. Even the gaps have been double-booked."],["work","The team said 'let's keep it crisp'. The meeting arrived with a 40-slide deck."],["work","I was asked for a quick update. My laptop needed a longer update first."],["work","My to-do list has a waiting list. Even the tasks need an appointment."],
+["tech","My phone's face unlock worked on Monday morning. The camera deserves a bravery award."],["tech","The printer is out of paper. My patience is out of stock too."],["tech","My smartwatch counted my steps to the chai stall. Finally, fitness with purpose."],["tech","The navigation app said 'take the next exit'. In this traffic, even exits need a token."],
+["food","The dosa was so crisp that the next table asked for the weather report."],["food","My filter coffee was strong enough to finish my pending tasks without me."],["food","The biryani had so many layers that it deserves its own family tree."],["food","I packed one thepla for later. It has now become the official emergency ration."],
+["wordplay","The chai kettle is a great listener; it always lets things brew."],["wordplay","The dosa opened a startup. It had a very crisp business model."],["wordplay","The auto driver wrote a book on shortcuts. It took the scenic route to publication."],["wordplay","The cricket umpire became a life coach: he knows when to call it."]
+],
+"hi-IN":[
+["everyday","बालकनी में पौधा लगाया। अब उसे धूप मुझसे ज़्यादा मिलती है और शिकायत भी कम है।"],["everyday","कपड़े रंग के हिसाब से छाँटे। मोज़ों ने फिर भी अपनी अलग पार्टी बना ली।"],["everyday","कुकर की सीटी ऐसे बजती है जैसे घर की सबसे बड़ी ब्रेकिंग न्यूज़ उसी के पास हो।"],["everyday","ट्रैफ़िक से बचने जल्दी निकला। ट्रैफ़िक पहले से रास्ते में मेरा इंतज़ार कर रहा था।"],
+["work","कैलेंडर में लगातार मीटिंग हैं। खाली समय ने भी छुट्टी की अर्जी दे दी।"],["work","टीम ने कहा, बात छोटी रखो। फिर 40 स्लाइड की प्रस्तुति आ गई।"],["work","क्विक अपडेट माँगा था। लैपटॉप ने पहले अपना अपडेट शुरू कर दिया।"],["work","मेरी टू-डू लिस्ट इतनी लंबी है कि कामों को भी अपॉइंटमेंट लेना पड़ता है।"],
+["tech","फ़ोन ने सुबह-सुबह चेहरा पहचान लिया। कैमरे को बहादुरी का पुरस्कार मिलना चाहिए।"],["tech","प्रिंटर का कागज़ खत्म हुआ। मेरा धैर्य भी उसी समय आउट ऑफ़ स्टॉक हो गया।"],["tech","स्मार्टवॉच ने चाय की दुकान तक के कदम गिने। पहली बार फिटनेस का सही मक़सद मिला।"],["tech","मैप ने अगला मोड़ लेने को कहा। ट्रैफ़िक में मोड़ भी टोकन लेकर मिलता है।"],
+["food","डोसा इतना कुरकुरा था कि पड़ोसी मेज़ ने मौसम का हाल पूछ लिया।"],["food","फ़िल्टर कॉफ़ी इतनी मज़बूत थी कि उसने मेरे अधूरे काम खुद निपटा दिए।"],["food","बिरयानी में इतनी परतें थीं कि उसका अपना खानदान बन सकता है।"],["food","एक थेपला बाद के लिए रखा था। अब वही आपातकालीन राशन है।"],
+["wordplay","चाय की केतली अच्छी श्रोता है—हर बात को उबलने देती है।"],["wordplay","डोसे ने स्टार्टअप खोला। उसका बिज़नेस मॉडल बहुत कुरकुरा था।"],["wordplay","ऑटोवाले ने शॉर्टकट पर किताब लिखी। किताब छपने तक लंबा रास्ता तय कर आई।"],["wordplay","अंपायर जीवन-कोच बन गया—उसे पता है कब खेल रोकना है।"]
+]
+};
+for(const locale of Object.keys(JESTBOX_JOKES_BATCH_3))window.JESTBOX_JOKES[locale].push(...JESTBOX_JOKES_BATCH_3[locale]);
+
+/* Batch 4: twenty more original jokes for each locale, balanced by category. */
+const JESTBOX_JOKES_BATCH_4={
+"en-US":[
+["everyday","I tried to declutter my desk. Now the clutter is in a neat pile with excellent posture."],["everyday","My weekend plans are ambitious: laundry, groceries, and pretending the laundry is a hobby."],["everyday","I bought noise-cancelling headphones. They cancel the noise but not my own commentary."],["everyday","The weather app said 'feels like summer'. My inbox said 'feels like Monday'."],
+["work","My manager asked me to touch base. I sent the base a polite email."],["work","We had a brainstorming session. The only thing raining was calendar invites."],["work","My spreadsheet has so many tabs it qualifies as a studio apartment."],["work","I was told to bring my whole self to work. My whole self requested a duvet day."],
+["tech","The laptop fan sounds like it's preparing for takeoff. I only opened a spreadsheet."],["tech","My phone suggested a digital detox. It delivered the suggestion as a push notification."],["tech","The app asked me to prove I'm human. I clicked the traffic lights and questioned everything."],["tech","My Wi-Fi password is a family secret. Even the router refuses to discuss it."],
+["food","I tried to make a fancy brunch. The toast came out artisanal charcoal."],["food","My soup was so comforting that the spoon asked to stay for dinner."],["food","The cereal box says 'part of a balanced breakfast'. I balanced it on the milk."],["food","I bought a cake for later. Later arrived approximately four minutes after checkout."],
+["wordplay","The musician got locked out, but found the right key eventually."],["wordplay","The gardener's jokes are growing on people."],["wordplay","I wondered why the ball was getting bigger. Then it hit me."],["wordplay","The electrician was shocked by the positive feedback."]
+],
+"es-PE":[
+["everyday","Limpié mi escritorio. Ahora el polvo está organizado por antigüedad."],["everyday","Mi domingo tiene tantos pendientes que ya está pidiendo feriado."],["everyday","Compré audífonos para concentrarme. Ahora escucho mi propia voz dando consejos."],["everyday","El pronóstico dijo día despejado. Mi agenda respondió que no tiene espacio."],
+["work","Me dijeron que conectara con el equipo. Abrí una videollamada y apareció hasta el gato."],["work","La lluvia de ideas fue intensa. Lo único que cayó fueron invitaciones a otra reunión."],["work","Mi hoja de cálculo tiene tantas pestañas que ya necesita alquiler."],["work","Pidieron que trajera toda mi energía. Llegué con batería al 12 por ciento."],
+["tech","La laptop suena como avión despegando. Solo abrí una hoja de cálculo."],["tech","El celular sugirió desconectarme. Lo hizo con una notificación urgente."],["tech","La app pidió demostrar que soy humano. Marqué los semáforos y dudé de mi existencia."],["tech","Mi contraseña del Wi-Fi es secreta. Ni el router quiere hablar del tema."],
+["food","Intenté preparar un brunch elegante. El pan salió en versión carbón artesanal."],["food","La sopa estaba tan reconfortante que la cuchara pidió quedarse a dormir."],["food","El cereal decía que era parte de un desayuno equilibrado. Lo equilibré sobre la leche."],["food","Compré una torta para después. El después llegó antes de guardar la boleta."],
+["wordplay","El músico perdió la llave, pero encontró la nota correcta."],["wordplay","El jardinero cuenta chistes que florecen con el tiempo."],["wordplay","El balón crecía y crecía. Al final, el problema me cayó encima."],["wordplay","El electricista recibió una crítica positiva y quedó impactado."]
+],
+"ru-RU":[
+["everyday","Навёл порядок на столе. Теперь беспорядок лежит аккуратной стопкой."],["everyday","Планы на выходные грандиозные: стирка, покупки и переговоры с диваном."],["everyday","Купил наушники с шумоподавлением. Они убрали шум, но не мои комментарии."],["everyday","Прогноз обещал ясный день. Календарь ответил, что у него всё занято."],
+["work","Попросили наладить контакт с командой. Я отправил всем дружелюбный смайлик."],["work","Провели мозговой штурм. Шумело всё, кроме самих идей."],["work","В моей таблице столько вкладок, что ей пора платить аренду."],["work","Сказали принести на работу себя целиком. Я уточнил, можно ли без понедельника."],
+["tech","Ноутбук гудит как самолёт. Я всего лишь открыл таблицу."],["tech","Телефон предложил цифровой детокс. Конечно, через срочное уведомление."],["tech","Приложение попросило доказать, что я человек. Я выбрал светофоры и задумался о жизни."],["tech","Пароль от вай-фая — семейная тайна. Даже роутер хранит молчание."],
+["food","Пытался приготовить изысканный завтрак. Тост получился авторским углём."],["food","Суп был настолько уютным, что ложка попросила остаться на ночь."],["food","На коробке хлопьев написано «сбалансированный завтрак». Я сбалансировал её на молоке."],["food","Купил торт на потом. Потом наступило через четыре минуты."],
+["wordplay","Музыкант потерял ключ, но в конце концов нашёл нужную ноту."],["wordplay","Шутки садовника со временем прорастают."],["wordplay","Мяч становился всё больше. Потом до меня дошло."],["wordplay","Электрик был потрясён положительным отзывом."]
+],
+"es-ES":[
+["everyday","He ordenado el escritorio. Ahora el desorden está en una pila con muy buena educación."],["everyday","Mis planes del domingo son ambiciosos: lavadora, compra y negociar con el sofá."],["everyday","Compré auriculares con cancelación de ruido. Cancelan todo menos mis propios pensamientos."],["everyday","La aplicación del tiempo dijo que haría bueno. Mi agenda dijo que ni hablar."],
+["work","Me pidieron conectar con el equipo. Abrí una videollamada y apareció hasta el gato."],["work","La lluvia de ideas fue intensa. Lo único que cayó fueron invitaciones a otra reunión."],["work","Mi hoja de cálculo tiene tantas pestañas que ya necesita contrato de alquiler."],["work","Me dijeron que llevara toda mi energía al trabajo. Llegué con el modo ahorro activado."],
+["tech","El portátil suena como un avión despegando. Solo he abierto una hoja de cálculo."],["tech","El móvil me recomendó una desconexión digital. Lo hizo con una notificación urgente."],["tech","La app pidió demostrar que soy humano. Marqué los semáforos y empecé a dudar."],["tech","La contraseña del Wi-Fi es un secreto familiar. Hasta el router guarda silencio."],
+["food","Intenté preparar un brunch elegante. La tostada salió en versión carbón de autor."],["food","La sopa estaba tan reconfortante que la cuchara pidió quedarse a cenar."],["food","La caja de cereales decía «desayuno equilibrado». La equilibré encima de la leche."],["food","Compré una tarta para luego. El luego llegó antes de salir de la tienda."],
+["wordplay","El músico perdió la llave, pero acabó encontrando la nota adecuada."],["wordplay","Los chistes del jardinero van calando poco a poco."],["wordplay","La pelota crecía y crecía. Al final, me cayó la ficha."],["wordplay","El electricista recibió una crítica positiva y se quedó impactado."]
+],
+"en-IN":[
+["everyday","I cleaned my desk. The clutter is now arranged in a very professional-looking pile."],["everyday","My Sunday plan includes laundry, groceries, and convincing the sofa that I have other commitments."],["everyday","I bought noise-cancelling headphones. They cancel traffic, not my internal monologue."],["everyday","The weather app promised clear skies. My calendar forecast showed 100% meetings."],
+["work","My lead asked me to connect with the team. I sent a 'Good morning' message with six folded hands."],["work","The brainstorming session was lively. The only thing raining was meeting invites."],["work","My spreadsheet has so many tabs it needs a society maintenance bill."],["work","I was asked to bring my full energy to work. I arrived with battery saver on."],
+["tech","My laptop fan sounds like an aircraft. I only opened an Excel sheet."],["tech","My phone suggested a digital detox. It delivered the advice as an urgent notification."],["tech","The app asked me to prove I'm human. I selected traffic lights and questioned my life choices."],["tech","The Wi-Fi password is a family secret. Even the router has signed an NDA."],
+["food","I tried making a fancy brunch. The toast became premium charcoal."],["food","The rasam was so comforting that the spoon asked for a second serving and a blanket."],["food","The cereal box said 'balanced breakfast'. I balanced it on the milk packet."],["food","I bought a cake for later. Later arrived before I reached the lift."],
+["wordplay","The musician lost the key but eventually found the right note."],["wordplay","The gardener's jokes are growing on everyone."],["wordplay","The cricket ball kept getting bigger. Then it hit me."],["wordplay","The electrician was shocked by the positive feedback."]
+],
+"hi-IN":[
+["everyday","मेज़ साफ़ की। अब बिखरा सामान भी बहुत अनुशासित ढेर में रखा है।"],["everyday","रविवार की योजना बड़ी है—कपड़े, सब्ज़ी और सोफ़े को समझाना कि मुझे बाहर भी जाना है।"],["everyday","शोर कम करने वाले हेडफ़ोन खरीदे। बाहर का शोर गया, मन की कमेंट्री नहीं।"],["everyday","मौसम ऐप ने साफ़ आसमान कहा। कैलेंडर ने बताया कि मीटिंगों के बाद ही सूरज दिखेगा।"],
+["work","टीम से जुड़ने को कहा। मैंने गुड मॉर्निंग भेजा और छह हाथ जोड़ने वाले इमोजी लगा दिए।"],["work","आइडिया वाली मीटिंग में खूब बारिश हुई—बस मीटिंग के निमंत्रणों की।"],["work","मेरी स्प्रेडशीट में इतने टैब हैं कि अब सोसाइटी मेंटेनेंस देना पड़ेगा।"],["work","ऑफिस में पूरी ऊर्जा लाने को कहा। मैं बैटरी सेवर मोड में पहुँच गया।"],
+["tech","लैपटॉप का पंखा विमान जैसा शोर करता है। मैंने सिर्फ़ एक्सेल खोला है।"],["tech","फ़ोन ने डिजिटल ब्रेक लेने को कहा। वह भी ज़रूरी नोटिफ़िकेशन भेजकर।"],["tech","ऐप ने इंसान होने का सबूत माँगा। मैंने ट्रैफ़िक लाइट चुनी और ख़ुद पर शक करने लगा।"],["tech","वाई-फ़ाई का पासवर्ड पारिवारिक राज़ है। राउटर ने भी गोपनीयता की शपथ ली है।"],
+["food","शाही नाश्ता बनाने चला था। टोस्ट प्रीमियम कोयला बन गया।"],["food","रसम इतनी सुकून देने वाली थी कि चम्मच ने दूसरी कटोरी और कंबल माँगा।"],["food","सीरियल के डिब्बे पर संतुलित नाश्ता लिखा था। मैंने उसे दूध के पैकेट पर संतुलित कर दिया।"],["food","केक बाद के लिए लिया था। बाद लिफ़्ट तक पहुँचने से पहले आ गया।"],
+["wordplay","संगीतकार की चाबी खो गई, पर आख़िर में सही सुर मिल गया।"],["wordplay","माली के चुटकुले धीरे-धीरे सबको पसंद आने लगे—वे खिल रहे हैं।"],["wordplay","क्रिकेट की गेंद बड़ी होती गई। फिर बात मेरी समझ में आ गई।"],["wordplay","इलेक्ट्रीशियन सकारात्मक प्रतिक्रिया से झटका खा गया।"]
+]
+};
+for(const locale of Object.keys(JESTBOX_JOKES_BATCH_4))window.JESTBOX_JOKES[locale].push(...JESTBOX_JOKES_BATCH_4[locale]);
+
+/* Batch 5: complete the 100-joke minimum per locale with region-specific originals. */
+const JESTBOX_JOKES_BATCH_5={
+"en-US":[
+["everyday","I bought a reusable shopping bag. It is currently holding six other reusable shopping bags."],["everyday","My house keys have a secret life. They only appear when I stop looking for them."],["everyday","I tried a morning routine. It went well until morning showed up."],["everyday","The delivery tracker says my package is nearby. Apparently nearby is a philosophical concept."],
+["work","My team introduced a quiet hour. The calendar sent 14 reminders about it."],["work","I was asked to align with the roadmap. I stood next to the map and nodded."],["work","The meeting notes say 'action items'. Mine say 'coffee, then reconsider'."],["work","My desk plant is thriving. It has better work-life balance than the whole department."],
+["tech","The software asked me to accept cookies. I was hoping for chocolate chip."],["tech","My phone's autocorrect changed 'thanks' to 'thunks'. Honestly, fair."],["tech","The cloud sounds fluffy, but my storage warning is very stormy."],["tech","I updated my apps. They all agreed to be slightly different and equally needy."],
+["food","I made pancakes shaped like the map of a small country. Breakfast declared independence."],["food","The pickle jar was difficult to open. It has a very strong dill-ence."],["food","My pasta was al dente. My patience was not."],["food","I bought fancy olive oil. The salad now has a higher credit score than I do."],
+["wordplay","The librarian got promoted because she was booked for success."],["wordplay","The clock factory workers got fired. They kept taking time off."],["wordplay","A broken pencil is pointless, but it still has a good point."],["wordplay","The comedian's ladder routine was a step above the rest."]
+],
+"es-PE":[
+["everyday","Compré una bolsa reutilizable. Ahora guarda otras cinco bolsas reutilizables: economía circular con equipaje."],["everyday","Mis llaves tienen vida propia. Aparecen cuando ya pedí un taxi."],["everyday","Intenté tener rutina mañanera. Todo iba bien hasta que llegó la mañana."],["everyday","El repartidor dice que está cerca. En Lima, «cerca» es una aventura geográfica."],
+["work","La oficina anunció una hora sin reuniones. El calendario mandó doce invitaciones para celebrarlo."],["work","Me pidieron alinearme con la estrategia. Me paré junto a la pizarra y asentí."],["work","Las notas dicen «acciones pendientes». Las mías dicen «café y volver a pensar»."],["work","La planta de mi escritorio está feliz. Tiene mejor equilibrio que todo el equipo."],
+["tech","La app pidió aceptar cookies. Yo esperaba galletas de verdad."],["tech","El autocorrector cambió «gracias» por «gracias, causa». Ya conoce el barrio."],["tech","La nube parece suave, pero la alerta de almacenamiento viene con tormenta."],["tech","Actualicé todas las apps. Ahora cada una tiene una nueva forma de pedir atención."],
+["food","Hice panqueques con forma de mapa. El desayuno declaró su independencia."],["food","El frasco de encurtidos no abría. Tenía mucha resistencia en conserva."],["food","La pasta quedó al dente. Mi paciencia quedó al límite."],["food","Compré aceite de oliva fino. Ahora la ensalada tiene mejor nivel de vida."],
+["wordplay","El bibliotecario ascendió porque tenía muchos libros bajo el brazo."],["wordplay","La fábrica de relojes cerró: sus empleados siempre se tomaban el tiempo."],["wordplay","El lápiz roto no tenía punta, pero sí argumentos."],["wordplay","El comediante hizo una rutina de escaleras: estuvo un peldaño por encima."]
+],
+"ru-RU":[
+["everyday","Купил многоразовую сумку. Теперь в ней живут ещё пять многоразовых сумок."],["everyday","Ключи ведут тайную жизнь: появляются ровно после вызова такси."],["everyday","Пытался завести утренний распорядок. Всё шло хорошо, пока не наступило утро."],["everyday","Курьер пишет «я рядом». Похоже, рядом — это отдельный часовой пояс."],
+["work","Ввели час без совещаний. Календарь прислал пятнадцать приглашений на открытие."],["work","Попросили согласовать план. Я встал рядом с картой и уверенно кивнул."],["work","В протоколе написано «задачи». У меня записано «кофе, затем переосмыслить»."],["work","Комнатное растение на столе отлично себя чувствует. У него лучший баланс работы и отдыха."],
+["tech","Приложение попросило принять куки. Я надеялся на печенье с шоколадом."],["tech","Автозамена исправила «спасибо» на «спасибки». Кажется, телефон слишком расслабился."],["tech","Облако звучит мягко, но предупреждение о памяти гремит как гроза."],["tech","Обновил приложения. Каждое стало немного другим и одинаково требовательным."],
+["food","Блины получились в форме карты. Завтрак объявил независимость."],["food","Банка с огурцами не открывалась. У неё была крепкая консервативная позиция."],["food","Паста получилась аль денте. Терпение — нет."],["food","Купил дорогое оливковое масло. Теперь салат живёт лучше меня."],
+["wordplay","Библиотекаря повысили: у него было много прочитанных заслуг."],["wordplay","Часовую фабрику закрыли: сотрудники постоянно брали время."],["wordplay","Сломанный карандаш бесполезен, но всё ещё может указать на проблему."],["wordplay","Комик выступил с номером про лестницу — он был на ступень выше остальных."]
+],
+"es-ES":[
+["everyday","Compré una bolsa reutilizable. Ahora guarda otras cinco bolsas reutilizables: reciclaje con síndrome de Diógenes."],["everyday","Mis llaves tienen vida propia. Aparecen justo después de pedir un taxi."],["everyday","Intenté crear una rutina mañanera. Todo iba bien hasta que llegó la mañana."],["everyday","El repartidor dice que está cerca. «Cerca» parece una provincia nueva."],
+["work","La oficina anunció una hora sin reuniones. El calendario envió doce invitaciones para celebrarlo."],["work","Me pidieron alinearme con la estrategia. Me puse junto al mapa y asentí con convicción."],["work","Las notas dicen «acciones pendientes». Las mías dicen «café y replanteamiento»."],["work","La planta de mi mesa está estupenda. Tiene mejor conciliación que todo el departamento."],
+["tech","La aplicación pidió aceptar cookies. Yo esperaba galletas de chocolate."],["tech","El autocorrector cambió «gracias» por «gracioso». Se está tomando demasiadas confianzas."],["tech","La nube parece blandita, pero el aviso de almacenamiento viene con tormenta."],["tech","Actualicé todas las aplicaciones. Ahora cada una tiene una nueva manera de llamar mi atención."],
+["food","Hice tortitas con forma de mapa. El desayuno declaró su independencia."],["food","El bote de pepinillos no se abría. Tenía una resistencia muy conservada."],["food","La pasta quedó al dente. Mi paciencia, ni de lejos."],["food","Compré aceite de oliva gourmet. La ensalada ya tiene mejor nivel de vida."],
+["wordplay","Ascendieron al bibliotecario: tenía muchos méritos entre páginas."],["wordplay","La fábrica de relojes cerró porque sus empleados siempre se tomaban su tiempo."],["wordplay","El lápiz roto no tenía punta, pero sí un buen argumento."],["wordplay","El monólogo del cómico sobre escaleras estuvo un peldaño por encima."]
+],
+"en-IN":[
+["everyday","I bought a reusable shopping bag. It now carries five other reusable bags. Sustainability has luggage."],["everyday","My keys have a secret schedule. They appear exactly after I book a cab."],["everyday","I tried a morning routine. It worked beautifully until the morning arrived."],["everyday","The delivery app says the rider is nearby. Nearby is doing a lot of work in this traffic."],
+["work","The office announced a meeting-free hour. The calendar sent ten invites to celebrate it."],["work","I was asked to align with the roadmap. I stood beside the whiteboard and nodded."],["work","The minutes say 'action items'. Mine say 'chai, then revisit'."],["work","The desk plant is thriving. It has better work-life balance than our whole team."],
+["tech","The app asked me to accept cookies. I was hoping for the bakery kind."],["tech","Autocorrect changed 'thanks' to 'thaaaanks'. Even my phone is being dramatic."],["tech","The cloud sounds fluffy, but the storage warning is a full monsoon alert."],["tech","I updated all my apps. Each one found a fresh way to ask for attention."],
+["food","I made pancakes shaped like a map. Breakfast declared independence."],["food","The pickle jar refused to open. It has a very strong preserving attitude."],["food","The pasta was al dente. My patience was fully overcooked."],["food","I bought premium ghee. My toast now has a better lifestyle than I do."],
+["wordplay","The librarian got promoted because she had a shelf of achievements."],["wordplay","The clock factory closed because everyone kept taking time off."],["wordplay","A broken pencil is pointless, but it can still make a sharp observation."],["wordplay","The comedian's staircase routine was a step above the competition."]
+],
+"hi-IN":[
+["everyday","कपड़े का थैला खरीदा। अब उसमें पाँच और कपड़े के थैले रहते हैं—थैले के अंदर थैला।"],["everyday","मेरी चाबियों का अपना टाइमटेबल है। कैब बुक करने के बाद ही मिलती हैं।"],["everyday","सुबह की दिनचर्या बनाई। सब ठीक था, जब तक सुबह सच में नहीं आ गई।"],["everyday","डिलीवरी ऐप कहता है राइडर पास है। ट्रैफ़िक में 'पास' का मतलब अलग ही होता है।"],
+["work","ऑफिस ने मीटिंग-फ्री घंटा घोषित किया। कैलेंडर ने जश्न मनाने के लिए दस मीटिंग भेज दीं।"],["work","रोडमैप के साथ अलाइन होने को कहा। मैं व्हाइटबोर्ड के पास खड़ा होकर सिर हिलाने लगा।"],["work","मीटिंग नोट्स में एक्शन आइटम हैं। मेरे नोट्स में चाय और फिर से सोचने की बात है।"],["work","मेरी मेज़ का पौधा खूब फल-फूल रहा है। उसका वर्क-लाइफ़ बैलेंस पूरी टीम से अच्छा है।"],
+["tech","ऐप ने कुकीज़ स्वीकार करने को कहा। मैं चॉकलेट वाली कुकी की उम्मीद कर रहा था।"],["tech","ऑटोकरेक्ट ने 'धन्यवाद' को 'धन्यवाद जी' कर दिया। फ़ोन भी अब संस्कारी हो गया।"],["tech","क्लाउड मुलायम लगता है, पर स्टोरेज की चेतावनी पूरी मानसून अलर्ट है।"],["tech","सभी ऐप अपडेट किए। अब हर ऐप ध्यान खींचने का नया तरीका जानता है।"],
+["food","नक्शे के आकार के पैनकेक बनाए। नाश्ते ने अपनी आज़ादी घोषित कर दी।"],["food","अचार का डिब्बा खुला ही नहीं। उसका रवैया बहुत अचार-संरक्षित था।"],["food","पास्ता अल-देंटे बना। मेरा धैर्य पूरी तरह गल गया।"],["food","प्रीमियम घी खरीदा। अब टोस्ट की जीवनशैली मुझसे बेहतर है।"],
+["wordplay","लाइब्रेरियन का प्रमोशन हुआ—उसकी उपलब्धियाँ शेल्फ़ भर थीं।"],["wordplay","घड़ी की फ़ैक्टरी बंद हुई, क्योंकि कर्मचारी हमेशा समय निकाल लेते थे।"],["wordplay","टूटी पेंसिल बेकार है, पर उसकी बात में अब भी नुकीलापन है।"],["wordplay","कॉमेडियन का सीढ़ियों वाला शो बाकियों से एक पायदान ऊपर था।"]
 ]
 };
 for(const locale of Object.keys(JESTBOX_JOKES_BATCH_5))window.JESTBOX_JOKES[locale].push(...JESTBOX_JOKES_BATCH_5[locale]);
