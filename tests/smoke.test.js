@@ -563,3 +563,10 @@ test("380px and narrower layouts stack category controls and joke actions", () =
   assert.match(rule[1], /\.jestbox \.joke-content\s*\{[^}]*padding-inline:\s*\.25rem;/s);
   assert.match(rule[1], /\.jestbox h1\s*\{[^}]*font-size:\s*clamp\(2rem, 11vw, 2\.6rem\);/s);
 });
+
+test("localized daily labels can wrap inside the narrow-screen joke toolbar", () => {
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  const rule = css.match(/@media \(max-width: 380px\) \{([\s\S]*?)\n\}/);
+  assert.ok(rule, "Missing narrow-screen responsive rule");
+  assert.match(rule[1], /\.jestbox \.daily-label\s*\{[^}]*max-width:\s*100%;\s*overflow-wrap:\s*anywhere;/s);
+});
