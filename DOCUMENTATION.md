@@ -22,11 +22,11 @@ English (`en-US`) is selected by default. The current content library contains 1
 ## 2. User-facing features
 
 - Searchable language/region picker with locale code and country.
-- Ten selectable themes, with page-wide colour tokens.
+- Ten selectable themes inside Settings & Superpowers, with individually coloured buttons and a visible active state.
 - Five-second translucent welcome screen, dismissible by touch or keyboard.
 - Searchable category field for All Jokes, Everyday Life, Work & Study, Tech & Internet, Food & Drink, and Wordplay.
 - Daily joke, random joke, copy, and share dialog with native device sharing when supported.
-- Settings for larger text, higher contrast, and reduced motion.
+- Settings & Superpowers with text sizing from 50% to 200% (85% default), extra contrast, reduced motion, underlined links, larger touch targets, increased line spacing, and stronger focus outlines. Preferences persist locally on the device.
 - Compact responsive home layout, keyboard navigation, focus visibility, and live announcements.
 - Footer privacy and accessibility links plus the WCAG 2.2 AA graphic.
 
@@ -38,7 +38,7 @@ Content should be independently written or culturally adapted for each locale. A
 
 ## 4. Runtime and privacy model
 
-The web app is static HTML, CSS, and JavaScript. Joke content, theme palettes, and UI dictionaries are bundled locally. The core experience makes no app-initiated network requests and does not use cookies or persistent browser storage. UI preferences remain in page memory and reset on a fresh load.
+The web app is static HTML, CSS, and JavaScript. Joke content, theme palettes, and UI dictionaries are bundled locally. The core experience makes no app-initiated network requests and does not use cookies or remote preference sync. Locale, category, and current joke remain in page memory. Display and accessibility preferences are stored locally on the device only; they are not transmitted or associated with an account.
 
 The share dialog invokes the official Capacitor Share plugin in Android builds, which opens the Android Sharesheet and exposes compatible installed share targets. Browser builds use the Web Share API where supported. The user initiates the action and chooses the recipient app; JestBox does not receive recipient details.
 
@@ -46,7 +46,7 @@ A web host, browser, operating system, app store, or distribution platform may p
 
 ## 5. Accessibility
 
-The implementation includes semantic landmarks, skip navigation, searchable labelled controls, visible focus, live status announcements, responsive reflow, reduced-motion support, forced-colors styles, and user-selectable larger text/high contrast. These features require browser, Android, keyboard, and assistive-technology verification.
+The implementation includes semantic landmarks, skip navigation, searchable labelled controls, visible focus, live status announcements, responsive reflow, reduced-motion support, forced-colors styles, and user-selectable 50–200% text sizing, extra contrast, reduced motion, underlined links, larger touch targets, increased line spacing, and stronger focus outlines. These features require browser, Android, keyboard, and assistive-technology verification.
 
 The WCAG 2.2 AA mark is a graphic. It is not W3C endorsement, certification, or evidence of a completed independent audit. The maintainer's conformance statement must be limited to the exact pages, locales, builds, and test evidence actually reviewed. The new six-locale UI and native Android wrapper require a fresh conformance assessment; earlier claims for the former two-locale web build must not be silently extended.
 
