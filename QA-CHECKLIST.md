@@ -68,3 +68,4 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 ## Content integrity
 - [ ] Review all 40 jokes for cultural naturalness, spelling, punctuation, repeated punchlines, and locale-appropriate humour.
 - [ ] Confirm each locale has 20 distinct jokes and the intended category distribution.
+- [ ] Confirm language selection is session-only: a fresh page load starts in `en-US`; no browser storage or cookies are introduced.
