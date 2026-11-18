@@ -10,8 +10,8 @@ JestBox is a lightweight, offline-first joke application with two distinct conte
 ## Project documentation
 
 - [Product and Technical Documentation](DOCUMENTATION.md)
-- [Privacy Policy](PRIVACY-POLICY.md)
-- [Accessibility Statement](ACCESSIBILITY-STATEMENT.md)
+- [Privacy Policy — English](PRIVACY-POLICY.md) · [Политика конфиденциальности — русский](PRIVACY-POLICY.ru-RU.md)
+- [Accessibility Statement — English](ACCESSIBILITY-STATEMENT.md) · [Заявление о доступности — русский](ACCESSIBILITY-STATEMENT.ru-RU.md)
 - [Release QA Checklist](QA-CHECKLIST.md)
 
 ## Features
