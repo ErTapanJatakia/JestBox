@@ -1,43 +1,43 @@
-# JestBox Privacy Policy — India
+# JestBox Privacy Policy
 
-**Effective date:** 18 November 2026  
-**Locales:** `en-US`, `es-PE`, `ru-RU`, `es-ES`, `en-IN`, `hi-IN`
+**Effective date:** 19 November 2026  
+**Product:** JestBox
 
-## 1. The short version
+## 1. In brief
 
-JestBox is an offline-first joke app. Once its bundled files are available, the core experience runs on the device. The current app code does not implement accounts, sign-in, analytics, advertising, tracking, external API calls, cookies, or persistent browser storage. It does not ask users to submit personal information.
+JestBox is an offline-first joke app. Its core features run from files bundled with the app. The app does not create accounts, request personal information, run advertising or analytics, use tracking tools, or call external APIs.
 
-## 2. Information and device behaviour
+## 2. Information kept on your device
 
-The selected locale, category, and current joke stay temporarily in page memory. The daily joke is selected using the device's local date, locale, and category. A fresh launch defaults to American English (`en-US`).
+The selected joke language, category, and current joke are held temporarily in app memory. The app stores only your display and accessibility preferences on your device: selected theme, text size, extra contrast, reduced motion, underlined links, larger touch targets, line spacing, and focus visibility. These preferences stay on that device, are not sent to JestBox, and are not synced to an account. You can change them at any time in Settings & Superpowers or clear the app's local site data through your device or browser settings.
 
-The app does not request a name, email address, phone number, location, contacts, photos, files, camera, or microphone. It does not read existing clipboard contents.
+The app does not ask for your name, email address, phone number, location, contacts, photos, files, camera, or microphone. It does not read existing clipboard contents.
 
-## 3. Copy and share
+## 3. Copying and sharing
 
-**Copy** asks the browser to place the displayed joke text on the system clipboard. **Share** opens an in-app dialog; if the user chooses, JestBox asks the browser or operating system to show its native share panel. The user selects the receiving app. The receiving app and operating system handle the content under their own privacy terms. JestBox does not receive recipient details.
+When you choose Copy, the displayed joke text is placed on the system clipboard. When you choose Share, JestBox asks your browser or operating system to open its sharing panel. You choose the receiving app. The operating system and receiving app then handle the content under their own privacy practices. JestBox does not receive recipient details.
 
-## 4. Network, hosting, and platform processing
+## 4. Hosting and platform services
 
-The core features do not need a network connection after the app files have loaded. A web host, app store, browser, operating system, or network provider may process technical connection and security information under its own notices. This is separate from the app's own code. Each Android build must be reviewed independently for its permissions, wrapper, and bundled SDKs.
+A browser, operating system, app store, web host, or network provider may process technical information needed to deliver, secure, or operate its service. That processing is separate from the app's own local features and is governed by the relevant provider's notices. Android builds and third-party platform components should be reviewed independently before release.
 
-## 5. Children, security, and policy changes
+## 5. Children, security, and changes
 
-JestBox is a general-audience humour app. It does not ask for age or create user profiles. Do not post sensitive information in public issues. If app data practices change, this policy must be updated before or alongside the affected release.
+JestBox is intended for a general audience and does not create user profiles. Do not post sensitive information in public support channels. If app functionality or data practices change, this policy will be updated to describe the change.
 
-## 6. App Developer and Support Team
+## 6. Developer and support contact
 
 - **Name:** Er. Tapan Jatakia (C. Eng.)
-- **Email — Russia:** [ertapanjatakia@yandex.com](mailto:ertapanjatakia@yandex.com)
-- **Email — regions outside Russia:** [tapan_ditu_17.20@outlook.com](mailto:tapan_ditu_17.20@outlook.com)
+- **Email:** ertapanjatakia@yandex.com
+- **Email:** tapan_ditu_17.20@outlook.com
 - **Phone:** [+91 9664332984](tel:+919664332984)
 - **Website:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-## 7. Data Protection Officer (DPO)
+## 7. Privacy contact
 
 - **Name:** Er. Tapan Jatakia (C. Eng.)
 - **Email:** [cyber.litigation.advisor@gmail.com](mailto:cyber.litigation.advisor@gmail.com)
 - **Phone:** [+91 9664332984](tel:+919664332984)
 - **Website:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-These published details identify the project's designated contact points. They do not, by themselves, establish whether a statutory DPO appointment is required or certify compliance with any law.
+For privacy questions or concerns about this policy, contact the privacy contact above.
