@@ -573,7 +573,6 @@ test("localized daily labels can wrap inside the narrow-screen joke toolbar", ()
 
 
 test("WCAG 2.2 AA conformance mark is locally bundled and consistently placed", () => {
-  const root = new URL("../", import.meta.url);
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
   const english = fs.readFileSync(new URL("../ACCESSIBILITY-STATEMENT.md", import.meta.url), "utf8");
