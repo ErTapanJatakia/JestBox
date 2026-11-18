@@ -552,3 +552,14 @@ test("short landscape viewports receive compact vertical spacing", () => {
   assert.match(rule[1], /\.jestbox \.locale-picker,\s*\.jestbox \.joke-panel\s*\{[^}]*margin-top:\s*\.5rem/s);
   assert.match(rule[1], /\.jestbox \.hero\.compact\s*\{[^}]*padding-block:\s*\.75rem/s);
 });
+
+test("380px and narrower layouts stack category controls and joke actions", () => {
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  const rule = css.match(/@media \(max-width: 380px\) \{([\s\S]*?)\n\}/);
+  assert.ok(rule, "Missing 380px narrow-screen responsive rule");
+  assert.match(rule[1], /\.jestbox \.category-control\s*\{[^}]*align-items:\s*stretch;\s*flex-direction:\s*column;/s);
+  assert.match(rule[1], /\.jestbox \.category-control select\s*\{[^}]*width:\s*100%;\s*max-width:\s*100%;/s);
+  assert.match(rule[1], /\.jestbox \.joke-actions\s*\{[^}]*grid-template-columns:\s*1fr;/s);
+  assert.match(rule[1], /\.jestbox \.joke-content\s*\{[^}]*padding-inline:\s*\.25rem;/s);
+  assert.match(rule[1], /\.jestbox h1\s*\{[^}]*font-size:\s*clamp\(2rem, 11vw, 2\.6rem\);/s);
+});
