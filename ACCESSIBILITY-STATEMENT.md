@@ -1,57 +1,43 @@
 # JestBox Accessibility Statement
 
-**Last reviewed:** 18 November 2026  
-**Product:** JestBox  
-**Languages:** `en-US`, `es-PE`, `ru-RU`, `es-ES`, `en-IN`, and `hi-IN`
+**Last reviewed:** 19 November 2026  
+**Product:** JestBox
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 guidance"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 Level AA conformance mark"></a></p>
+<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 guidance"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 Level AA conformance mark graphic"></a></p>
 
 ## Our commitment
 
-JestBox aims to be usable by people with different access needs, including keyboard users, screen-reader users, people who enlarge text, and people who use operating-system accessibility settings. Accessibility is an ongoing engineering and testing activity.
+JestBox aims to be usable by people with different access needs. Accessibility is an ongoing design, engineering, and testing activity. We use WCAG 2.2 Level AA as a design and evaluation target. The graphic above is a reference mark; it does not mean W3C or WAI has reviewed, approved, or certified JestBox.
 
-We use WCAG 2.2 Level AA as a design and evaluation target. The logo above is a conformance-mark graphic; it does not mean W3C/WAI has reviewed, tested, approved, or certified JestBox.
+## Accessibility features
 
-## Features in the current development interface
+Settings & Superpowers includes text sizing from 50% to 200%, extra contrast, reduced motion, underlined links, larger touch targets, increased line spacing, and stronger keyboard-focus outlines. Your choices are saved locally on your device. The app also provides ten colour themes, semantic page structure, labelled controls, keyboard navigation, visible focus, live announcements, responsive layouts, and support for operating-system reduced-motion and forced-colour preferences.
 
-- Semantic header, main, footer, headings, and labelled sections.
-- Skip navigation and visible keyboard focus.
-- Searchable language and category inputs with associated labels and suggestions.
-- Dialogs for themes, settings, and sharing.
-- Ten theme palettes, with additional high-contrast and larger-text settings.
-- Reduced-motion and forced-colors CSS support.
-- Polite live regions for joke changes and action feedback.
-- Responsive layout and touch-friendly controls.
+The language and category pickers support text search and keyboard navigation. The launch screen can be dismissed by touch or keyboard input. Sharing is initiated by the user through the platform's share interface.
 
-These are implementation intentions and source-level features. Their usability must be confirmed with actual keyboard, screen-reader, browser, and device testing.
+## Conformance and testing status
 
-## Conformance status and scope
-
-The previous owner-declared WCAG 2.2 Level AA statement related to the earlier two-locale browser build. It must **not** be treated as automatically covering this new six-locale redesign, the new dialogs, the theme palettes, or the Android wrapper. The current release candidate is under renewed accessibility evaluation. No independent audit or W3C certification is claimed.
-
-Before asserting conformance for this release, the maintainer must evaluate all six locales, every theme, dialogs, text enlargement, contrast, reflow, keyboard-only operation, screen-reader announcements, reduced motion, forced colours, and the Android WebView/native share experience. Any failing or unverified success criterion must be documented and resolved or clearly scoped.
+These features are implementation measures, not proof that every screen or combination meets every WCAG success criterion. No independent audit or W3C certification is claimed. Keyboard-only use, screen-reader announcements, text enlargement, reflow, contrast, every theme, all six locales, dialogs, and Android behaviour require practical testing across supported devices and assistive technologies. Any unverified or failing criterion must be recorded and addressed before a conformance claim is made.
 
 ## Known limitations
 
-- Browser and operating-system share dialogs are platform interfaces and are not fully controlled by JestBox.
-- Assistive-technology behavior varies by browser, operating system, screen reader, and device.
-- Android packaging requires a separate native accessibility review.
-- This statement does not represent third-party certification.
+- Browser, operating-system, and receiving-app share interfaces are controlled by their respective platforms.
+- Assistive-technology behaviour can differ by browser, operating system, device, and screen reader.
+- Android packaging and native integrations require separate device-level accessibility testing.
 
-## Reporting an accessibility barrier
+## Report an accessibility barrier
 
-Please report the affected screen/control, steps, expected and actual results, device/OS/browser, and assistive technology/version where relevant. Avoid including sensitive personal information.
+Please include the affected screen or control, steps to reproduce, expected and actual results, device, operating system, browser, and assistive technology/version where relevant. Do not include sensitive personal information.
 
-## Contact information of the WCAG auditor
+## Accessibility contact
 
 - **Name:** Er. Tapan Jatakia (C. Eng.)
 - **Email:** [cyber.litigation.advisor@gmail.com](mailto:cyber.litigation.advisor@gmail.com)
 - **Phone:** [+91 9664332984](tel:+919664332984)
 - **Website:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 guidance"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 Level AA conformance mark"></a></p>
+<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 guidance"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 Level AA conformance mark graphic"></a></p>
 
-## References
+## Reference
 
-- [W3C — Web Content Accessibility Guidelines (WCAG) 2.2](https://www.w3.org/TR/WCAG22/)
-- [W3C WAI — Developing an Accessibility Statement](https://www.w3.org/WAI/planning/statements/)
+[W3C — Web Content Accessibility Guidelines (WCAG) 2.2](https://www.w3.org/TR/WCAG22/)
