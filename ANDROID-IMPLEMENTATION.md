@@ -6,6 +6,10 @@ JestBox remains a static, offline-first HTML/CSS/JavaScript application. Capacit
 
 The root web files remain the single source of truth. `scripts/prepare-web.mjs` stages the application files, joke data, native share bridge, local `assets/`, and all twelve localized legal HTML pages into the generated `www/` directory. Legal pages are rendered from the six locale-specific Markdown policies and accessibility statements during the build, so they remain available offline. Generated staging output is recreated for every build.
 
+## Application branding
+
+The canonical launcher artwork is `assets/JestBox-Original.png`. After Capacitor generates the Android platform, `scripts/prepare-android-branding.mjs` copies this exact source image into Android's `drawable-nodpi` resources and configures the generated application manifest to use it as both the standard and round launcher icon. The web launch screen and header use the same source PNG. No substitute mascot is used as the product logo.
+
 ## Toolchain
 
 - Node.js 22
