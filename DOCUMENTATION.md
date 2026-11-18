@@ -40,7 +40,7 @@ Content should be independently written or culturally adapted for each locale. A
 
 The web app is static HTML, CSS, and JavaScript. Joke content, theme palettes, and UI dictionaries are bundled locally. The core experience makes no app-initiated network requests and does not use cookies or persistent browser storage. UI preferences remain in page memory and reset on a fresh load.
 
-The share dialog invokes the platform share interface only after an explicit user action. The operating system and chosen recipient app handle the shared text under their own policies. JestBox does not receive recipient information.
+The share dialog invokes the official Capacitor Share plugin in Android builds, which opens the Android Sharesheet and exposes compatible installed share targets. Browser builds use the Web Share API where supported. The user initiates the action and chooses the recipient app; JestBox does not receive recipient details.
 
 A web host, browser, operating system, app store, or distribution platform may process technical information independently. See the Privacy Policy for scope and limitations.
 
@@ -52,7 +52,7 @@ The WCAG 2.2 AA mark is a graphic. It is not W3C endorsement, certification, or 
 
 ## 6. Development and validation
 
-No web build step is required. With Node.js 22 or newer:
+No browser build step is required. Android staging uses the pinned Capacitor Share plugin and esbuild to bundle its bridge. With Node.js 22 or newer:
 
 ```sh
 node --check script.js
