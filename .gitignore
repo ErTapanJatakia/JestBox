@@ -1,0 +1,14 @@
+# Generated dependencies and build output
+node_modules/
+www/
+android/
+.gradle/
+**/build/
+local.properties
+
+# Signing material and local secrets
+*.jks
+*.keystore
+.env
+.env.*
+!.env.example
