@@ -2,7 +2,7 @@
   "name": "jestbox",
   "version": "1.0.0",
   "private": true,
-  "description": "Offline-first six-locale joke application",
+  "description": "Offline-first eight-locale joke application",
   "scripts": {
     "prepare:web": "node scripts/prepare-web.mjs",
     "android:add": "npm run prepare:web && cap add android",
