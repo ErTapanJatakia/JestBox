@@ -139,3 +139,6 @@ Android packaging, native wrapper review, app-store metadata, and RuStore submis
 The currently documented product scope is the two-locale joke application described above. Adding accounts, user-generated content, analytics, advertisements, external APIs, persistent preferences, or third-party SDKs changes the privacy and security model and requires review of the source, privacy policy, accessibility statement, tests, and release checklist.
 
 Any future platform build must be reviewed independently for its runtime permissions, embedded SDKs, network behavior, accessibility, and store-specific declarations.
+## 11. Repository governance
+
+The repository also publishes its [Proprietary Licence](LICENSE), [Contributing Guidelines](CONTRIBUTING.md), and [Code of Conduct](CODE_OF_CONDUCT.md). The private vulnerability-reporting channel will be documented in [SECURITY.md](SECURITY.md) before that policy is published.
