@@ -10,7 +10,7 @@
 
 JestBox aims to be usable by as many people as possible, including people who navigate by keyboard, use assistive technologies, need enlarged text, or use operating-system accessibility settings. Accessibility is treated as an ongoing engineering and quality activity.
 
-We use the **Web Content Accessibility Guidelines (WCAG) 2.2 Level AA** as our design and evaluation target. This is a target, not a declaration that the application has been independently audited or formally certified as conformant.
+We use the **Web Content Accessibility Guidelines (WCAG) 2.2 Level AA** as our design and evaluation standard. The maintainer's conformance claim and its scope are set out below; it is not a statement of W3C endorsement or independent third-party certification.
 
 ## Accessibility features implemented
 
