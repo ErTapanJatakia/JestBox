@@ -77,8 +77,8 @@ test("startup is English by default and runtime uses no browser storage or netwo
   const app = bootApp();
   assert.equal(app.root.lang, "en-US");
   assert.equal(app.elements["daily-label"].textContent, app.context.__testCopy["en-US"].daily);
-  assert.doesNotMatch(source, /\\b(?:localStorage|sessionStorage|indexedDB)\\b|document\\.cookie/);
-  assert.doesNotMatch(source, /\\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\\s*\\(/);
+  assert.doesNotMatch(source, /\b(?:localStorage|sessionStorage|indexedDB)\b|document\.cookie/);
+  assert.doesNotMatch(source, /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(/);
 });
 
 test("the page provides a keyboard skip link to its main landmark", () => {
