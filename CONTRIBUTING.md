@@ -12,12 +12,12 @@ Supported locales:
 - `en-IN` — Indian English
 - `hi-IN` — Indian Hindi
 
-The current joke data foundation has 100 jokes per locale. The product target is 100+ unique, locally written/adapted jokes per locale, ideally balanced across five categories. Do not submit machine-translated filler or duplicate punchlines.
+The current joke data foundation has 100 jokes per locale. The product target is 100+ unique, locally written/adapted jokes per locale, ideally balanced across five categories. Do not submit literal translations that ignore regional usage, filler content, or duplicate punchlines.
 
 ## Engineering principles
 
 - Preserve offline-first operation and local bundling.
-- Do not add accounts, analytics, advertising, trackers, telemetry, remote APIs, or persistent storage without explicit approval and privacy/security review.
+- Do not add accounts, analytics, advertising, trackers, telemetry, remote APIs, or remote/synced user data. Local-only display and accessibility preferences are permitted; any other persistent storage requires explicit approval and privacy/security review.
 - Keep all interface strings localised across all six locales.
 - Preserve keyboard access, screen-reader names and announcements, visible focus, responsive reflow, text resizing, reduced motion, and forced-colors support.
 - Keep themes accessible; verify text and non-text contrast for every palette.
