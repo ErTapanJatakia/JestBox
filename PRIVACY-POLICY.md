@@ -1,7 +1,7 @@
 # JestBox Privacy Policy
 
 **Effective date:** 18 November 2026  
-**Product:** JestBox (American English `en-US` and Russian `ru-RU`)  
+**Product:** JestBox (`en-US`, `es-PE`, `ru-RU`, `es-ES`, `en-IN`, and `hi-IN`)  
 **Scope:** The JestBox application source and its current browser-based experience.
 
 ## 1. At a glance
@@ -44,7 +44,7 @@ These values are not written to browser storage by the application. A fresh page
 
 If a user selects **Copy**, the app asks the browser to write the currently displayed joke text to the system clipboard. The app does not read the existing clipboard contents.
 
-If a user selects **Share**, the app invokes the operating system or browser's native share interface when available. If native sharing is unavailable or fails for a reason other than user cancellation, the app may attempt to copy the joke text to the clipboard as a fallback.
+If a user selects **Share**, the app opens a share dialog. The user may then ask the operating system or browser to open its native share interface, where compatible installed apps may be offered. If native sharing is unavailable, the app explains the limitation and offers a separate, explicit Copy action. JestBox does not silently copy text as a substitute for a share.
 
 The user chooses whether and where to share. Once text is passed to a share target or copied, the receiving app, service, or operating system handles it under its own terms and privacy practices. JestBox does not receive a report of who the user shares with or what the recipient does with the text.
 
