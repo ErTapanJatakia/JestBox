@@ -4,7 +4,7 @@
 
 JestBox remains a static, offline-first HTML/CSS/JavaScript application. Capacitor packages the existing source as locally bundled WebView assets; the Android application does not need a remote website, backend, account, analytics SDK, or network API for its core functionality.
 
-The root web files remain the single source of truth. `scripts/prepare-web.mjs` stages the application files, joke data, native share bridge, local `assets/`, and all twelve localized legal HTML pages into the generated `www/` directory. Legal pages are rendered from the six locale-specific Markdown policies and accessibility statements during the build, so they remain available offline. Generated staging output is recreated for every build.
+The root web files remain the single source of truth. `scripts/prepare-web.mjs` stages the application files, joke data, native share bridge, local `assets/`, and all sixteen localized legal HTML pages into the generated `www/` directory. Legal pages are rendered from the eight locale-specific Markdown policies and accessibility statements during the build, so they remain available offline. Generated staging output is recreated for every build.
 
 ## Application branding
 
@@ -21,7 +21,7 @@ The proposed Android application ID is `com.ertapanjatakia.jestbox`. Treat it as
 
 ## Automated debug build
 
-The `JestBox Android debug build` workflow installs the pinned Capacitor, Share, Markdown-rendering, and bundling dependencies; stages the local web assets and twelve localized legal pages; generates the Android platform project; synchronizes it; and assembles a debug APK. The APK is uploaded as a 14-day workflow artifact.
+The `JestBox Android debug build` workflow installs the pinned Capacitor, Share, Markdown-rendering, and bundling dependencies; stages the local web assets and sixteen localized legal pages; generates the Android platform project; synchronizes it; and assembles a debug APK. The APK is uploaded as a 14-day workflow artifact.
 
 This first integration stage generates the Android project in the CI workspace. It deliberately does not commit generated Android/Gradle files to the repository yet. Once the debug build and compatibility review pass, the generated native project can be committed in a dedicated follow-up change for maintainable Android Studio development and release signing.
 
