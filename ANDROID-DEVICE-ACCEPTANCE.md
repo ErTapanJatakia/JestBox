@@ -7,7 +7,7 @@
 ## 1. Obtain the correct build
 
 1. Open the JestBox repository's Actions page: https://github.com/ErTapanJatakia/JestBox/actions
-2. Open the successful **JestBox Android debug build** run for the latest \`feat/jestbox-six-locale-experience\` commit.
+2. Open the successful **JestBox Android debug build** run for the latest \`feat/urdu-locales-ur-in-ur-pk\` commit.
 3. Confirm the run includes successful steps named **Verify APK signature, alignment, and checksum** and **Upload debug APK and checksum**.
 4. Download the \`jestbox-android-debug\` artifact ZIP and extract it.
 5. Confirm the ZIP contains \`app-debug.apk\` and \`app-debug.apk.sha256\`. Use only the APK from this exact run.
