@@ -1,19 +1,27 @@
 # JestBox
 
-**Two locales. Two cultures. A little laughter wherever you are.**
+**Small box. Big laughs. Offline, on your side of the world.**
 
-JestBox is a lightweight, offline-first joke application with two distinct content locales:
+JestBox is a lightweight, offline-first joke app with six independently localised language-and-region experiences:
 
-- **American English (en-US)** — original, US-oriented everyday, workplace, technology, food and wordplay jokes.
-- **Russian (ru-RU)** — original Russian-language jokes written for a Russian Federation audience, with local phrasing and familiar everyday references.
+| Locale | Experience |
+|---|---|
+| `en-US` | American English — United States of America |
+| `es-PE` | Peruvian Spanish — Republic of Peru |
+| `ru-RU` | Russian — Russian Federation |
+| `es-ES` | Spanish — Kingdom of Spain |
+| `en-IN` | Indian English — Republic of India |
+| `hi-IN` | Indian Hindi — Republic of India |
+
+The language selector is searchable. English (`en-US`) is the default. Joke text is written for its regional audience rather than mechanically translated. The current content foundation contains 20 jokes per locale; the approved content target is at least 100 per locale.
 
 ## Project documentation
 
 - [Product and Technical Documentation](DOCUMENTATION.md)
-- [Privacy Policy — English](PRIVACY-POLICY.md) · [Политика конфиденциальности — русский](PRIVACY-POLICY.ru-RU.md)
-- [Accessibility Statement — English](ACCESSIBILITY-STATEMENT.md) · [Заявление о доступности — русский](ACCESSIBILITY-STATEMENT.ru-RU.md)
+- [Privacy Policy — English](PRIVACY-POLICY.md) · [Russian](PRIVACY-POLICY.ru-RU.md)
+- [Accessibility Statement — English](ACCESSIBILITY-STATEMENT.md) · [Russian](ACCESSIBILITY-STATEMENT.ru-RU.md)
 - [Release QA Checklist](QA-CHECKLIST.md)
-- [Licence — Proprietary / All Rights Reserved](LICENSE)
+- [Proprietary Licence — All Rights Reserved](LICENSE)
 - [Security Policy](SECURITY.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
@@ -21,34 +29,35 @@ JestBox is a lightweight, offline-first joke application with two distinct conte
 
 ## Features
 
-- Two selectable locales with fully localized interface text.
-- Separate joke collections for each locale; jokes are adapted for their audience, not literal translations.
-- Daily joke selected deterministically from the device's local calendar date.
-- Random joke button and category filtering.
-- Copy and native share actions where supported, with a clipboard fallback.
-- Responsive interface, visible keyboard focus, and reduced-motion support.
-- All content is bundled locally; the application works offline.
+- Six searchable language/region choices and fully localised interface copy.
+- Ten full-app colour themes.
+- A five-second skippable launch screen with a locally bundled mascot mark.
+- Searchable joke-category picker: All Jokes, Everyday Life, Work & Study, Tech & Internet, Food & Drink, and Wordplay.
+- Daily and random joke selection, plus copy and native device sharing where supported.
+- Settings with larger text, high contrast, and reduced-motion controls.
+- Compact responsive layout, keyboard focus, screen-reader announcements, and forced-colors support.
+- All joke content and interface assets are bundled locally.
 
 ## Privacy by design
 
-- No accounts, sign-in, analytics, advertising SDKs, trackers or external APIs.
-- No personal information is requested or collected.
-- No cookies, localStorage, IndexedDB or application database.
-- Locale and category choices exist only in the current page session.
-- Joke text is copied or shared only after the user explicitly selects the relevant action.
-- The application does not require network access for its core functionality.
+- No app accounts, analytics, advertising SDKs, trackers, or app-initiated external API calls.
+- No personal information is requested by the current app logic.
+- No app-created cookies or persistent browser storage.
+- Locale, category, and accessibility choices are held in the current page session.
+- Sharing is user-initiated; the operating system and selected recipient app apply their own privacy practices.
 
-## Run
+## Run and validate
 
-Open `index.html` in a modern browser or serve the repository directory with a static HTTP server. No build step or package installation is required.
-
-To run the dependency-free source checks locally with Node.js 22 or newer:
+Open `index.html` in a modern browser or serve the repository directory with a static HTTP server. The web experience requires no build step.
 
 ```sh
 node --check script.js
+node --check jokes.js
 node --test
 ```
 
-## Validation status
+## Validation and release boundaries
 
-The dependency-free regression suite and CodeQL completed successfully on the merged `main` branch after PR #1. The GitHub Advanced Security agentic review on the final PR head was blocked by an external Copilot model quota error (HTTP 402); this is not a vulnerability finding and is not a security-clean result. See the [PR #1 checks](https://github.com/ErTapanJatakia/JestBox/pull/1) for the recorded results. Manual browser/device and assistive-technology QA remains a separate activity and should be recorded in `QA-CHECKLIST.md` with configuration details and evidence; maintainer-reported manual QA is not represented as an independent audit. Android integration is being developed separately; a successful debug build will not by itself establish device compatibility, native accessibility, release signing, or RuStore acceptance.
+The new six-locale experience is under development on a review branch. Its current starter content is 20 jokes per locale; reaching and validating 100+ per locale remains an open acceptance item. New changes require fresh CI and manual verification. The WCAG logo is a conformance-mark graphic, not W3C approval or an independent audit. Do not infer AA conformance from the logo or source assertions alone.
+
+Android integration is maintained separately. A successful debug build does not establish device compatibility, native accessibility, release signing, or RuStore acceptance. The proprietary licence remains in force; public source visibility grants no general reuse rights.
