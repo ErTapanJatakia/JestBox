@@ -1,8 +1,10 @@
 package com.ertapanjatakia.jestbox
 
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import android.net.http.SslError
 import android.os.Build
 import android.os.Bundle
 import android.view.ViewGroup
@@ -12,12 +14,9 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.net.http.SslError
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
 
-class MainActivity : ComponentActivity() {
+class MainActivity : Activity() {
     private lateinit var webView: WebView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,11 +71,6 @@ class MainActivity : ComponentActivity() {
         }
         setContentView(webView)
         webView.loadUrl("file:///android_asset/www/index.html")
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (webView.canGoBack()) webView.goBack() else finish()
-            }
-        })
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
     }
 
@@ -92,6 +86,15 @@ class MainActivity : ComponentActivity() {
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(this, "No browser is available to open this link.", Toast.LENGTH_SHORT).show()
             true
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        if (::webView.isInitialized && webView.canGoBack()) {
+            webView.goBack()
+        } else {
+            super.onBackPressed()
         }
     }
 
