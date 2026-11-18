@@ -9,7 +9,7 @@ const locales=["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN"];
 const categories=["everyday","work","tech","food","wordplay"];
 
 test("all app script selectors exist in the page",()=>{for(const [,id] of js.matchAll(/\$\("#([a-z0-9-]+)"\)/g))assert.ok(html.includes('id="'+id+'"'),"Missing HTML id "+id)});
-test("English is the default locale and all six requested locale choices are searchable",()=>{assert.match(html,/<html lang="en-US">/);for(const label of ["American English (en-US)","Peruvian Spanish (es-PE)","Russian (ru-RU)","Spanish (es-ES)","Indian English (en-IN)","Indian Hindi (hi-IN)"])assert.ok(js.includes(label),label);for(const code of locales)assert.ok(js.includes('"'+code+'"')||js.includes('["'+code+'"'))});
+test("English is the default locale and all six requested locale choices are searchable",()=>{assert.match(html,/<html lang="en-US">/);for(const label of ["American English","Peruvian Spanish","Russian","Spanish","Indian English","Indian Hindi"])assert.ok(js.includes(label),label);for(const code of locales)assert.ok(js.includes('"'+code+'"')||js.includes('["'+code+'"'))});
 test("every locale has 100 regionally authored jokes with twenty per category in the current batch",()=>{assert.deepEqual(Object.keys(jokes).sort(),[...locales].sort());for(const locale of locales){assert.equal(jokes[locale].length,100,locale);const counts=Object.fromEntries(categories.map(c=>[c,jokes[locale].filter(j=>j[0]===c).length]));for(const c of categories)assert.equal(counts[c],20,locale+" "+c);const normalized=jokes[locale].map(j=>j[1].normalize("NFKC").toLocaleLowerCase().replace(/\s+/g," ").trim());assert.equal(new Set(normalized).size,normalized.length,locale+" duplicate joke") }});
 test("every joke uses the writing system of its selected language locale",()=>{for(const locale of locales){const text=jokes[locale].map(j=>j[1]).join(" ");if(locale==="ru-RU"){assert.match(text,/\p{Script=Cyrillic}/u);assert.doesNotMatch(text,/\p{Script=Latin}/u,"Latin-script intrusion in "+locale)}else if(locale==="hi-IN"){assert.match(text,/\p{Script=Devanagari}/u);assert.doesNotMatch(text,/\p{Script=Latin}/u,"Latin-script intrusion in "+locale)}else{assert.doesNotMatch(text,/\p{Script=Cyrillic}|\p{Script=Devanagari}/u,"non-Latin script intrusion in "+locale)}}});
 test("ten named themes define full-page color tokens",()=>{const start=js.indexOf("const THEMES=")+"const THEMES=".length;const end=js.indexOf("];",start)+1;const palettes=Function("return "+js.slice(start,end))();assert.equal(palettes.length,10);for(const token of ["--page","--surface","--text","--muted","--border","--accent"])assert.ok(css.includes(token))});
@@ -57,3 +57,39 @@ test("generated legal pages use a translated document title for every locale",()
 test("Android launcher branding is generated from the canonical original PNG",()=>{const branding=read("scripts/prepare-android-branding.mjs");assert.ok(branding.includes("assets/JestBox-Original.png"));assert.ok(branding.includes("drawable-nodpi/jestbox_icon.png"));assert.ok(branding.includes("jestbox_launcher"));const workflow=read(".github/workflows/android-debug.yml");assert.ok(workflow.includes("node scripts/prepare-android-branding.mjs"))});
 
 test("launch screen brand title, tagline, and skip hint use 20 percent larger default typography",()=>{assert.ok(css.includes(".launch-brand{margin:.1rem 0 .25rem;font-size:clamp(2.4rem,9.6vw,3.6rem)"));assert.ok(css.includes(".launch-tagline{max-width:30ch;margin:.25rem auto 0;color:var(--text);font-size:clamp(.984rem,2.88vw,1.2rem)"));assert.ok(css.includes(".launch-hint{margin:.25rem 0 0;color:var(--muted);font-size:.864rem"));assert.ok(css.includes(".launch-brand{grid-column:2;grid-row:1;font-size:clamp(1.68rem,6vh,2.4rem)}"));assert.ok(css.includes(".launch-tagline{grid-column:2;grid-row:2;max-width:none;margin:0;font-size:clamp(.864rem,2.76vh,1.08rem)"))});
+
+test("all six interface dictionaries expose the same complete set of non-empty translations",()=>{
+ const start=js.indexOf("const UI=")+ "const UI=".length;
+ const end=js.indexOf("\\n};",start)+2;
+ const dictionaries=Function("return "+js.slice(start,end))();
+ const expected=Object.keys(dictionaries["en-US"]).sort();
+ assert.deepEqual(Object.keys(dictionaries).sort(),[...locales].sort());
+ for(const locale of locales){
+  assert.deepEqual(Object.keys(dictionaries[locale]).sort(),expected,locale+" UI key coverage");
+  for(const [key,value] of Object.entries(dictionaries[locale]))if(typeof value==="string")assert.ok(value.trim(),locale+" empty "+key);
+  assert.equal(dictionaries[locale].cats.length,6,locale+" category labels");
+ }
+});
+test("locale and country names are translated in every searchable locale selector",()=>{
+ const localeStart=js.indexOf("const LOCALE_LABELS=")+"const LOCALE_LABELS=".length;
+ const localeEnd=js.indexOf("\\n};",localeStart)+2;
+ const countryStart=js.indexOf("const COUNTRY_LABELS=")+"const COUNTRY_LABELS=".length;
+ const countryEnd=js.indexOf("\\n};",countryStart)+2;
+ const labels=Function("return "+js.slice(localeStart,localeEnd))();
+ const countries=Function("return "+js.slice(countryStart,countryEnd))();
+ for(const locale of locales){
+  assert.deepEqual(Object.keys(labels[locale]).sort(),[...locales].sort(),locale+" language labels");
+  assert.deepEqual(Object.keys(countries[locale]).sort(),[...locales].sort(),locale+" country labels");
+  for(const code of locales){assert.ok(labels[locale][code]);assert.ok(countries[locale][code]);}
+ }
+ assert.match(js,/COUNTRY_LABELS\\[locale\\]\\[item\\.code\\]/);
+});
+test("accessibility names, fallback copy, and category heading follow the selected locale",()=>{
+ for(const key of ["skipMain","close","loading","wcagTitle","wcagAlt"])assert.match(js,new RegExp(key+":"));
+ assert.match(js,/\\$\\("#category-label"\\)\\.textContent=x\\.category/);
+ assert.match(js,/\\$\\("#wcag-mark-image"\\)\\.alt=x\\.wcagAlt/);
+ assert.match(js,/\\$\\("#wcag-mark-link"\\)\\.title=x\\.wcagTitle/);
+ assert.match(html,/id="wcag-mark-link"/);
+ assert.match(html,/id="wcag-mark-image"/);
+ assert.doesNotMatch(html,/certified giggle/i);
+});
