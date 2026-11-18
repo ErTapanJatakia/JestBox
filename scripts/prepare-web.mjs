@@ -54,8 +54,6 @@ const localizedTitles = {
   "ru-RU": { privacy: "Политика конфиденциальности", accessibility: "Заявление о доступности" },
   "hi-IN": { privacy: "गोपनीयता नीति", accessibility: "सुगम्यता वक्तव्य" },
   "ur-IN": { privacy: "رازداری کی پالیسی", accessibility: "رسائی پذیری کا بیان" },
-  "ur-PK": { privacy: "رازداری کی پالیسی", accessibility: "رسائی کی سہولتوں کا بیان" },
-  "ur-IN": { privacy: "رازداری کی پالیسی", accessibility: "رسائی پذیری کا بیان" },
   "ur-PK": { privacy: "رازداری کی پالیسی", accessibility: "رسائی کی سہولتوں کا بیان" }
 };
 for (const locale of locales) {
