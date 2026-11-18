@@ -1,7 +1,7 @@
 import { access, cp, mkdir, rm } from "node:fs/promises";
 import { constants } from "node:fs";
 
-const requiredFiles = ["index.html", "script.js", "styles.css"];
+const requiredFiles = ["index.html", "script.js", "jokes.js", "styles.css"];
 for (const file of requiredFiles) {
   await access(file, constants.R_OK);
 }
