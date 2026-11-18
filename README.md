@@ -17,6 +17,7 @@ JestBox is a lightweight, offline-first joke application with two distinct conte
 - [Security Policy](SECURITY.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
+- [Android Implementation Plan](ANDROID-IMPLEMENTATION.md)
 
 ## Features
 
@@ -50,4 +51,4 @@ node --test
 
 ## Validation status
 
-The dependency-free regression suite and GitHub validation workflows have passed for the current reviewed feature-branch commit. The latest successful checks include the push and pull-request smoke-test workflows, CodeQL, JavaScript/TypeScript analysis, and GitHub Advanced Security. See the [pull-request checks](https://github.com/ErTapanJatakia/JestBox/pull/1) for the run records. Manual browser/device and assistive-technology QA remains a separate activity and should be recorded in `QA-CHECKLIST.md` with configuration details and evidence; maintainer-reported manual QA is not represented as an independent audit. Android packaging and RuStore submission are separate release activities and have not been validated by these browser-source checks.
+The dependency-free regression suite and CodeQL completed successfully on the merged `main` branch after PR #1. The GitHub Advanced Security agentic review on the final PR head was blocked by an external Copilot model quota error (HTTP 402); this is not a vulnerability finding and is not a security-clean result. See the [PR #1 checks](https://github.com/ErTapanJatakia/JestBox/pull/1) for the recorded results. Manual browser/device and assistive-technology QA remains a separate activity and should be recorded in `QA-CHECKLIST.md` with configuration details and evidence; maintainer-reported manual QA is not represented as an independent audit. Android integration is being developed separately; a successful debug build will not by itself establish device compatibility, native accessibility, release signing, or RuStore acceptance.
