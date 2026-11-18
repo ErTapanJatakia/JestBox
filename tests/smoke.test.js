@@ -532,3 +532,13 @@ test("interactive component boundaries meet the 3:1 non-text contrast threshold"
   assert.ok(ratio(buttonText, accent) >= 4.5,
     "Button label contrast against the accent fill must be at least 4.5:1");
 });
+
+test("reduced-motion preference disables nonessential animation and transitions", () => {
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  const rule = css.match(/@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n\}/);
+  assert.ok(rule, "Missing reduced-motion media query");
+  assert.match(rule[1], /scroll-behavior: auto !important/);
+  assert.match(rule[1], /animation-duration: 0\.01ms !important/);
+  assert.match(rule[1], /animation-iteration-count: 1 !important/);
+  assert.match(rule[1], /transition-duration: 0\.01ms !important/);
+});
