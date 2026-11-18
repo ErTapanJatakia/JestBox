@@ -17,7 +17,7 @@ JestBox is an offline-first joke application with six regional language experien
 | `en-IN` | Indian English — India |
 | `hi-IN` | Indian Hindi — India |
 
-English (`en-US`) is selected by default. The current content foundation contains 20 regionally authored jokes per locale. The product acceptance target is at least 100 unique jokes per locale (600 total), with regional language and cultural review.
+English (`en-US`) is selected by default. The current content foundation contains 40 regionally authored jokes per locale. The product acceptance target is at least 100 unique jokes per locale (600 total), with regional language and cultural review.
 
 ## 2. User-facing features
 
@@ -32,7 +32,7 @@ English (`en-US`) is selected by default. The current content foundation contain
 
 ## 3. Content model
 
-Jokes are stored in `jokes.js` as locale-specific arrays of category/text pairs. Category identifiers are `everyday`, `work`, `tech`, `food`, and `wordplay`. `all` is a filter, not a joke category. The current initial distribution is four jokes in each category per locale (20 total); the planned 100-joke minimum requires at least 20 per category.
+Jokes are stored in `jokes.js` as locale-specific arrays of category/text pairs. Category identifiers are `everyday`, `work`, `tech`, `food`, and `wordplay`. `all` is a filter, not a joke category. The current initial distribution is eight jokes in each category per locale (20 total); the planned 100-joke minimum requires at least 20 per category.
 
 Content should be independently written or culturally adapted for each locale. Avoid literal translation, duplicate punchlines, stereotypes, discriminatory humour, and jokes that depend on a culture-specific reference unfamiliar to the target audience.
 
