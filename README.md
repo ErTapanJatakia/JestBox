@@ -18,6 +18,12 @@ JestBox is a lightweight, offline-first joke application with two distinct conte
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
 
+## Android application
+
+- [Android wrapper architecture and build notes](android/README.md) · [Android validation checklist](android/QA-CHECKLIST.md)
+
+The native Android wrapper is under active development. See its architecture notes and validation checklist; no release APK has been validated or published yet.
+
 ## Features
 
 - Two selectable locales with fully localized interface text.
