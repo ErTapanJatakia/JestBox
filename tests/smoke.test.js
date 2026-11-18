@@ -542,3 +542,13 @@ test("reduced-motion preference disables nonessential animation and transitions"
   assert.match(rule[1], /animation-iteration-count: 1 !important/);
   assert.match(rule[1], /transition-duration: 0\.01ms !important/);
 });
+
+test("short landscape viewports receive compact vertical spacing", () => {
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  const rule = css.match(/@media \(max-height: 480px\) and \(orientation: landscape\) \{([\s\S]*?)\n\}/);
+  assert.ok(rule, "Missing short-landscape responsive rule");
+  assert.match(rule[1], /\.jestbox\s*\{[^}]*padding-top:\s*\.5rem/s);
+  assert.match(rule[1], /\.jestbox\s*\{[^}]*padding-bottom:\s*1rem/s);
+  assert.match(rule[1], /\.jestbox \.locale-picker,\s*\.jestbox \.joke-panel\s*\{[^}]*margin-top:\s*\.5rem/s);
+  assert.match(rule[1], /\.jestbox \.hero\.compact\s*\{[^}]*padding-block:\s*\.75rem/s);
+});
