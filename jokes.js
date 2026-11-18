@@ -195,9 +195,9 @@ const JESTBOX_JOKES_BATCH_5={
 ["food","I asked for less spice. The cook smiled politely and treated it as a creative suggestion."],
 ["food","The tiffin was packed for later. The aroma opened it before lunchtime."],
 ["wordplay","The chai stall's business is steeped in success."],
-["wordplay","The auto-rickshaw comedian always gets a fare laugh."],
-["wordplay","The monsoon cloud became a musician because it had great rain-ge."],
-["wordplay","The dosa tried stand-up comedy, but its best jokes kept rolling."]
+["wordplay","The auto-rickshaw driver became a comedian; every ride came with a fair amount of laughter."],
+["wordplay","The monsoon cloud joined a band; it was great at making it rain."],
+["wordplay","The dosa started a podcast. Its delivery was always crisp."]
 ],
 "hi-IN":[
 ["everyday","बारिश के लिए छाता खरीदा। बारिश नहीं आई, मगर छाता रोज़ बाहर घूमने की ज़िद करता है।"],
@@ -217,9 +217,9 @@ const JESTBOX_JOKES_BATCH_5={
 ["food","कम तीखा बनाने को कहा। रसोइए ने मुस्कराकर इसे सुझाव समझा, निर्देश नहीं।"],
 ["food","टिफ़िन दोपहर के लिए रखा था। खुशबू ने उसे समय से पहले खोल दिया।"],
 ["wordplay","चाय की दुकान का कारोबार खूब उबल रहा है।"],
-["wordplay","ऑटो वाला इतना मज़ेदार था कि हर सवारी हँसते-हँसते उतरती थी।"],
-["wordplay","बादल ने संगीत शुरू किया—उसकी हर धुन में बारिश की ताल थी।"],
-["wordplay","डोसे ने हास्य मंच पर जाने की कोशिश की, मगर उसके चुटकुले लुढ़कते ही रहे।"]
+["wordplay","ऑटो वाले ने चुटकुला सुनाया—किराया भी हँस पड़ा।"],
+["wordplay","बादल ने ढोल बजाया—हर तरफ़ बूंदों की ताल गूँज उठी।"],
+["wordplay","डोसा मंच पर आया—उसकी कॉमेडी में भी कुरकुरापन था।"]
 ]
 };
 for(const locale of Object.keys(JESTBOX_JOKES_BATCH_5))window.JESTBOX_JOKES[locale].push(...JESTBOX_JOKES_BATCH_5[locale]);
