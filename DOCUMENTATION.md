@@ -6,7 +6,7 @@
 
 ## 1. Product overview
 
-JestBox is an offline-first joke application with six regional language experiences:
+JestBox is an offline-first joke application with eight regional language experiences:
 
 | Locale | Audience |
 |---|---|
@@ -16,8 +16,10 @@ JestBox is an offline-first joke application with six regional language experien
 | `es-ES` | Spanish — Spain |
 | `en-IN` | Indian English — India |
 | `hi-IN` | Indian Hindi — India |
+| `ur-IN` | Indian Urdu — Republic of India |
+| `ur-PK` | Pakistani Urdu — Islamic Republic of Pakistan |
 
-English (`en-US`) is selected by default. The current content library contains 100 jokes per locale (600 total), with 20 jokes in each of five categories, including Wordplay. Automated checks validate counts, category balance, uniqueness, and the expected writing system for each locale. Regional humour quality still benefits from native-speaker review.
+English (`en-US`) is selected by default. The current content library contains 100 jokes per locale (800 total), with 20 jokes in each of five categories, including Wordplay. Automated checks validate counts, category balance, uniqueness, and the expected writing system for each locale. Regional humour quality still benefits from native-speaker review.
 
 ## Brand identity and assets
 
@@ -36,7 +38,7 @@ The canonical JestBox logo is `assets/JestBox-Original.png`: the laughing jester
 
 ## 3. Content model
 
-Jokes are stored in `jokes.js` as locale-specific arrays of category/text pairs. Category identifiers are `everyday`, `work`, `tech`, `food`, and `wordplay`. `all` is a filter, not a joke category. The current distribution is twenty jokes in each category per locale (100 total). `all` is a filter, not a joke category. The six locale datasets are maintained independently; English, Spanish, Russian, and Hindi content is written in the respective locale language rather than mixed-language copy. Russian and Hindi automated checks reject Latin-script intrusions; they do not replace native-speaker editorial review.
+Jokes are stored in `jokes.js` as locale-specific arrays of category/text pairs. Category identifiers are `everyday`, `work`, `tech`, `food`, and `wordplay`. `all` is a filter, not a joke category. The current distribution is twenty jokes in each category per locale (100 total). `all` is a filter, not a joke category. All eight locale datasets are maintained independently. Urdu collections use Arabic-derived Urdu script, and both Urdu interfaces and generated legal pages render right-to-left. Automated script checks reject Latin-script intrusions in Russian, Hindi, and Urdu; they do not replace regional editorial review.
 
 Content should be independently written or culturally adapted for each locale. Avoid literal translation, duplicate punchlines, stereotypes, discriminatory humour, and jokes that depend on a culture-specific reference unfamiliar to the target audience.
 
@@ -52,7 +54,7 @@ A web host, browser, operating system, app store, or distribution platform may p
 
 The implementation includes semantic landmarks, skip navigation, searchable labelled controls, visible focus, live status announcements, responsive reflow, reduced-motion support, forced-colors styles, and user-selectable 50–200% text sizing, extra contrast, reduced motion, underlined links, larger touch targets, increased line spacing, and stronger focus outlines. These features require browser, Android, keyboard, and assistive-technology verification.
 
-The WCAG 2.2 AA mark is a graphic. It is not W3C endorsement, certification, or evidence of a completed independent audit. The maintainer's conformance statement must be limited to the exact pages, locales, builds, and test evidence actually reviewed. The new six-locale UI and native Android wrapper require a fresh conformance assessment; earlier claims for the former two-locale web build must not be silently extended.
+The WCAG 2.2 AA mark is a graphic. It is not W3C endorsement, certification, or evidence of a completed independent audit. The maintainer's conformance statement must be limited to the exact pages, locales, builds, and test evidence actually reviewed. The new eight-locale UI and native Android wrapper require a fresh conformance assessment; earlier claims for the former two-locale web build must not be silently extended.
 
 ## 6. Development and validation
 
