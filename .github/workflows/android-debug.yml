@@ -28,6 +28,7 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check script.js
+          node --check jokes.js
           node --check scripts/prepare-web.mjs
       - name: Run dependency-free regression tests
         run: node --test
