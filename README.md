@@ -1,5 +1,7 @@
 # JestBox
 
+![Original JestBox laughing jester gift-box logo](assets/JestBox-Original.png)
+
 **Small box. Big laughs. Offline, on your side of the world.**
 
 JestBox is a lightweight, offline-first joke app with six independently localised language-and-region experiences:
