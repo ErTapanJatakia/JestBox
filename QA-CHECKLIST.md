@@ -58,9 +58,9 @@ Use this checklist on the feature branch before approving PR #1 or preparing an 
 
 ## Evidence and release gate
 
-- [ ] Run `node --check script.js` using Node.js 22 or newer.
-- [ ] Run `node --test` and retain the complete output.
-- [ ] After the complete application implementation is finished and the repository owner re-enables CI, run the code-quality workflows and retain their results.
+- [x] `node --check script.js` passed in the GitHub Actions validation workflow using Node.js 22.
+- [x] `node --test` passed in the GitHub Actions validation workflow; the workflow log retains the execution output.
+- [x] GitHub validation workflows passed for the reviewed feature-branch head: push smoke tests, pull-request smoke tests, CodeQL, JavaScript/TypeScript analysis, and GitHub Advanced Security. See [PR #1 and its checks](https://github.com/ErTapanJatakia/JestBox/pull/1).
 - [ ] Record browser/device versions and any defects found.
 - [ ] Do not package Android or submit to RuStore until source tests and required manual QA checks pass.
 
