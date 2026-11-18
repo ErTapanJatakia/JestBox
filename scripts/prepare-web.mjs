@@ -1,7 +1,7 @@
 import { access, cp, mkdir, rm, readFile, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { constants } from "node:fs";
-import { marked } from "marked";
+
 
 const requiredFiles = ["index.html", "script.js", "jokes.js", "share-bridge.bundle.js", "styles.css"];
 for (const file of requiredFiles) await access(file, constants.R_OK);
@@ -20,6 +20,31 @@ try {
   console.warn("esbuild is not installed; retaining the browser-safe share bridge stub.");
 }
 
+function inlineMarkdown(value) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/\\[([^\\]]+)\\]\\((https?:\\/\\/[^ )]+|mailto:[^ )]+|tel:[^ )]+)\\)/g, '<a href="$2">$1</a>')
+    .replace(/\\*\\*([^*]+)\\*\\*/g, "<strong>$1</strong>")
+    .replace(/\\*([^*]+)\\*/g, "<em>$1</em>");
+}
+function renderMarkdown(markdown) {
+  const lines = markdown.replaceAll("assets/wcag22aa-blue.svg", "../assets/wcag22aa-blue.svg").split(/\\r?\\n/);
+  const out = []; let paragraph = []; let list = null;
+  const flushP = () => { if (paragraph.length) { out.push("<p>" + inlineMarkdown(paragraph.join(" ")) + "</p>"); paragraph = []; } };
+  const flushL = () => { if (list) { out.push("</" + list + ">"); list = null; } };
+  for (const line of lines) {
+    if (!line.trim()) { flushP(); flushL(); continue; }
+    if (/^<[^>]+>/.test(line.trim())) { flushP(); flushL(); out.push(line); continue; }
+    const h = line.match(/^(#{1,6})\\s+(.+)$/);
+    if (h) { flushP(); flushL(); const n = h[1].length; out.push("<h" + n + ">" + inlineMarkdown(h[2]) + "</h" + n + ">"); continue; }
+    if (/^\\s*---+\\s*$/.test(line)) { flushP(); flushL(); out.push("<hr>"); continue; }
+    const li = line.match(/^\\s*[-*]\\s+(.+)$/);
+    if (li) { flushP(); if (list !== "ul") { flushL(); list = "ul"; out.push("<ul>"); } out.push("<li>" + inlineMarkdown(li[1]) + "</li>"); continue; }
+    const oi = line.match(/^\\s*\\d+\\.\\s+(.+)$/);
+    if (oi) { flushP(); if (list !== "ol") { flushL(); list = "ol"; out.push("<ol>"); } out.push("<li>" + inlineMarkdown(oi[1]) + "</li>"); continue; }
+    flushL(); paragraph.push(line.trim());
+  }
+  flushP(); flushL(); return out.join("\\n");
+}
 const locales = ["en-US", "es-PE", "ru-RU", "es-ES", "en-IN", "hi-IN"];
 for (const locale of locales) {
   const suffix = locale === "en-US" ? "" : `.${locale}`;
@@ -29,7 +54,7 @@ for (const locale of locales) {
   ]) {
     const source = `${prefix}${suffix}.md`;
     const markdown = await readFile(source, "utf8");
-    const body = marked.parse(markdown.replaceAll("assets/wcag22aa-blue.svg", "../assets/wcag22aa-blue.svg"));
+    const body = renderMarkdown(markdown);
     const page = `<!doctype html>
 <html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark light"><title>${title} — JestBox</title>
