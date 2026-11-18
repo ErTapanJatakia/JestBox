@@ -36,3 +36,14 @@ test("six locale policy and accessibility documents include the required contact
 
 test("the same regionally localised privacy-aware tagline appears on launch and home",()=>{assert.match(js,/\["#headline","launch"\]/);assert.match(js,/\["#launch-tagline","launch"\]/);for(const phrase of ["Pocket-sized local laughs","Risas locales de bolsillo","Местный юмор в кармане","जेब में देसी हँसी"])assert.ok(js.includes(phrase),phrase)});
 test("theme names are localised for all six selected locales",()=>{assert.match(js,/const THEME_NAMES=/);for(const locale of ["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN"])assert.ok(js.includes('"'+locale+'":['),"Missing theme translations: "+locale)});
+
+test("no exact joke text is reused across different locale collections",()=>{
+ const owner=new Map();
+ for(const locale of locales){
+  for(const [,text] of jokes[locale]){
+   const normalized=text.normalize("NFKC").toLocaleLowerCase().replace(/\\s+/g," ").trim();
+   assert.ok(!owner.has(normalized),`Cross-locale duplicate between ${owner.get(normalized)} and ${locale}: ${text}`);
+   owner.set(normalized,locale);
+  }
+ }
+});
