@@ -39,7 +39,7 @@ personal or sensitive information.
 
 Do not report security vulnerabilities in public issues or through a public
 conduct report. Use the private vulnerability-disclosure instructions in
-[SECURITY.md](SECURITY.md) once that channel is published.
+[SECURITY.md](SECURITY.md).
 
 Reports will be handled as confidentially as reasonably possible. Information
 may be shared only where needed to assess or respond to a report, protect
