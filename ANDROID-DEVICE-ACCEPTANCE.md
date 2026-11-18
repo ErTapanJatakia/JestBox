@@ -39,8 +39,9 @@ The app ID is currently \`com.ertapanjatakia.jestbox\`. A debug build may not in
 
 - [ ] App installs and opens without a crash.
 - [ ] Launch screen appears and can be skipped by tapping.
-- [ ] Default locale is American English; all six locales can be selected.
+- [ ] Default locale is American English; all eight locales can be selected.
 - [ ] Locale selection updates the interface and country/region presentation.
+- [ ] Select `ur-IN` and `ur-PK`; confirm all screens switch to right-to-left and Urdu text remains readable.
 - [ ] All Jokes and each of the five categories work, including Wordplay.
 - [ ] Joke navigation works repeatedly without blank or malformed content.
 - [ ] All ten themes apply across the app and remain readable.
