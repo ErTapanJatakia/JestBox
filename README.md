@@ -7,6 +7,13 @@ JestBox is a lightweight, offline-first joke application with two distinct conte
 - **American English (en-US)** — original, US-oriented everyday, workplace, technology, food and wordplay jokes.
 - **Russian (ru-RU)** — original Russian-language jokes written for a Russian Federation audience, with local phrasing and familiar everyday references.
 
+## Project documentation
+
+- [Product and Technical Documentation](DOCUMENTATION.md)
+- [Privacy Policy](PRIVACY-POLICY.md)
+- [Accessibility Statement](ACCESSIBILITY-STATEMENT.md)
+- [Release QA Checklist](QA-CHECKLIST.md)
+
 ## Features
 
 - Two selectable locales with fully localized interface text.
