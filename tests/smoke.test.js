@@ -49,7 +49,7 @@ test("no exact joke text is reused across different locale collections",()=>{
 });
 
 test("dashboard omits launch-only marketing copy and starts with the two primary panels",()=>{const main=html.match(/<main id="main"[\s\S]*?<\/main>/)?.[0]||"";assert.doesNotMatch(html,/<section class="hero compact"/);assert.match(main,/class="locale-picker panel"[\s\S]*class="joke-panel panel"/);assert.doesNotMatch(main,/Pocket-sized local laughs|Local laughs, zero signal drama/)});
-test("locale and category menus sort alphabetically and open the complete option list on tap",()=>{assert.match(js,/label\.localeCompare\(b\.label,locale/);assert.match(js,/addEventListener\("click",\(\)=>renderLocaleOptions/);assert.match(js,/addEventListener\("click",\(\)=>renderCategoryOptions/)});
+test("locale and category menus sort alphabetically and open the complete option list on tap",()=>{assert.match(js,/localeDisplay\(a\.code\)\.localeCompare\(localeDisplay\(b\.code\),locale/);assert.match(js,/addEventListener\("click",\(\)=>renderLocaleOptions/);assert.match(js,/addEventListener\("click",\(\)=>renderCategoryOptions/)});
 test("accessibility preferences persist locally with a readable default text scale",()=>{assert.match(js,/textScale:85/);assert.match(html,/min="50" max="200"/);assert.match(js,/savePrefs\(\)/);assert.match(js,/applyPrefs\(\)/);assert.match(css,/body\.underline-links/);assert.match(css,/body\.larger-targets/);assert.match(css,/body\.more-line-spacing/);assert.match(css,/body\.enhanced-focus/)});
 test("all six privacy policies and accessibility statements are localized",()=>{for(const locale of locales){const suffix=locale==="en-US"?"":"."+locale;const policy=read("PRIVACY-POLICY"+suffix+".md");const statement=read("ACCESSIBILITY-STATEMENT"+suffix+".md");assert.match(policy,/19|noviembre|November|ноября|नवंबर/);assert.match(statement,/WCAG 2\.2/);assert.equal(statement.split("assets/wcag22aa-blue.svg").length-1,2);assert.match(statement,/cyber\.litigation\.advisor@gmail\.com/)}});
 test("generated legal pages use a translated document title for every locale",()=>{const build=read("scripts/prepare-web.mjs");for(const title of ["Política de privacidad","Declaración de accesibilidad","Политика конфиденциальности","Заявление о доступности","गोपनीयता नीति","सुगम्यता वक्तव्य"])assert.ok(build.includes(title),title);assert.match(build,/localizedTitle/)});
@@ -60,7 +60,7 @@ test("launch screen brand title, tagline, and skip hint use 20 percent larger de
 
 test("all six interface dictionaries expose the same complete set of non-empty translations",()=>{
  const start=js.indexOf("const UI=")+ "const UI=".length;
- const end=js.indexOf("\\n};",start)+2;
+ const end=js.indexOf("\n};",start)+2;
  const dictionaries=Function("return "+js.slice(start,end))();
  const expected=Object.keys(dictionaries["en-US"]).sort();
  assert.deepEqual(Object.keys(dictionaries).sort(),[...locales].sort());
@@ -72,9 +72,9 @@ test("all six interface dictionaries expose the same complete set of non-empty t
 });
 test("locale and country names are translated in every searchable locale selector",()=>{
  const localeStart=js.indexOf("const LOCALE_LABELS=")+"const LOCALE_LABELS=".length;
- const localeEnd=js.indexOf("\\n};",localeStart)+2;
+ const localeEnd=js.indexOf("\n};",localeStart)+2;
  const countryStart=js.indexOf("const COUNTRY_LABELS=")+"const COUNTRY_LABELS=".length;
- const countryEnd=js.indexOf("\\n};",countryStart)+2;
+ const countryEnd=js.indexOf("\n};",countryStart)+2;
  const labels=Function("return "+js.slice(localeStart,localeEnd))();
  const countries=Function("return "+js.slice(countryStart,countryEnd))();
  for(const locale of locales){
