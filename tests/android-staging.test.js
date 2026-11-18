@@ -15,7 +15,7 @@ test("Android staging script copies only the local web app and bundled assets", 
     await cp("styles.css", join(fixture, "styles.css"));
     await cp("assets", join(fixture, "assets"), { recursive: true });
     for (const name of ["PRIVACY-POLICY", "ACCESSIBILITY-STATEMENT"]) {
-      for (const locale of ["", ".es-PE", ".ru-RU", ".es-ES", ".en-IN", ".hi-IN"]) {
+      for (const locale of ["", ".es-PE", ".ru-RU", ".es-ES", ".en-IN", ".hi-IN", ".ur-IN", ".ur-PK"]) {
         await cp(`${name}${locale}.md`, join(fixture, `${name}${locale}.md`));
       }
     }
@@ -31,10 +31,10 @@ test("Android staging script copies only the local web app and bundled assets", 
     const sourceAsset = await readFile("assets/wcag22aa-blue.svg", "utf8");
     const stagedAsset = await readFile(join(fixture, "www/assets/wcag22aa-blue.svg"), "utf8");
     assert.equal(stagedAsset, sourceAsset, "bundled accessibility asset must be copied unchanged");
-    for (const locale of ["en-US", "es-PE", "ru-RU", "es-ES", "en-IN", "hi-IN"]) {
+    for (const locale of ["en-US", "es-PE", "ru-RU", "es-ES", "en-IN", "hi-IN", "ur-IN", "ur-PK"]) {
       for (const kind of ["privacy", "accessibility"]) {
         const page = await readFile(join(fixture, `www/legal/${kind}-${locale}.html`), "utf8");
-        assert.match(page, new RegExp(`<html lang="${locale}">`));
+        assert.match(page, new RegExp(`<html lang="${locale}" dir="${locale.startsWith("ur-") ? "rtl" : "ltr"}">`));
         assert.match(page, /JestBox/);
       }
     }
