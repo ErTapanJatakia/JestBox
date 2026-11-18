@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { cp, mkdtemp, readFile, rm } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -14,6 +14,12 @@ test("Android staging script copies only the local web app and bundled assets", 
     await cp("share-bridge.bundle.js", join(fixture, "share-bridge.bundle.js"));
     await cp("styles.css", join(fixture, "styles.css"));
     await cp("assets", join(fixture, "assets"), { recursive: true });
+    for (const name of ["PRIVACY-POLICY", "ACCESSIBILITY-STATEMENT"]) {
+      for (const locale of ["", ".es-PE", ".ru-RU", ".es-ES", ".en-IN", ".hi-IN"]) {
+        await cp(`${name}${locale}.md`, join(fixture, `${name}${locale}.md`));
+      }
+    }
+    await symlink(join(process.cwd(), "node_modules"), join(fixture, "node_modules"), "dir");
     await cp("scripts/prepare-web.mjs", join(fixture, "prepare-web.mjs"));
     await execFileSync(process.execPath, [join(fixture, "prepare-web.mjs")], { cwd: fixture });
 
@@ -26,6 +32,13 @@ test("Android staging script copies only the local web app and bundled assets", 
     const sourceAsset = await readFile("assets/wcag22aa-blue.svg", "utf8");
     const stagedAsset = await readFile(join(fixture, "www/assets/wcag22aa-blue.svg"), "utf8");
     assert.equal(stagedAsset, sourceAsset, "bundled accessibility asset must be copied unchanged");
+    for (const locale of ["en-US", "es-PE", "ru-RU", "es-ES", "en-IN", "hi-IN"]) {
+      for (const kind of ["privacy", "accessibility"]) {
+        const page = await readFile(join(fixture, `www/legal/${kind}-${locale}.html`), "utf8");
+        assert.match(page, new RegExp(`<html lang="${locale}">`));
+        assert.match(page, /JestBox/);
+      }
+    }
   } finally {
     await rm(fixture, { recursive: true, force: true });
   }
