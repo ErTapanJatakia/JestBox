@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="366" height="128" viewBox="0 0 366 128" role="img" aria-labelledby="title desc">
+  <title id="title">WCAG 2.2 AA</title>
+  <desc id="desc">W3C Web Content Accessibility Guidelines 2.2 Level AA conformance mark</desc>
+  <rect width="366" height="128" fill="#ffffff"/>
+  <rect x="146" width="220" height="128" fill="#b4d1e2"/>
+  <g fill="#005a9c" font-family="Arial, Helvetica, sans-serif" font-size="55" font-weight="700" letter-spacing="-2"><text x="13" y="83">W3C</text></g>
+  <g fill="#000000" font-family="Arial, Helvetica, sans-serif" font-size="43" font-weight="700"><text x="160" y="55">WCAG</text><text x="160" y="104">2.2 AA</text></g>
+</svg>
