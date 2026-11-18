@@ -12,6 +12,7 @@
 - [ ] Confirm changing locale resets the category to All Jokes and updates the page language/title.
 - [ ] Confirm category search filters All Jokes, Everyday Life, Work & Study, Tech & Internet, Food & Drink, and Wordplay in every locale.
 - [ ] Confirm every locale contains at least 100 unique, regionally appropriate jokes; minimum distribution is 20 per category.
+- [ ] Confirm no exact joke text is reused across different locale collections; review model-assisted regional language and cultural fit without claiming native-speaker certification.
 - [ ] Review jokes for natural language, local phrasing, cultural relevance, duplicates, offensive stereotypes, and category accuracy.
 - [ ] Confirm the daily joke is stable for a given device-local date, locale, and category; confirm it changes appropriately after date/locale/category changes.
 - [ ] Confirm the random-joke action does not immediately repeat when alternatives exist.
