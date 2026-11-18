@@ -82,13 +82,13 @@ test("locale and country names are translated in every searchable locale selecto
   assert.deepEqual(Object.keys(countries[locale]).sort(),[...locales].sort(),locale+" country labels");
   for(const code of locales){assert.ok(labels[locale][code]);assert.ok(countries[locale][code]);}
  }
- assert.match(js,/COUNTRY_LABELS\\[locale\\]\\[item\\.code\\]/);
+ assert.ok(js.includes("COUNTRY_LABELS[locale][item.code]"));
 });
 test("accessibility names, fallback copy, and category heading follow the selected locale",()=>{
  for(const key of ["skipMain","close","loading","wcagTitle","wcagAlt","description"])assert.match(js,new RegExp(key+":"));
- assert.match(js,/\\$\\("#category-label"\\)\\.textContent=x\\.category/);
- assert.match(js,/\\$\\("#wcag-mark-image"\\)\\.alt=x\\.wcagAlt/);
- assert.match(js,/\\$\\("#wcag-mark-link"\\)\\.title=x\\.wcagTitle/);assert.match(js,/meta\\[name="description"\\]/);
+ assert.ok(js.includes('$("#category-label").textContent=x.category;'));
+ assert.ok(js.includes('$("#wcag-mark-image").alt=x.wcagAlt;'));
+ assert.ok(js.includes('$("#wcag-mark-link").title=x.wcagTitle;'));assert.ok(js.includes('meta[name="description"]'));
  assert.match(html,/id="wcag-mark-link"/);
  assert.match(html,/id="wcag-mark-image"/);
  assert.doesNotMatch(html,/certified giggle/i);
