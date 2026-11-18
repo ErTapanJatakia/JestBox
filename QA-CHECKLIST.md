@@ -1,12 +1,12 @@
 # JestBox release QA checklist
 
-**Scope:** six-locale redesign, ten themes, native share integration, accessibility controls, and Android wrapper.  
+**Scope:** eight-locale redesign, ten themes, native share integration, accessibility controls, and Android wrapper.  
 **Rule:** record device/browser/OS, viewport, assistive technology, date, outcome, and evidence. Do not mark a check complete without observing it.
 
 ## Functional and content checks
 
 - [ ] Fresh launch defaults to American English (`en-US`).
-- [ ] Search/select each locale: `en-US`, `es-PE`, `ru-RU`, `es-ES`, `en-IN`, and `hi-IN`.
+- [ ] Search/select each locale: `en-US`, `es-PE`, `ru-RU`, `es-ES`, `en-IN`, `hi-IN`, `ur-IN`, and `ur-PK`.
 - [ ] Confirm each locale displays its country on a separate line in the searchable selector.
 - [ ] Confirm every visible line, heading, status, button label, accessible name, category, and dialog is localised after changing locale.
 - [ ] Confirm changing locale resets the category to All Jokes and updates the page language/title.
@@ -57,7 +57,7 @@
 
 ## Documentation and release gates
 
-- [ ] Verify all six Privacy Policies and all six Accessibility Statements are translated into their matching language locale and describe the current build.
+- [ ] Verify all eight Privacy Policies and all eight Accessibility Statements are translated into their matching language locale and describe the current build.
 - [ ] Verify developer/support, DPO, and WCAG auditor contact details.
 - [ ] Verify Proprietary / All Rights Reserved licence remains in place.
 - [ ] Verify Security Policy, Code of Conduct, Contributing Guidelines, and product documentation are current.

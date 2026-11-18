@@ -7,7 +7,7 @@
 ## 1. Obtain the correct build
 
 1. Open the JestBox repository's Actions page: https://github.com/ErTapanJatakia/JestBox/actions
-2. Open the successful **JestBox Android debug build** run for the latest \`feat/jestbox-six-locale-experience\` commit.
+2. Open the successful **JestBox Android debug build** run for the latest \`feat/urdu-locales-ur-in-ur-pk\` commit.
 3. Confirm the run includes successful steps named **Verify APK signature, alignment, and checksum** and **Upload debug APK and checksum**.
 4. Download the \`jestbox-android-debug\` artifact ZIP and extract it.
 5. Confirm the ZIP contains \`app-debug.apk\` and \`app-debug.apk.sha256\`. Use only the APK from this exact run.
@@ -39,8 +39,9 @@ The app ID is currently \`com.ertapanjatakia.jestbox\`. A debug build may not in
 
 - [ ] App installs and opens without a crash.
 - [ ] Launch screen appears and can be skipped by tapping.
-- [ ] Default locale is American English; all six locales can be selected.
+- [ ] Default locale is American English; all eight locales can be selected.
 - [ ] Locale selection updates the interface and country/region presentation.
+- [ ] Select `ur-IN` and `ur-PK`; confirm all screens switch to right-to-left and Urdu text remains readable.
 - [ ] All Jokes and each of the five categories work, including Wordplay.
 - [ ] Joke navigation works repeatedly without blank or malformed content.
 - [ ] All ten themes apply across the app and remain readable.

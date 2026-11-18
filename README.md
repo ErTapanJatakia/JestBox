@@ -4,7 +4,7 @@
 
 **Small box. Big laughs. Offline, on your side of the world.**
 
-JestBox is a lightweight, offline-first joke app with six independently localised language-and-region experiences:
+JestBox is a lightweight, offline-first joke app with eight independently localised language-and-region experiences:
 
 | Locale | Experience |
 |---|---|
@@ -14,14 +14,16 @@ JestBox is a lightweight, offline-first joke app with six independently localise
 | `es-ES` | Spanish — Kingdom of Spain |
 | `en-IN` | Indian English — Republic of India |
 | `hi-IN` | Indian Hindi — Republic of India |
+| `ur-IN` | Indian Urdu — Republic of India |
+| `ur-PK` | Pakistani Urdu — Islamic Republic of Pakistan |
 
-The language selector is searchable. English (`en-US`) is the default. Joke text is written for its regional audience in the selected locale. The current content library contains 100 original jokes per locale (600 total), with 20 jokes in each of five categories, including Wordplay. Joke text follows the selected locale's language and writing system; regional references are tailored to each audience.
+The language selector is searchable. English (`en-US`) is the default. Joke text is written for its regional audience in the selected locale. The current content library contains 100 original jokes per locale (800 total), with 20 jokes in each of five categories, including Wordplay. Joke text follows the selected locale's language and writing system; regional references are tailored to each audience.
 
 ## Project documentation
 
 - [Product and Technical Documentation](DOCUMENTATION.md)
-- Privacy Policies: [en-US](PRIVACY-POLICY.md) · [es-PE](PRIVACY-POLICY.es-PE.md) · [ru-RU](PRIVACY-POLICY.ru-RU.md) · [es-ES](PRIVACY-POLICY.es-ES.md) · [en-IN](PRIVACY-POLICY.en-IN.md) · [hi-IN](PRIVACY-POLICY.hi-IN.md)
-- Accessibility Statements: [en-US](ACCESSIBILITY-STATEMENT.md) · [es-PE](ACCESSIBILITY-STATEMENT.es-PE.md) · [ru-RU](ACCESSIBILITY-STATEMENT.ru-RU.md) · [es-ES](ACCESSIBILITY-STATEMENT.es-ES.md) · [en-IN](ACCESSIBILITY-STATEMENT.en-IN.md) · [hi-IN](ACCESSIBILITY-STATEMENT.hi-IN.md)
+- Privacy Policies: [en-US](PRIVACY-POLICY.md) · [es-PE](PRIVACY-POLICY.es-PE.md) · [ru-RU](PRIVACY-POLICY.ru-RU.md) · [es-ES](PRIVACY-POLICY.es-ES.md) · [en-IN](PRIVACY-POLICY.en-IN.md) · [hi-IN](PRIVACY-POLICY.hi-IN.md) · [ur-IN](PRIVACY-POLICY.ur-IN.md) · [ur-PK](PRIVACY-POLICY.ur-PK.md)
+- Accessibility Statements: [en-US](ACCESSIBILITY-STATEMENT.md) · [es-PE](ACCESSIBILITY-STATEMENT.es-PE.md) · [ru-RU](ACCESSIBILITY-STATEMENT.ru-RU.md) · [es-ES](ACCESSIBILITY-STATEMENT.es-ES.md) · [en-IN](ACCESSIBILITY-STATEMENT.en-IN.md) · [hi-IN](ACCESSIBILITY-STATEMENT.hi-IN.md) · [ur-IN](ACCESSIBILITY-STATEMENT.ur-IN.md) · [ur-PK](ACCESSIBILITY-STATEMENT.ur-PK.md)
 - [Release QA Checklist](QA-CHECKLIST.md)
 - [Proprietary Licence — All Rights Reserved](LICENSE)
 - [Security Policy](SECURITY.md)
@@ -31,7 +33,7 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 
 ## Features
 
-- Six searchable language/region choices and fully localised interface copy.
+- Eight searchable language/region choices and fully localised interface copy.
 - Ten full-app colour themes.
 - A five-second skippable launch screen with a locally bundled mascot mark.
 - Searchable joke-category picker: All Jokes, Everyday Life, Work & Study, Tech & Internet, Food & Drink, and Wordplay.
@@ -61,6 +63,6 @@ node --test
 
 ## Validation and release boundaries
 
-The new six-locale experience is under development on a review branch. Its current starter content is 100 jokes per locale; reaching and validating 100+ per locale remains an open acceptance item. New changes require fresh CI and manual verification. The WCAG graphic is a reference mark, not W3C approval or an independent audit. Do not infer AA conformance from the logo or source assertions alone.
+The eight-locale experience includes 100 jokes per locale (800 total), balanced across five categories. Urdu (`ur-IN` and `ur-PK`) uses independent regional collections and right-to-left interface and legal-page presentation. Automated validation and practical RTL/device review remain required for each release commit. New changes require fresh CI and manual verification. The WCAG graphic is a reference mark, not W3C approval or an independent audit. Do not infer AA conformance from the logo or source assertions alone.
 
 Android integration is maintained separately. A successful debug build does not establish device compatibility, native accessibility, release signing, or RuStore acceptance. The proprietary licence remains in force; public source visibility grants no general reuse rights.

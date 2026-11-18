@@ -45,14 +45,16 @@ function renderMarkdown(markdown) {
   }
   flushP(); flushL(); return out.join("\n");
 }
-const locales = ["en-US", "es-PE", "ru-RU", "es-ES", "en-IN", "hi-IN"];
+const locales = ["en-US", "es-PE", "ru-RU", "es-ES", "en-IN", "hi-IN", "ur-IN", "ur-PK"];
 const localizedTitles = {
   "en-US": { privacy: "Privacy Policy", accessibility: "Accessibility Statement" },
   "en-IN": { privacy: "Privacy Policy", accessibility: "Accessibility Statement" },
   "es-PE": { privacy: "Política de privacidad", accessibility: "Declaración de accesibilidad" },
   "es-ES": { privacy: "Política de privacidad", accessibility: "Declaración de accesibilidad" },
   "ru-RU": { privacy: "Политика конфиденциальности", accessibility: "Заявление о доступности" },
-  "hi-IN": { privacy: "गोपनीयता नीति", accessibility: "सुगम्यता वक्तव्य" }
+  "hi-IN": { privacy: "गोपनीयता नीति", accessibility: "सुगम्यता वक्तव्य" },
+  "ur-IN": { privacy: "رازداری کی پالیسی", accessibility: "رسائی پذیری کا بیان" },
+  "ur-PK": { privacy: "رازداری کی پالیسی", accessibility: "رسائی کی سہولتوں کا بیان" }
 };
 for (const locale of locales) {
   const suffix = locale === "en-US" ? "" : `.${locale}`;
@@ -65,11 +67,11 @@ for (const locale of locales) {
     const body = renderMarkdown(markdown);
     const localizedTitle = localizedTitles[locale][kind];
     const page = `<!doctype html>
-<html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="${locale}" dir="${locale.startsWith("ur-") ? "rtl" : "ltr"}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark light"><title>${localizedTitle} — JestBox</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light dark}
-body{margin:0;background:#101827;color:#f8f9ff;line-height:1.65}
+body{margin:0;background:#101827;color:#f8f9ff;line-height:1.65;direction:${locale.startsWith("ur-") ? "rtl" : "ltr"};text-align:${locale.startsWith("ur-") ? "right" : "left"}}
 main{width:min(900px,calc(100% - 2rem));margin:2rem auto;padding:clamp(1rem,4vw,2.5rem);background:#1b2940;border:1px solid #8092ad;border-radius:1rem}
 a{color:#75e6da;overflow-wrap:anywhere}img{max-width:100%;height:auto}
 h1,h2,h3{line-height:1.2}h1{font-size:clamp(1.6rem,4vw,2.3rem)}h2{margin-top:2rem}
@@ -81,4 +83,4 @@ li{margin:.35rem 0}code{overflow-wrap:anywhere}
     await writeFile(`www/legal/${kind}-${locale}.html`, page);
   }
 }
-console.log("Prepared local app assets and all 12 locale-specific legal pages in www/.");
+console.log(`Prepared local app assets and ${locales.length * 2} locale-specific legal pages in www/.`);
