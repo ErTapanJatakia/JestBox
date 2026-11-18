@@ -3,11 +3,11 @@
 **آخری جائزہ:** 19 نومبر 2026  
 **مصنوعہ:** JestBox
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="ڈبلیو سی اے جی 2.2 رہنمائی"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="ڈبلیو سی اے جی 2.2 سطح اے اے حوالہ نشان"></a></p>
+<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 رہنمائی"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 سطح اے اے حوالہ نشان"></a></p>
 
 ## ہمارا عزم
 
-JestBox کا مقصد مختلف رسائی کی ضروریات رکھنے والے افراد کے لیے قابل استعمال تجربہ فراہم کرنا ہے۔ رسائی پذیری ڈیزائن، انجینئرنگ اور جانچ کا مسلسل عمل ہے۔ ہم ڈبلیو سی اے جی 2.2 سطح اے اے کو ڈیزائن اور جائزے کا ہدف بناتے ہیں۔ اوپر دیا گیا نشان صرف حوالہ ہے؛ اس کا مطلب یہ نہیں کہ ڈبلیو تھری سی یا ڈبلیو اے آئی نے JestBox کا جائزہ لیا، منظوری دی یا اسے سند دی ہے۔
+JestBox کا مقصد مختلف رسائی کی ضروریات رکھنے والے افراد کے لیے قابل استعمال تجربہ فراہم کرنا ہے۔ رسائی پذیری ڈیزائن، انجینئرنگ اور جانچ کا مسلسل عمل ہے۔ ہم WCAG 2.2 سطح اے اے کو ڈیزائن اور جائزے کا ہدف بناتے ہیں۔ اوپر دیا گیا نشان صرف حوالہ ہے؛ اس کا مطلب یہ نہیں کہ ڈبلیو تھری سی یا ڈبلیو اے آئی نے JestBox کا جائزہ لیا، منظوری دی یا اسے سند دی ہے۔
 
 ## رسائی پذیری کی سہولتیں
 
@@ -36,7 +36,7 @@ JestBox کا مقصد مختلف رسائی کی ضروریات رکھنے وا�
 - **فون:** [+91 9664332984](tel:+919664332984)
 - **ویب سائٹ:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="ڈبلیو سی اے جی 2.2 رہنمائی"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="ڈبلیو سی اے جی 2.2 سطح اے اے حوالہ نشان"></a></p>
+<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 رہنمائی"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 سطح اے اے حوالہ نشان"></a></p>
 
 ## حوالہ
 
