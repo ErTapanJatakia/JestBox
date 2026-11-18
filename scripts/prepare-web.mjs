@@ -45,14 +45,16 @@ function renderMarkdown(markdown) {
   }
   flushP(); flushL(); return out.join("\n");
 }
-const locales = ["en-US", "es-PE", "ru-RU", "es-ES", "en-IN", "hi-IN"];
+const locales = ["en-US", "es-PE", "ru-RU", "es-ES", "en-IN", "hi-IN", "ur-IN", "ur-PK"];
 const localizedTitles = {
   "en-US": { privacy: "Privacy Policy", accessibility: "Accessibility Statement" },
   "en-IN": { privacy: "Privacy Policy", accessibility: "Accessibility Statement" },
   "es-PE": { privacy: "Política de privacidad", accessibility: "Declaración de accesibilidad" },
   "es-ES": { privacy: "Política de privacidad", accessibility: "Declaración de accesibilidad" },
   "ru-RU": { privacy: "Политика конфиденциальности", accessibility: "Заявление о доступности" },
-  "hi-IN": { privacy: "गोपनीयता नीति", accessibility: "सुगम्यता वक्तव्य" }
+  "hi-IN": { privacy: "गोपनीयता नीति", accessibility: "सुगम्यता वक्तव्य" },
+  "ur-IN": { privacy: "رازداری کی پالیسی", accessibility: "رسائی پذیری کا بیان" },
+  "ur-PK": { privacy: "رازداری کی پالیسی", accessibility: "رسائی کی سہولتوں کا بیان" }
 };
 for (const locale of locales) {
   const suffix = locale === "en-US" ? "" : `.${locale}`;
@@ -81,4 +83,4 @@ li{margin:.35rem 0}code{overflow-wrap:anywhere}
     await writeFile(`www/legal/${kind}-${locale}.html`, page);
   }
 }
-console.log("Prepared local app assets and all 12 locale-specific legal pages in www/.");
+console.log(`Prepared local app assets and ${locales.length * 2} locale-specific legal pages in www/.`);
