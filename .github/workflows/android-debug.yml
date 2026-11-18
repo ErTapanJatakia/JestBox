@@ -32,6 +32,7 @@ jobs:
           node --check jokes.js
           node --check share-bridge.entry.js
           node --check scripts/prepare-web.mjs
+          node --check scripts/prepare-android-branding.mjs
       - name: Run dependency-free regression tests
         run: node --test
       - name: Set up Java
@@ -49,6 +50,8 @@ jobs:
         run: npm run prepare:web
       - name: Generate Android platform project
         run: npx cap add android
+      - name: Apply original JestBox launcher artwork
+        run: node scripts/prepare-android-branding.mjs
       - name: Synchronize native project
         run: npx cap sync android
       - name: Assemble debug APK
