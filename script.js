@@ -9,7 +9,7 @@ const copy = {
     categories: { all: "All jokes", everyday: "Everyday life", work: "Work & study", tech: "Tech & internet", food: "Food & drink", wordplay: "Wordplay" },
     another: "Another joke", copy: "Copy", share: "Share",
     privacy: "Made for offline smiles. No accounts, tracking, or personal data collection.",
-    footer: "Two locales. Locally stored laughs. Zero fuss.",
+    footer: "Two locales. Jokes bundled in the app. Zero fuss.",
     copied: "Copied!", copyFailed: "Copy unavailable here. You can select the joke and copy it.",
     shared: "Ready to share.", shareFallback: "Sharing isn't available here. The joke has been copied instead.",
     categoryNames: { everyday: "Everyday life", work: "Work & study", tech: "Tech & internet", food: "Food & drink", wordplay: "Wordplay" }
@@ -23,7 +23,7 @@ const copy = {
     categories: { all: "Все шутки", everyday: "Повседневная жизнь", work: "Работа и учёба", tech: "Технологии и интернет", food: "Еда и напитки", wordplay: "Игра слов" },
     another: "Ещё шутку", copy: "Копировать", share: "Поделиться",
     privacy: "Улыбайтесь даже без интернета. Без аккаунтов, слежки и сбора личных данных.",
-    footer: "Две локали. Юмор прямо в приложении. Никаких сложностей.",
+    footer: "Две локали. Шутки уже в приложении. Никаких сложностей.",
     copied: "Скопировано!", copyFailed: "Копирование недоступно. Вы можете выделить шутку и скопировать её.",
     shared: "Можно отправлять!", shareFallback: "Поделиться сейчас нельзя — шутка скопирована.",
     categoryNames: { everyday: "Повседневная жизнь", work: "Работа и учёба", tech: "Технологии и интернет", food: "Еда и напитки", wordplay: "Игра слов" }
