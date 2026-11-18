@@ -2,590 +2,94 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
+const read=(name)=>fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
+const html=read("index.html"),js=read("script.js"),css=read("styles.css"),jokesSource=read("jokes.js");
+const dataContext={window:{}};vm.runInNewContext(jokesSource,dataContext);const jokes=dataContext.window.JESTBOX_JOKES;
+const locales=["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN"];
+const categories=["everyday","work","tech","food","wordplay"];
 
-const source = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
+test("all app script selectors exist in the page",()=>{for(const [,id] of js.matchAll(/\$\("#([a-z0-9-]+)"\)/g))assert.ok(html.includes('id="'+id+'"'),"Missing HTML id "+id)});
+test("English is the default locale and all six requested locale choices are searchable",()=>{assert.match(html,/<html lang="en-US">/);for(const label of ["American English","Peruvian Spanish","Russian","Spanish","Indian English","Indian Hindi"])assert.ok(js.includes(label),label);for(const code of locales)assert.ok(js.includes('"'+code+'"')||js.includes('["'+code+'"'))});
+test("every locale has 100 regionally authored jokes with twenty per category in the current batch",()=>{assert.deepEqual(Object.keys(jokes).sort(),[...locales].sort());for(const locale of locales){assert.equal(jokes[locale].length,100,locale);const counts=Object.fromEntries(categories.map(c=>[c,jokes[locale].filter(j=>j[0]===c).length]));for(const c of categories)assert.equal(counts[c],20,locale+" "+c);const normalized=jokes[locale].map(j=>j[1].normalize("NFKC").toLocaleLowerCase().replace(/\s+/g," ").trim());assert.equal(new Set(normalized).size,normalized.length,locale+" duplicate joke") }});
+test("every joke uses the writing system of its selected language locale",()=>{for(const locale of locales){const text=jokes[locale].map(j=>j[1]).join(" ");if(locale==="ru-RU"){assert.match(text,/\p{Script=Cyrillic}/u);assert.doesNotMatch(text,/\p{Script=Latin}/u,"Latin-script intrusion in "+locale)}else if(locale==="hi-IN"){assert.match(text,/\p{Script=Devanagari}/u);assert.doesNotMatch(text,/\p{Script=Latin}/u,"Latin-script intrusion in "+locale)}else{assert.doesNotMatch(text,/\p{Script=Cyrillic}|\p{Script=Devanagari}/u,"non-Latin script intrusion in "+locale)}}});
+test("ten named themes define full-page color tokens",()=>{const start=js.indexOf("const THEMES=")+"const THEMES=".length;const end=js.indexOf("];",start)+1;const palettes=Function("return "+js.slice(start,end))();assert.equal(palettes.length,10);for(const token of ["--page","--surface","--text","--muted","--border","--accent"])assert.ok(css.includes(token))});
+test("only the Settings gear remains in the header and the theme picker lives below Accessibility",()=>{const header=html.match(/<header class="site-header">([\s\S]*?)<\/header>/)?.[1]||"";assert.match(header,/id="settings-button"/);assert.doesNotMatch(header,/theme-button|theme-dialog/);assert.match(html,/id="settings-title">Settings &amp; Superpowers/);assert.ok(html.indexOf('id="accessibility-title"')<html.indexOf('id="themes-title"'));assert.match(html,/id="theme-options"/);assert.match(html,/id="large-text"[^>]*type="range"[^>]*min="50"[^>]*max="200"[^>]*step="5"[^>]*value="85"/);for(const id of ["high-contrast","reduce-motion","underline-links","larger-targets","line-spacing","focus-outline"])assert.ok(html.includes('id="'+id+'"'))});
+test("language and category controls are searchable combobox inputs",()=>{assert.match(html,/id="locale-search" role="combobox"[^>]*aria-controls="locale-options"/);assert.match(html,/id="category-search" role="combobox"[^>]*aria-controls="category-options"/);for(const name of ["All Jokes","Everyday Life","Work & Study","Tech & Internet","Food & Drink"])assert.ok(js.includes(name));for(const country of ["United States of America","Republic of Peru","Russian Federation","Kingdom of Spain","Republic of India"])assert.ok(js.includes(country))});
+test("share opens a dialog and invokes the native device share API without the old unavailable message",()=>{assert.match(html,/<dialog id="share-dialog"/);assert.match(html,/id="native-share-button"/);assert.match(js,/navigator\.share\(/);assert.match(js,/window\.JestBoxNativeShare/);assert.match(html,/share-bridge\.bundle\.js/);assert.match(read("package.json"),/"@capacitor\/share": "8\.0\.3"/);assert.doesNotMatch(js,/Sharing isn't available/);assert.match(js,/shareError/)});
+test("launch screen is skippable and auto-dismisses after five seconds",()=>{assert.match(html,/id="launch-screen"/);assert.match(js,/timer=setTimeout\(dismiss,5000\)/);assert.match(js,/addEventListener\("click",dismiss\)/)});
+test("footer exposes privacy and an Accessibility Statement button plus the bundled WCAG mark",()=>{assert.match(html,/id="privacy-link"/);assert.match(html,/id="accessibility-link" class="footer-button"/);assert.match(html,/assets\/wcag22aa-blue\.svg/)});
+test("app remains local-first and stores only display/accessibility preferences locally",()=>{assert.doesNotMatch(js,/\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(/);assert.match(js,/localStorage\.getItem\(PREF_KEY/);assert.match(js,/localStorage\.setItem\(PREF_KEY/);assert.match(js,/const PREF_KEY="jestbox\.preferences\.v1"/);assert.doesNotMatch(js,/\b(?:sessionStorage|indexedDB)\b|document\.cookie/)});
+test("keyboard focus, reduced motion, forced-colors, and text resizing remain implemented",()=>{assert.match(html,/class="skip-link"/);assert.match(css,/:focus-visible/);assert.match(css,/@media\s*\(prefers-reduced-motion:\s*reduce\)/);assert.match(css,/@media\s*\(forced-colors:\s*active\)/);assert.match(css,/body\.large-text/)});
+test("the original JestBox jester gift-box artwork is the canonical web brand",()=>{assert.ok(html.includes("assets/JestBox-Original.png"));assert.ok(fs.existsSync(new URL("../assets/JestBox-Original.png",import.meta.url)));assert.doesNotMatch(html,/assets\/jestbox-mark\.svg/)});
 
-function makeElement(value = "") {
-  return {
-    value, textContent: "", attributes: {}, listeners: {}, options: [],
-    classList: { values: new Set(), toggle(name, force) { if (force) this.values.add(name); else this.values.delete(name); } },
-    addEventListener(name, callback) { this.listeners[name] = callback; },
-    setAttribute(name, value) { this.attributes[name] = value; }
-  };
-}
+test("every theme meets WCAG AA text contrast and 3:1 component-boundary contrast",()=>{
+ const start=js.indexOf("const THEMES=")+"const THEMES=".length;const end=js.indexOf("];",start)+1;assert.ok(start>0&&end>start,"Theme palette source must be present");
+ const box={};vm.runInNewContext("globalThis.palettes="+js.slice(start,end),box);
+ const lum=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);return .2126*v[0]+.7152*v[1]+.0722*v[2]};
+ const ratio=(a,b)=>{const [x,y]=[lum(a),lum(b)].sort((m,n)=>n-m);return (x+.05)/(y+.05)};
+ assert.equal(box.palettes.length,10);
+ box.palettes.forEach((p,i)=>{const ink=i===8?"#ffffff":i===9?"#000000":"#061a1b";for(const surface of [p[1],p[2]]){assert.ok(ratio(p[3],surface)>=4.5,p[0]+" primary text");assert.ok(ratio(p[4],surface)>=4.5,p[0]+" muted text");assert.ok(ratio(p[5],surface)>=3,p[0]+" boundaries");assert.ok(ratio(p[6],surface)>=4.5,p[0]+" accent");}assert.ok(ratio(ink,p[6])>=4.5,p[0]+" button text")});
+});
+test("six locale policy and accessibility documents include the required contact routes",()=>{
+ for(const locale of ["es-PE","es-ES","en-IN","hi-IN"]){const policy=read("PRIVACY-POLICY."+locale+".md");const statement=read("ACCESSIBILITY-STATEMENT."+locale+".md");assert.match(policy,/cyber\.litigation\.advisor@gmail\.com/);assert.match(policy,/ertapanjatakia@yandex\.com/);assert.match(policy,/tapan_ditu_17\.20@outlook\.com/);assert.match(statement,/cyber\.litigation\.advisor@gmail\.com/);assert.equal(statement.split("assets/wcag22aa-blue.svg").length-1,2);}
+});
 
-function bootApp(now = new Date()) {
-  const ids = [
-    "locale-label", "skip-link", "home-link", "headline", "eyebrow", "intro", "locale-eyebrow",
-    "locale-heading", "locale-buttons", "daily-label", "category-label",
-    "category", "joke-heading", "joke-category", "status", "another-label",
-    "copy-label", "share-label", "privacy-note", "footer-line",
-    "another-button", "copy-button", "share-button"
-  ];
-  const elements = Object.fromEntries(ids.map((id) => [id, makeElement()]));
-  elements.category.value = "all";
-  elements.category.options = ["all", "everyday", "work", "tech", "food", "wordplay"]
-    .map((value) => ({ value, textContent: "" }));
-  const localeButtons = ["en-US", "ru-RU"].map((locale) => {
-    const button = makeElement();
-    button.dataset = { locale };
-    return button;
-  });
-  const root = { lang: "", dir: "" };
-  const document = {
-    documentElement: root, title: "", visibilityState: "visible", listeners: {},
-    addEventListener(name, callback) { this.listeners[name] = callback; },
-    querySelector(selector) {
-      if (selector === "#locale-buttons") return elements["locale-buttons"];
-      return elements[selector.slice(1)];
-    },
-    querySelectorAll(selector) {
-      return selector === "[data-locale]" ? localeButtons : [];
-    }
-  };
-  const clipboardWrites = [];
-  const navigator = { clipboard: { async writeText(value) { clipboardWrites.push(value); } } };
-  const deterministicMath = Object.create(Math);
-  deterministicMath.random = () => 0;
-  class FixedDate extends Date {
-    constructor(...args) {
-      if (args.length) super(...args);
-      else super(now.getTime());
-    }
-    static now() { return now.getTime(); }
+test("launch screen uses a prominent brand and short sentence-per-line localised copy",()=>{assert.match(html,/class="launch-brand">JESTBOX/);assert.match(html,/id="launch-tagline" class="launch-tagline"/);assert.match(css,/white-space:pre-line/);assert.match(css,/orientation:landscape/);assert.match(js,/\["#launch-tagline","launch"\]/);for(const phrase of ["Pocket-sized local laughs.","Risas locales de bolsillo.","Местный юмор всегда под рукой.","जेब में देसी हँसी।"])assert.ok(js.includes(phrase),phrase)});
+test("theme names are localised for all six selected locales",()=>{assert.match(js,/const THEME_NAMES=/);for(const locale of ["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN"])assert.ok(js.includes('"'+locale+'":['),"Missing theme translations: "+locale)});
+
+test("no exact joke text is reused across different locale collections",()=>{
+ const owner=new Map();
+ for(const locale of locales){
+  for(const [,text] of jokes[locale]){
+   const normalized=text.normalize("NFKC").toLocaleLowerCase().replace(/\\s+/g," ").trim();
+   assert.ok(!owner.has(normalized),`Cross-locale duplicate between ${owner.get(normalized)} and ${locale}: ${text}`);
+   owner.set(normalized,locale);
   }
-  const window = { listeners: {}, addEventListener(name, callback) { this.listeners[name] = callback; } };
-  const context = { document, window, navigator, Date: FixedDate, Math: deterministicMath };
-  vm.runInNewContext(
-    source + "\nglobalThis.__testJokes = jokes; globalThis.__testCopy = copy; globalThis.__testDailySeed = () => daySeed() + elements.category.value;",
-    context
-  );
-  return { elements, localeButtons, root, navigator, clipboardWrites, document, window, context };
-}
-
-test("every JavaScript ID selector exists in the HTML document", () => {
-  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  const selectors = [...source.matchAll(/querySelector\("#([a-z0-9-]+)"\)/g)]
-    .map((match) => match[1]);
-  assert.ok(selectors.length > 0);
-  for (const id of selectors) {
-    assert.ok(html.includes(`id="${id}"`), `Missing HTML id: ${id}`);
-  }
+ }
 });
 
-test("startup is English by default and runtime uses no browser storage or network APIs", () => {
-  const app = bootApp();
-  assert.equal(app.root.lang, "en-US");
-  assert.equal(app.elements["daily-label"].textContent, app.context.__testCopy["en-US"].daily);
-  assert.doesNotMatch(source, /\b(?:localStorage|sessionStorage|indexedDB)\b|document\.cookie/);
-  assert.doesNotMatch(source, /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(/);
+test("dashboard omits launch-only marketing copy and starts with the two primary panels",()=>{const main=html.match(/<main id="main"[\s\S]*?<\/main>/)?.[0]||"";assert.doesNotMatch(html,/<section class="hero compact"/);assert.match(main,/class="locale-picker panel"[\s\S]*class="joke-panel panel"/);assert.doesNotMatch(main,/Pocket-sized local laughs|Local laughs, zero signal drama/)});
+test("locale and category menus sort alphabetically and open the complete option list on tap",()=>{assert.match(js,/localeDisplay\(a\.code\)\.localeCompare\(localeDisplay\(b\.code\),locale/);assert.match(js,/addEventListener\("click",\(\)=>renderLocaleOptions/);assert.match(js,/addEventListener\("click",\(\)=>renderCategoryOptions/)});
+test("accessibility preferences persist locally with a readable default text scale",()=>{assert.match(js,/textScale:85/);assert.match(html,/min="50" max="200"/);assert.match(js,/savePrefs\(\)/);assert.match(js,/applyPrefs\(\)/);assert.match(css,/body\.underline-links/);assert.match(css,/body\.larger-targets/);assert.match(css,/body\.more-line-spacing/);assert.match(css,/body\.enhanced-focus/)});
+test("all six privacy policies and accessibility statements are localized",()=>{for(const locale of locales){const suffix=locale==="en-US"?"":"."+locale;const policy=read("PRIVACY-POLICY"+suffix+".md");const statement=read("ACCESSIBILITY-STATEMENT"+suffix+".md");assert.match(policy,/19|noviembre|November|ноября|नवंबर/);assert.match(statement,/WCAG 2\.2/);assert.equal(statement.split("assets/wcag22aa-blue.svg").length-1,2);assert.match(statement,/cyber\.litigation\.advisor@gmail\.com/)}});
+test("generated legal pages use a translated document title for every locale",()=>{const build=read("scripts/prepare-web.mjs");for(const title of ["Política de privacidad","Declaración de accesibilidad","Политика конфиденциальности","Заявление о доступности","गोपनीयता नीति","सुगम्यता वक्तव्य"])assert.ok(build.includes(title),title);assert.match(build,/localizedTitle/)});
+
+test("Android launcher branding is generated from the canonical original PNG",()=>{const branding=read("scripts/prepare-android-branding.mjs");assert.ok(branding.includes("assets/JestBox-Original.png"));assert.ok(branding.includes("drawable-nodpi/jestbox_icon.png"));assert.ok(branding.includes("jestbox_launcher"));const workflow=read(".github/workflows/android-debug.yml");assert.ok(workflow.includes("node scripts/prepare-android-branding.mjs"))});
+
+test("launch screen brand title, tagline, and skip hint use 20 percent larger default typography",()=>{assert.ok(css.includes(".launch-brand{margin:.1rem 0 .25rem;font-size:clamp(2.4rem,9.6vw,3.6rem)"));assert.ok(css.includes(".launch-tagline{max-width:30ch;margin:.25rem auto 0;color:var(--text);font-size:clamp(.984rem,2.88vw,1.2rem)"));assert.ok(css.includes(".launch-hint{margin:.25rem 0 0;color:var(--muted);font-size:.864rem"));assert.ok(css.includes(".launch-brand{grid-column:2;grid-row:1;font-size:clamp(1.68rem,6vh,2.4rem)}"));assert.ok(css.includes(".launch-tagline{grid-column:2;grid-row:2;max-width:none;margin:0;font-size:clamp(.864rem,2.76vh,1.08rem)"))});
+
+test("all six interface dictionaries expose the same complete set of non-empty translations",()=>{
+ const start=js.indexOf("const UI=")+ "const UI=".length;
+ const end=js.indexOf("\n};",start)+2;
+ const dictionaries=Function("return "+js.slice(start,end))();
+ const expected=Object.keys(dictionaries["en-US"]).sort();
+ assert.deepEqual(Object.keys(dictionaries).sort(),[...locales].sort());
+ for(const locale of locales){
+  assert.deepEqual(Object.keys(dictionaries[locale]).sort(),expected,locale+" UI key coverage");
+  for(const [key,value] of Object.entries(dictionaries[locale]))if(typeof value==="string")assert.ok(value.trim(),locale+" empty "+key);
+  assert.equal(dictionaries[locale].cats.length,6,locale+" category labels");
+ }
 });
-
-test("the page provides a keyboard skip link to its main landmark", () => {
-  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  assert.match(html, /<a class="skip-link" id="skip-link" href="#main">Skip to main content<\/a>/);
-  assert.match(html, /<main id="main"/);
-  assert.match(fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8"),
-    /\.skip-link:focus\s*\{\s*transform: translateY\(0\);/);
+test("locale and country names are translated in every searchable locale selector",()=>{
+ const localeStart=js.indexOf("const LOCALE_LABELS=")+"const LOCALE_LABELS=".length;
+ const localeEnd=js.indexOf("\n};",localeStart)+2;
+ const countryStart=js.indexOf("const COUNTRY_LABELS=")+"const COUNTRY_LABELS=".length;
+ const countryEnd=js.indexOf("\n};",countryStart)+2;
+ const labels=Function("return "+js.slice(localeStart,localeEnd))();
+ const countries=Function("return "+js.slice(countryStart,countryEnd))();
+ for(const locale of locales){
+  assert.deepEqual(Object.keys(labels[locale]).sort(),[...locales].sort(),locale+" language labels");
+  assert.deepEqual(Object.keys(countries[locale]).sort(),[...locales].sort(),locale+" country labels");
+  for(const code of locales){assert.ok(labels[locale][code]);assert.ok(countries[locale][code]);}
+ }
+ assert.ok(js.includes("COUNTRY_LABELS[locale][item.code]"));
 });
-
-test("live joke updates are announced and the main landmark is programmatically focusable", () => {
-  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  assert.match(html, /<main id="main"[^>]*tabindex="-1"/);
-  assert.match(html, /<div class="joke-content" aria-live="polite" aria-atomic="true">/);
-  assert.match(html, /<p class="status-text" id="status" role="status">/);
-  assert.doesNotMatch(html, /id="status"[^>]*aria-live=/);
-});
-
-test("decorative action glyphs are hidden from assistive technology", () => {
-  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  for (const id of ["another-button", "copy-button", "share-button"]) {
-    const button = html.match(new RegExp(`<button[^>]*id="${id}"[^>]*>([\\s\\S]*?)</button>`));
-    assert.ok(button, `Missing button: ${id}`);
-    assert.match(button[1], /<span aria-hidden="true">/);
-  }
-});
-
-test("narrow-screen layout rules preserve usable action targets", () => {
-  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  assert.match(css, /@media \(max-width: 380px\)/);
-  assert.match(css, /@media \(max-width: 560px\)/);
-  assert.match(css, /\.locale-buttons\s*\{\s*grid-template-columns: 1fr;/);
-  assert.match(css, /\.joke-toolbar\s*\{\s*align-items: flex-start;\s*flex-direction: column;/);
-  assert.match(css, /\.joke-actions\s*\{\s*display: grid;\s*grid-template-columns: 1fr 1fr;/);
-  assert.match(css, /h1, h2, h3, p\s*\{\s*overflow-wrap: anywhere;/);
-  assert.match(css, /\.jestbox \.locale-button\s*\{\s*overflow-wrap: anywhere;/);
-  assert.match(css, /\.jestbox \.joke-content h2\s*\{[^}]*overflow-wrap: anywhere;/);
-
-  assert.match(css, /\.jestbox \.joke-actions button\s*\{\s*min-height: 44px;/);
-  assert.match(css, /\.jestbox \.category-control select\s*\{\s*min-height: 44px;/);
-  assert.match(css, /\.site-header a\s*\{[^}]*min-height: 44px;/);
-  assert.match(css, /orientation: landscape/);
-  assert.match(css, /\.site-header\s*\{\s*flex-wrap: wrap;/);
-  assert.match(css, /\.jestbox \.category-control\s*\{\s*align-items: stretch;\s*flex-direction: column;/);
-  assert.match(css, /\.jestbox \.category-control select\s*\{\s*width: 100%;\s*max-width: 100%;/);
-  assert.match(css, /\.jestbox\s*\{\s*padding-top: \.5rem;\s*padding-bottom: 1rem;/);
-});
-
-test("both locales contain 20 original jokes and all five categories", () => {
-  const { context } = bootApp();
-  for (const locale of ["en-US", "ru-RU"]) {
-    const jokes = context.__testJokes[locale];
-    assert.equal(jokes.length, 20, locale);
-    assert.deepEqual([...new Set(jokes.map((joke) => joke.category))].sort(),
-      ["everyday", "food", "tech", "wordplay", "work"]);
-    assert.ok(jokes.every((joke) => typeof joke.text === "string" && joke.text.trim()));
-  }
-});
-
-test("both locale dictionaries have identical complete interface and category keys", () => {
-  const { context } = bootApp();
-  const english = context.__testCopy["en-US"];
-  const russian = context.__testCopy["ru-RU"];
-  assert.deepEqual(Object.keys(russian).sort(), Object.keys(english).sort());
-
-  for (const key of Object.keys(english)) {
-    if (key === "categories" || key === "categoryNames") continue;
-    assert.equal(typeof english[key], "string", `English ${key} must be a string`);
-    assert.ok(english[key].trim(), `English ${key} must not be empty`);
-    assert.equal(typeof russian[key], "string", `Russian ${key} must be a string`);
-    assert.ok(russian[key].trim(), `Russian ${key} must not be empty`);
-  }
-
-  const expectedCategoryKeys = ["all", "everyday", "food", "tech", "wordplay", "work"];
-  assert.deepEqual(Object.keys(english.categories).sort(), expectedCategoryKeys);
-  assert.deepEqual(Object.keys(russian.categories).sort(), expectedCategoryKeys);
-  assert.deepEqual(Object.keys(english.categoryNames).sort(), expectedCategoryKeys.slice(1));
-  assert.deepEqual(Object.keys(russian.categoryNames).sort(), expectedCategoryKeys.slice(1));
-  for (const key of expectedCategoryKeys) {
-    assert.ok(english.categories[key].trim(), `Missing English category label: ${key}`);
-    assert.ok(russian.categories[key].trim(), `Missing Russian category label: ${key}`);
-    if (key !== "all") {
-      assert.ok(english.categoryNames[key].trim(), `Missing English joke category: ${key}`);
-      assert.ok(russian.categoryNames[key].trim(), `Missing Russian joke category: ${key}`);
-    }
-  }
-});
-
-test("joke text is unique within each locale after whitespace normalization", () => {
-  const { context } = bootApp();
-  for (const locale of ["en-US", "ru-RU"]) {
-    const normalized = context.__testJokes[locale].map((joke) =>
-      joke.text.normalize("NFC").replace(/\s+/g, " ").trim().toLocaleLowerCase(locale)
-    );
-    assert.equal(new Set(normalized).size, normalized.length, `${locale} contains duplicate joke text`);
-  }
-});
-
-test("each locale has the intended 20-joke category distribution", () => {
-  const { context } = bootApp();
-  const expected = { everyday: 5, work: 4, tech: 4, food: 3, wordplay: 4 };
-  for (const locale of ["en-US", "ru-RU"]) {
-    const counts = context.__testJokes[locale].reduce((result, joke) => {
-      result[joke.category] = (result[joke.category] || 0) + 1;
-      return result;
-    }, {});
-    assert.deepEqual(counts, expected, locale);
-  }
-});
-
-test("Russian selection localizes the document, controls, and category filter", () => {
-  const app = bootApp();
-  app.localeButtons[1].listeners.click();
-  assert.equal(app.root.lang, "ru-RU");
-  assert.equal(app.elements["skip-link"].textContent, "Перейти к основному содержимому");
-  assert.equal(app.elements["home-link"].attributes["aria-label"], "На главную JestBox");
-  assert.equal(app.elements["locale-buttons"].attributes["aria-label"], "Выберите язык шуток");
-  assert.equal(app.localeButtons[0].attributes["aria-pressed"], "false");
-  assert.equal(app.localeButtons[1].attributes["aria-pressed"], "true");
-  assert.equal(app.elements["another-label"].textContent, "Ещё шутку");
-  app.elements.category.value = "food";
-  app.elements.category.listeners.change();
-  assert.equal(app.elements["joke-category"].textContent, "Еда и напитки");
-  assert.ok(app.context.__testJokes["ru-RU"].some((joke) =>
-    joke.category === "food" && joke.text === app.elements["joke-heading"].textContent));
-});
-
-test("the daily joke is stable for the same locale and device-local date", () => {
-  const first = bootApp();
-  const second = bootApp();
-  assert.equal(first.elements["joke-heading"].textContent,
-    second.elements["joke-heading"].textContent);
-
-  first.localeButtons[1].listeners.click();
-  second.localeButtons[1].listeners.click();
-  assert.equal(first.root.lang, "ru-RU");
-  assert.equal(first.elements["joke-heading"].textContent,
-    second.elements["joke-heading"].textContent);
-});
-
-test("the daily-joke seed changes with local date, locale, and category", () => {
-  const app = bootApp(new Date(2026, 0, 2, 12, 0, 0));
-  const originalSeed = app.context.__testDailySeed();
-
-  const nextDay = bootApp(new Date(2026, 0, 3, 12, 0, 0));
-  assert.notEqual(nextDay.context.__testDailySeed(), originalSeed);
-
-  app.elements.category.value = "food";
-  assert.notEqual(app.context.__testDailySeed(), originalSeed);
-
-  app.localeButtons[1].listeners.click();
-  assert.notEqual(app.context.__testDailySeed(), originalSeed);
-});
-
-test("the daily joke refreshes after local midnight when the app becomes visible", () => {
-  const deviceDate = new Date(2026, 0, 2, 23, 59, 0);
-  const app = bootApp(deviceDate);
-  const nextDay = bootApp(new Date(2026, 0, 3, 0, 1, 0));
-  const originalJoke = app.elements["joke-heading"].textContent;
-
-  deviceDate.setTime(new Date(2026, 0, 3, 0, 1, 0).getTime());
-  app.document.listeners.visibilitychange();
-
-  assert.equal(app.elements["joke-heading"].textContent,
-    nextDay.elements["joke-heading"].textContent);
-  assert.notEqual(app.elements["joke-heading"].textContent, originalJoke);
-});
-
-test("a hidden app defers daily-joke rollover until it becomes visible", () => {
-  const deviceDate = new Date(2026, 0, 2, 23, 59, 0);
-  const app = bootApp(deviceDate);
-  const originalJoke = app.elements["joke-heading"].textContent;
-
-  deviceDate.setTime(new Date(2026, 0, 3, 0, 1, 0).getTime());
-  app.document.visibilityState = "hidden";
-  app.document.listeners.visibilitychange();
-  assert.equal(app.elements["joke-heading"].textContent, originalJoke);
-
-  app.document.visibilityState = "visible";
-  app.document.listeners.visibilitychange();
-  assert.notEqual(app.elements["joke-heading"].textContent, originalJoke);
-});
-
-test("random selection respects the active category", () => {
-  const app = bootApp();
-  app.elements.category.value = "tech";
-  app.elements.category.listeners.change();
-  app.elements["another-button"].listeners.click();
-  assert.equal(app.elements["joke-category"].textContent, "Tech & internet");
-  assert.ok(app.context.__testJokes["en-US"].some((joke) =>
-    joke.category === "tech" && joke.text === app.elements["joke-heading"].textContent));
-});
-
-test("the joke label distinguishes random selections and resets for daily selections", () => {
-  const app = bootApp();
-  assert.equal(app.elements["daily-label"].textContent, "TODAY'S LITTLE LAUGH");
-
-  app.elements["another-button"].listeners.click();
-  assert.equal(app.elements["daily-label"].textContent, "ANOTHER LITTLE LAUGH");
-
-  app.elements.category.value = "food";
-  app.elements.category.listeners.change();
-  assert.equal(app.elements["daily-label"].textContent, "TODAY'S LITTLE LAUGH");
-
-  app.elements["another-button"].listeners.click();
-  app.localeButtons[1].listeners.click();
-  assert.equal(app.elements["daily-label"].textContent, "ШУТКА НА СЕГОДНЯ");
-
-  app.elements["another-button"].listeners.click();
-  assert.equal(app.elements["daily-label"].textContent, "ЕЩЁ ОДНА ШУТКА");
-});
-
-test("consecutive random selections do not repeat the currently displayed joke", () => {
-  const app = bootApp();
-  let previous = app.elements["joke-heading"].textContent;
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    app.elements["another-button"].listeners.click();
-    const current = app.elements["joke-heading"].textContent;
-    assert.notEqual(current, previous);
-    previous = current;
-  }
-});
-
-test("copy and share use clipboard only after explicit user actions", async () => {
-  const app = bootApp();
-  const joke = app.elements["joke-heading"].textContent;
-  await app.elements["copy-button"].listeners.click();
-  assert.deepEqual(app.clipboardWrites, [joke]);
-  assert.equal(app.elements.status.textContent, "Copied!");
-  await app.elements["share-button"].listeners.click();
-  assert.equal(app.clipboardWrites.length, 2);
-  assert.equal(app.elements.status.textContent,
-    "Sharing isn't available here. The joke has been copied instead.");
-});
-
-test("cancelling the native share sheet does not report success or copy the joke", async () => {
-  const app = bootApp();
-  app.navigator.share = async () => {
-    const error = new Error("Share cancelled");
-    error.name = "AbortError";
-    throw error;
-  };
-
-  await app.elements["share-button"].listeners.click();
-
-  assert.deepEqual(app.clipboardWrites, []);
-  assert.equal(app.elements.status.textContent, "");
-});
-
-
-test("a pending copy does not overwrite the interface after a locale change", async () => {
-  const app = bootApp();
-  let completeWrite;
-  app.navigator.clipboard.writeText = () => new Promise((resolve) => {
-    completeWrite = resolve;
-  });
-
-  const pendingCopy = app.elements["copy-button"].listeners.click();
-  app.localeButtons[1].listeners.click();
-  completeWrite();
-  await pendingCopy;
-
-  assert.equal(app.root.lang, "ru-RU");
-  assert.equal(app.elements.status.textContent, "");
-});
-
-test("a pending native share does not overwrite the interface after a locale change", async () => {
-  const app = bootApp();
-  let completeShare;
-  let payload;
-  app.navigator.share = (value) => {
-    payload = value;
-    return new Promise((resolve) => {
-      completeShare = resolve;
-    });
-  };
-
-  const pendingShare = app.elements["share-button"].listeners.click();
-  app.localeButtons[1].listeners.click();
-  completeShare();
-  await pendingShare;
-
-  assert.equal(payload.title, "A joke from JestBox");
-  assert.equal(app.root.lang, "ru-RU");
-  assert.equal(app.elements.status.textContent, "");
-});
-
-test("the app has no network or persistent-storage integration", () => {
-  assert.doesNotMatch(source,
-    /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(|\b(?:localStorage|sessionStorage|indexedDB)\b|document\.cookie/);
-});
-
-test("switching locale resets the category and updates document language and title", () => {
-  const app = bootApp();
-  app.elements.category.value = "food";
-  app.elements.category.listeners.change();
-
-  app.localeButtons[1].listeners.click();
-
-  assert.equal(app.elements.category.value, "all");
-  assert.equal(app.root.lang, "ru-RU");
-  assert.equal(app.context.document.title, "JestBox — Немного хорошего настроения");
-  assert.ok(app.context.__testJokes["ru-RU"].some((joke) =>
-    joke.text === app.elements["joke-heading"].textContent));
-});
-
-test("clipboard failure is reported without claiming a successful copy", async () => {
-  const app = bootApp();
-  app.navigator.clipboard.writeText = async () => {
-    throw new Error("Clipboard unavailable");
-  };
-
-  await app.elements["copy-button"].listeners.click();
-
-  assert.equal(app.clipboardWrites.length, 0);
-  assert.equal(app.elements.status.textContent,
-    "Copy unavailable here. You can select the joke and copy it.");
-});
-
-test("successful native sharing reports success without using clipboard", async () => {
-  const app = bootApp();
-  let sharedPayload;
-  app.navigator.share = async (payload) => {
-    sharedPayload = payload;
-  };
-
-  await app.elements["share-button"].listeners.click();
-
-  assert.equal(sharedPayload.text, app.elements["joke-heading"].textContent);
-  assert.equal(sharedPayload.title, "A joke from JestBox");
-  assert.deepEqual(app.clipboardWrites, []);
-  assert.equal(app.elements.status.textContent, "Ready to share.");
-});
-
-test("a failed native share falls back to clipboard and reports the fallback", async () => {
-  const app = bootApp();
-  const joke = app.elements["joke-heading"].textContent;
-  app.navigator.share = async () => {
-    throw new Error("Share failed");
-  };
-
-  await app.elements["share-button"].listeners.click();
-
-  assert.deepEqual(app.clipboardWrites, [joke]);
-  assert.equal(app.elements.status.textContent,
-    "Sharing isn't available here. The joke has been copied instead.");
-});
-
-
-test("high-contrast mode retains visible control boundaries and system-color focus indicators", () => {
-  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  assert.match(css, /@media \(forced-colors: active\)/);
-  assert.match(css, /border: 1px solid CanvasText/);
-  assert.match(css, /outline: 3px solid Highlight/);
-  assert.match(css, /\.locale-button\.active\s*\{\s*outline: 2px solid Highlight;/);
-});
-
-test("interactive controls expose accessible names, states, and visible focus styles", () => {
-  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  assert.match(html, /<section class="locale-picker panel" aria-labelledby="locale-heading">/);
-  assert.match(html, /<section class="joke-panel panel" aria-labelledby="joke-heading">/);
-  assert.match(html, /<a class="skip-link" id="skip-link" href="#main">/);
-  assert.match(html, /<main id="main" class="container jestbox" tabindex="-1">/);
-  assert.match(html, /<div class="locale-buttons" id="locale-buttons" role="group" aria-label="Choose joke language">/);
-  assert.match(html, /data-locale="en-US" aria-pressed="true">[\s\S]*?<strong>American English<\/strong>/);
-  assert.match(html, /data-locale="ru-RU" aria-pressed="false">[\s\S]*?<strong>Русский<\/strong>/);
-  assert.match(html, /<label class="category-control" for="category">[\s\S]*?<select id="category">/);
-  for (const id of ["another-label", "copy-label", "share-label"]) {
-    assert.match(html, new RegExp(`<span id="${id}">[^<]+<\/span>`));
-  }
-
-  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  assert.match(css, /button:focus-visible,[\s\n]*a:focus-visible,[\s\n]*select:focus-visible[\s\S]*?outline: 3px solid var\(--accent\)/);
-  assert.match(css, /\.jestbox :focus-visible,[\s\n]*\.jestbox:focus[\s\S]*?outline: 3px solid var\(--accent\)/);
-  assert.match(css, /a:focus-visible/);
-  assert.match(css, /\.skip-link:focus\s*\{\s*transform: translateY\(0\);/);
-});
-
-
-test("a pending copy does not report completion after the displayed joke changes", async () => {
-  const app = bootApp();
-  let completeWrite;
-  app.navigator.clipboard.writeText = () => new Promise((resolve) => {
-    completeWrite = resolve;
-  });
-
-  const pendingCopy = app.elements["copy-button"].listeners.click();
-  app.elements["another-button"].listeners.click();
-  completeWrite();
-  await pendingCopy;
-
-  assert.equal(app.elements.status.textContent, "");
-});
-
-test("a pending native share does not report completion after the displayed joke changes", async () => {
-  const app = bootApp();
-  let completeShare;
-  app.navigator.share = () => new Promise((resolve) => {
-    completeShare = resolve;
-  });
-
-  const pendingShare = app.elements["share-button"].listeners.click();
-  app.elements["another-button"].listeners.click();
-  completeShare();
-  await pendingShare;
-
-  assert.equal(app.elements.status.textContent, "");
-});
-
-
-test("interactive component boundaries meet the 3:1 non-text contrast threshold", () => {
-  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  const token = (name) => {
-    const match = css.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`));
-    assert.ok(match, `Missing six-digit --${name} color token`);
-    return match[1];
-  };
-  const border = token("border");
-  const page = token("page");
-  const text = token("text");
-  const muted = token("muted");
-  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  const accentMatch = html.match(/--accent:\s*(#[0-9a-fA-F]{6})/);
-  const buttonTextMatch = css.match(/button, \.button \{[^}]*color:\s*(#[0-9a-fA-F]{6})/);
-  assert.ok(accentMatch, "Missing six-digit page accent color");
-  assert.ok(buttonTextMatch, "Missing six-digit button label color");
-  const accent = accentMatch[1];
-  const buttonText = buttonTextMatch[1];
-
-  const luminance = (hex) => {
-    const channels = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
-    const linear = channels.map((channel) =>
-      channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4);
-    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
-  };
-  const ratio = (first, second) => {
-    const values = [luminance(first), luminance(second)].sort((a, b) => b - a);
-    return (values[0] + 0.05) / (values[1] + 0.05);
-  };
-
-  for (const surface of [page, "#111f33", "#0c1727"]) {
-    assert.ok(ratio(border, surface) >= 3,
-      `Border contrast against ${surface} must be at least 3:1`);
-    assert.ok(ratio(text, surface) >= 4.5,
-      `Primary text contrast against ${surface} must be at least 4.5:1`);
-    assert.ok(ratio(muted, surface) >= 4.5,
-      `Muted text contrast against ${surface} must be at least 4.5:1`);
-    assert.ok(ratio(accent, surface) >= 4.5,
-      `Accent text/focus contrast against ${surface} must be at least 4.5:1`);
-  }
-  assert.ok(ratio(buttonText, accent) >= 4.5,
-    "Button label contrast against the accent fill must be at least 4.5:1");
-});
-
-test("reduced-motion preference disables nonessential animation and transitions", () => {
-  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  const rule = css.match(/@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n\}/);
-  assert.ok(rule, "Missing reduced-motion media query");
-  assert.match(rule[1], /scroll-behavior: auto !important/);
-  assert.match(rule[1], /animation-duration: 0\.01ms !important/);
-  assert.match(rule[1], /animation-iteration-count: 1 !important/);
-  assert.match(rule[1], /transition-duration: 0\.01ms !important/);
-});
-
-test("short landscape viewports receive compact vertical spacing", () => {
-  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  const rule = css.match(/@media \(max-height: 480px\) and \(orientation: landscape\) \{([\s\S]*?)\n\}/);
-  assert.ok(rule, "Missing short-landscape responsive rule");
-  assert.match(rule[1], /\.jestbox\s*\{[^}]*padding-top:\s*\.5rem/s);
-  assert.match(rule[1], /\.jestbox\s*\{[^}]*padding-bottom:\s*1rem/s);
-  assert.match(rule[1], /\.jestbox \.locale-picker,\s*\.jestbox \.joke-panel\s*\{[^}]*margin-top:\s*\.5rem/s);
-  assert.match(rule[1], /\.jestbox \.hero\.compact\s*\{[^}]*padding-block:\s*\.75rem/s);
-});
-
-test("380px and narrower layouts stack category controls and joke actions", () => {
-  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  const rule = css.match(/@media \(max-width: 380px\) \{([\s\S]*?)\n\}/);
-  assert.ok(rule, "Missing 380px narrow-screen responsive rule");
-  assert.match(rule[1], /\.jestbox \.category-control\s*\{[^}]*align-items:\s*stretch;\s*flex-direction:\s*column;/s);
-  assert.match(rule[1], /\.jestbox \.category-control select\s*\{[^}]*width:\s*100%;\s*max-width:\s*100%;/s);
-  assert.match(rule[1], /\.jestbox \.joke-actions\s*\{[^}]*grid-template-columns:\s*1fr;/s);
-  assert.match(rule[1], /\.jestbox \.joke-content\s*\{[^}]*padding-inline:\s*\.25rem;/s);
-  assert.match(rule[1], /\.jestbox h1\s*\{[^}]*font-size:\s*clamp\(2rem, 11vw, 2\.6rem\);/s);
-});
-
-test("localized daily labels can wrap inside the narrow-screen joke toolbar", () => {
-  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  const rule = css.match(/@media \(max-width: 380px\) \{([\s\S]*?)\n\}/);
-  assert.ok(rule, "Missing narrow-screen responsive rule");
-  assert.match(rule[1], /\.jestbox \.daily-label\s*\{[^}]*max-width:\s*100%;\s*overflow-wrap:\s*anywhere;/s);
-});
-
-
-test("WCAG 2.2 AA conformance mark is locally bundled and consistently placed", () => {
-  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-  const english = fs.readFileSync(new URL("../ACCESSIBILITY-STATEMENT.md", import.meta.url), "utf8");
-  const russian = fs.readFileSync(new URL("../ACCESSIBILITY-STATEMENT.ru-RU.md", import.meta.url), "utf8");
-  const logoPath = new URL("../assets/wcag22aa-blue.svg", import.meta.url);
-
-  assert.ok(fs.existsSync(logoPath), "The local WCAG logo asset must exist");
-  assert.match(fs.readFileSync(logoPath, "utf8"), /<svg[\s\S]*?WCAG[\s\S]*?2\.2 AA/);
-  assert.match(html, /<footer>[\s\S]*?class="wcag-conformance-mark"[\s\S]*?assets\/wcag22aa-blue\.svg/);
-  assert.match(html, /href="https:\/\/www\.w3\.org\/WAI\/WCAG2AA-Conformance"/);
-  assert.match(css, /\.wcag-conformance-mark\s*\{[^}]*justify-content:\s*center/s);
-  assert.equal((english.match(/assets\/wcag22aa-blue\.svg/g) || []).length, 2,
-    "English statement must show the logo at the top and bottom");
-  assert.equal((russian.match(/assets\/wcag22aa-blue\.svg/g) || []).length, 2,
-    "Russian statement must show the logo at the top and bottom");
+test("accessibility names, fallback copy, and category heading follow the selected locale",()=>{
+ for(const key of ["skipMain","close","loading","wcagTitle","wcagAlt","description"])assert.match(js,new RegExp(key+":"));
+ assert.ok(js.includes('$("#category-label").textContent=x.category;'));
+ assert.ok(js.includes('$("#wcag-mark-image").alt=x.wcagAlt;'));
+ assert.ok(js.includes('$("#wcag-mark-link").title=x.wcagTitle;'));assert.ok(js.includes('meta[name="description"]'));
+ assert.match(html,/id="wcag-mark-link"/);
+ assert.match(html,/id="wcag-mark-image"/);
+ assert.doesNotMatch(html,/certified giggle/i);
 });

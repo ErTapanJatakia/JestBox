@@ -1,39 +1,43 @@
-    # Project 022: Random Joke Generator
+# JestBox source guide
 
-    Level: **Beginner**
+JestBox is an offline-first joke application with six language-and-region experiences, ten colour themes, locally saved accessibility preferences, and an Android wrapper.
 
-    This is a compact classroom implementation of random joke generator. It focuses on the essential interaction and keeps the code small enough to explain line by line.
+## Source layout
 
-    ## Learning goals
+- `index.html` — application structure, launch screen, dashboard, Settings & Superpowers, and dialogs.
+- `styles.css` — responsive layouts, theme tokens, and accessibility presentation.
+- `script.js` — locale dictionaries, searchable pickers, joke selection, sharing, themes, and on-device preferences.
+- `jokes.js` — the bundled joke collections for all six locales.
+- `assets/JestBox-Original.png` — canonical laughing jester gift-box logo used by the web app, browser icon, README, and generated Android launcher icon.
+- `assets/wcag22aa-blue.svg` — WCAG reference graphic used in accessibility materials.
+- `assets/` — other locally bundled visual assets.
+- `scripts/prepare-web.mjs` — prepares the offline web bundle and localized legal pages for Android.
+- `tests/` — source-level regression and Android staging tests.
 
-    - arrays and randomness
-    - dynamic styles
-    - copyable output
+## Run locally
 
-    ## Files
+Open `index.html` in a modern browser, or serve the repository directory with a static HTTP server. The browser experience requires no external API or account.
 
-    - `index.html`
-- `styles.css`
-- `script.js`
-- `README.md`
+## Validate
 
-    ## Run the project
+Use Node.js 22 or newer:
 
-    1. Open `index.html` directly in a browser, or use VS Code Live Server.
-2. Interact with the main controls.
-3. Refresh and confirm any saved browser state remains available.
+```sh
+node --check script.js
+node --check jokes.js
+node --test
+```
 
-    ## Test checklist
+## Android debug build
 
-    - The page loads without a console syntax error.
-    - The primary interaction changes the interface.
-    - Empty or invalid input produces useful feedback where applicable.
-    - Keyboard focus remains visible.
-    - The layout works at a narrow mobile width.
+Install the pinned dependencies, prepare the bundled web assets, and run the Capacitor Android debug build:
 
-    ## Classroom extensions
+```sh
+npm install
+npm run prepare:web
+npx cap add android
+npx cap sync android
+cd android && ./gradlew assembleDebug
+```
 
-    1. Add one more data field, item, or state.
-    2. Improve the empty, loading, or error state.
-    3. Create a second color theme.
-    4. Explain which file owns structure, presentation, and behavior.
+The debug build is not a production-signed release. Device compatibility, native accessibility, signing, and store publication require separate review and authorization.
