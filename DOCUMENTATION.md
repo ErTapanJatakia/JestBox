@@ -117,7 +117,7 @@ node --check script.js
 node --test
 ```
 
-**Execution status is separate from test authorship.** Do not describe tests as passing unless they have actually been run and their output reviewed. CI workflows are intentionally deferred until the repository owner re-enables them after implementation completion.
+**Execution status is separate from test authorship.** The current feature-branch head has passed the push and pull-request smoke-test workflows, CodeQL, JavaScript/TypeScript analysis, and GitHub Advanced Security. The run records are linked from [PR #1](https://github.com/ErTapanJatakia/JestBox/pull/1). These results apply to the recorded commit only; subsequent changes require fresh validation. Do not describe tests as passing unless they have actually been run and their output reviewed.
 
 ## 9. Quality assurance and release gates
 
