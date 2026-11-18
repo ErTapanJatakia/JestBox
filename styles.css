@@ -258,3 +258,24 @@ select:focus-visible {
 .jestbox .category-control select {
   min-height: 44px;
 }
+
+
+/* Preserve clear controls and keyboard focus in operating-system high-contrast modes. */
+@media (forced-colors: active) {
+  .jestbox .panel,
+  .jestbox .locale-button,
+  .jestbox .joke-actions button,
+  .jestbox .category-control select {
+    border: 1px solid CanvasText;
+  }
+  .jestbox .locale-button.active {
+    outline: 2px solid Highlight;
+  }
+  .jestbox :focus-visible,
+  .jestbox:focus,
+  .site-header a:focus-visible,
+  .skip-link:focus {
+    outline: 3px solid Highlight;
+    outline-offset: 3px;
+  }
+}
