@@ -32,3 +32,6 @@ test("every theme meets WCAG AA text contrast and 3:1 component-boundary contras
 test("six locale policy and accessibility documents include the required contact routes",()=>{
  for(const locale of ["es-PE","es-ES","en-IN","hi-IN"]){const policy=read("PRIVACY-POLICY."+locale+".md");const statement=read("ACCESSIBILITY-STATEMENT."+locale+".md");assert.match(policy,/cyber\.litigation\.advisor@gmail\.com/);assert.match(policy,/ertapanjatakia@yandex\.com/);assert.match(policy,/tapan_ditu_17\.20@outlook\.com/);assert.match(statement,/cyber\.litigation\.advisor@gmail\.com/);assert.equal(statement.split("assets/wcag22aa-blue.svg").length-1,2);}
 });
+
+test("the same regionally localised privacy-aware tagline appears on launch and home",()=>{assert.match(js,/\["#headline","launch"\]/);assert.match(js,/\["#launch-tagline","launch"\]/);for(const phrase of ["Pocket-sized local laughs","Risas locales de bolsillo","Местный юмор в кармане","जेब में देसी हँसी"])assert.ok(js.includes(phrase),phrase)});
+test("theme names are localised for all six selected locales",()=>{assert.match(js,/const THEME_NAMES=/);for(const locale of ["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN"])assert.ok(js.includes('"'+locale+'":['),"Missing theme translations: "+locale)});
