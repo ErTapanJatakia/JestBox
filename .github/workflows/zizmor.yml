@@ -1,0 +1,54 @@
+name: zizmor GitHub Actions security audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Audit workflow security
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Run zizmor static analysis
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo" \
+            ghcr.io/zizmorcore/zizmor:1.32.0 \
+            --format=sarif --no-exit-codes /repo/.github/workflows \
+            > zizmor-results.sarif
+          test -s zizmor-results.sarif
+      - name: Upload zizmor findings to code scanning
+        if: always() && hashFiles('zizmor-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        with:
+          sarif_file: zizmor-results.sarif
+          category: zizmor-workflows
+      - name: Generate zizmor summary
+        if: always() && hashFiles('zizmor-results.sarif') != ''
+        run: bash .github/scripts/render-sarif-summary.sh zizmor zizmor-results.sarif
+      - name: Archive zizmor report
+        if: always() && hashFiles('zizmor-results.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: jestbox-zizmor-report
+          path: |
+            zizmor-results.sarif
+            zizmor-security-summary.md
+          if-no-files-found: error
+          retention-days: 30

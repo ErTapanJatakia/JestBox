@@ -1,0 +1,44 @@
+name: actionlint workflow validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "29 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint GitHub Actions workflow definitions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+      - name: Install pinned actionlint
+        run: go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
+      - name: Lint all workflow files
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$(go env GOPATH)/bin/actionlint" -color -oneline .github/workflows/*.yml
+      - name: Record lint result
+        if: always()
+        shell: bash
+        run: |
+          {
+            printf "# actionlint\n\n"
+            printf -- "- Commit: %s\n" "$GITHUB_SHA"
+            printf -- "- Workflow run: %s\n" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            printf "%s\n" "- Scope: all YAML workflow definitions under .github/workflows/"
+          } >> "$GITHUB_STEP_SUMMARY"

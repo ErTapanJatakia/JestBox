@@ -55,7 +55,7 @@ jobs:
             -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
             -e MOBSF_VT_ENABLED=0 \
             opensecurity/mobile-security-framework-mobsf:latest
-          for attempt in $(seq 1 60); do
+          for _ in {1..60}; do
             if curl --silent --fail http://127.0.0.1:8000/ >/dev/null; then
               exit 0
             fi
@@ -83,7 +83,7 @@ jobs:
             --data-urlencode "file_name=$FILE_NAME" \
             --data-urlencode "scan_type=apk" \
             http://127.0.0.1:8000/api/v1/scan > mobsf-scan-response.json
-          for attempt in $(seq 1 60); do
+          for _ in {1..60}; do
             if curl --silent --show-error --fail -X POST \
               -H "Authorization: $MOBSF_API_KEY" \
               --data-urlencode "hash=$HASH" \
