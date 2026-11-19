@@ -110,6 +110,7 @@ jobs:
             docker rm -f jestbox-mobsf >/dev/null 2>&1 || true
             timeout 15s adb devices -l > "$GITHUB_WORKSPACE/adb-devices.txt" 2>&1 || true
             { id; ls -l /dev/kvm; } > "$GITHUB_WORKSPACE/kvm-permissions.txt" 2>&1 || true
+            cp "$RUNNER_TEMP/remount.log" "$GITHUB_WORKSPACE/remount.log" 2>/dev/null || true
             cat "$RUNNER_TEMP/adb-server.log" > "$GITHUB_WORKSPACE/adb-server.log" 2>/dev/null || true
             cat "$RUNNER_TEMP/emulator.log" > "$GITHUB_WORKSPACE/emulator.log" 2>/dev/null || true
             if [[ -f "$RUNNER_TEMP/emulator.pid" ]]; then
@@ -130,7 +131,7 @@ jobs:
             exit 1
           fi
           ls -l /dev/kvm
-          "$ANDROID_HOME/emulator/emulator" -avd jestbox_api30 -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data -accel on > "$RUNNER_TEMP/emulator.log" 2>&1 &
+          "$ANDROID_HOME/emulator/emulator" -avd jestbox_api30 -writable-system -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data -accel on > "$RUNNER_TEMP/emulator.log" 2>&1 &
           echo $! > "$RUNNER_TEMP/emulator.pid"
 
           # Bound transport discovery separately from the Android boot deadline.
@@ -306,5 +307,6 @@ jobs:
             adb-devices.txt
             kvm-permissions.txt
             root-check.txt
+            remount.log
           if-no-files-found: warn
           retention-days: 30
