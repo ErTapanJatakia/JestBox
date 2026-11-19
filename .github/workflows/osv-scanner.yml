@@ -29,17 +29,11 @@ jobs:
           node-version: "22"
       - name: Resolve npm dependency tree for this scan
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.24"
-      - name: Install pinned OSV-Scanner
-        run: go install github.com/google/osv-scanner/v2/cmd/osv-scanner@v2.7.1
-      - name: Scan repository dependencies
+      - name: Run pinned OSV-Scanner container
         shell: bash
         run: |
           set +e
-          osv-scanner scan source --recursive --format sarif --output osv-results.sarif .
+          docker run --rm -v "$GITHUB_WORKSPACE:/src" ghcr.io/google/osv-scanner:v2.7.1 scan source --recursive --format sarif --output /src/osv-results.sarif /src
           status=$?
           set -e
           if [ ! -s osv-results.sarif ]; then
