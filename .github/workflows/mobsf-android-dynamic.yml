@@ -184,6 +184,13 @@ jobs:
           ROOT_ID="$(timeout 30s adb shell id)"
           printf '%s\n' "$ROOT_ID"
           grep -q 'uid=0' <<< "$ROOT_ID"
+          if ! timeout 60s adb remount > "$RUNNER_TEMP/remount.log" 2>&1; then
+            cat "$RUNNER_TEMP/remount.log"
+            echo "::error::MobSF requires a writable /system partition; ADB remount failed."
+            exit 1
+          fi
+          timeout 15s adb shell touch /system/.jestbox-mobsf-write-test
+          timeout 15s adb shell rm /system/.jestbox-mobsf-write-test
           timeout 15s adb connect 127.0.0.1:5555
           timeout 15s adb devices -l | grep -qE '^127\.0\.0\.1:5555[[:space:]]+device([[:space:]]|$)'
 
