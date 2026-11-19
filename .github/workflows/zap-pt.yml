@@ -71,7 +71,7 @@ jobs:
           docker run --rm --user 0:0 --network host \
             -e HOME=/root \
             -v "$GITHUB_WORKSPACE:/zap/wrk/:rw" \
-            ghcr.io/zaproxy/zaproxy:2.16.1 \
+            ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py \
               -t http://127.0.0.1:8080 \
               -m 5 \
@@ -82,11 +82,12 @@ jobs:
           test -s zap-baseline.html
 
       - name: Run bounded active ZAP scan when explicitly requested
-        if: github.event_name == 'workflow_dispatch' && inputs.active_scan
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.active_scan) || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         shell: bash
         run: |
           set -euo pipefail
-          docker run --rm --network host \
+          docker run --rm --user 0:0 --network host \
+            -e HOME=/root \
             -v "$GITHUB_WORKSPACE:/zap/wrk/:rw" \
             ghcr.io/zaproxy/zaproxy:2.16.1 \
             zap-full-scan.py \
@@ -110,8 +111,8 @@ jobs:
             printf -- "- Workflow run: %s\n" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             printf -- "- Target: isolated local build at 127.0.0.1:8080\n"
             printf -- "- Scan mode: "
-            if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.active_scan }}" == "true" ]]; then
-              printf "baseline plus bounded active scan\n"
+            if [[ "${{ github.event_name }}" == "schedule" || ( "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.active_scan }}" == "true" ) || ( "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ) ]]; then
+              printf "baseline plus bounded active scan (scheduled, main push, or manual opt-in)\n"
             else
               printf "baseline passive scan\n"
             fi
