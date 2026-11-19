@@ -160,7 +160,7 @@ jobs:
             --data-urlencode "hash=$HASH" \
             http://127.0.0.1:8000/api/v1/scan \
             -o "$GITHUB_WORKSPACE/mobsf-static-scan.json"
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
             http://127.0.0.1:8000/api/v1/report_json \
@@ -260,6 +260,12 @@ jobs:
           cleanup() {
             docker logs jestbox-mobsf > "$GITHUB_WORKSPACE/mobsf-container.log" 2>&1 || true
             docker rm -f jestbox-mobsf >/dev/null 2>&1 || true
+            timeout 15s adb devices -l > "$GITHUB_WORKSPACE/adb-devices.txt" 2>&1 || true
+            cat "$RUNNER_TEMP/adb-server.log" > "$GITHUB_WORKSPACE/adb-server.log" 2>/dev/null || true
+            cat "$RUNNER_TEMP/emulator.log" > "$GITHUB_WORKSPACE/emulator.log" 2>/dev/null || true
+            if [[ -f "$RUNNER_TEMP/emulator.pid" ]]; then
+              ps -p "$(cat "$RUNNER_TEMP/emulator.pid")" -o pid=,stat=,etime=,cmd= > "$GITHUB_WORKSPACE/emulator-process.txt" 2>&1 || true
+            fi
           }
           trap cleanup EXIT
 
@@ -273,7 +279,7 @@ jobs:
 
           ready=false
           for _ in {1..90}; do
-            if curl --silent --fail http://127.0.0.1:8000/ >/dev/null; then
+            if curl --silent --fail --connect-timeout 5 --max-time 15 http://127.0.0.1:8000/ >/dev/null; then
               ready=true
               break
             fi
@@ -284,7 +290,7 @@ jobs:
             exit 1
           fi
 
-          UPLOAD="$(curl --silent --show-error --fail \
+          UPLOAD="$(curl --silent --show-error --fail --connect-timeout 10 --max-time 120 \
             -H "Authorization: $API_KEY" \
             -F "file=@$APK" \
             http://127.0.0.1:8000/api/v1/upload)"
