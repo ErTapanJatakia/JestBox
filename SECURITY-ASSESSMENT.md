@@ -10,7 +10,7 @@ The scope includes the eight-locale JavaScript application, npm dependencies, Gi
 
 | Tool | Coverage | Reporting |
 |---|---|---|
-| GitHub CodeQL | JavaScript/TypeScript source-code security analysis | GitHub code scanning |
+| GitHub CodeQL default setup | JavaScript/TypeScript and GitHub Actions analysis already managed by GitHub repository security settings | GitHub code scanning |
 | OSV-Scanner | Known vulnerabilities in discoverable dependency manifests/lockfiles | GitHub code scanning |
 | Trivy | Filesystem dependencies, secrets, misconfigurations and licence findings | GitHub code scanning |
 | Microsoft DevSkim | Secure-coding rules for source files | GitHub code scanning |
@@ -20,7 +20,7 @@ The scope includes the eight-locale JavaScript application, npm dependencies, Gi
 
 ## Trigger schedule
 
-- CodeQL: pushes and pull requests targeting `main`, weekly schedule, and manual dispatch.
+- CodeQL: managed by the repository's existing GitHub default setup; its analysis runs are visible in the Security/Actions surfaces. No duplicate advanced-setup workflow is added.
 - OSV, Trivy and DevSkim: pushes to `main`, pull requests targeting `main` where configured, weekly schedule, and manual dispatch.
 - Dependency Review: pull requests targeting `main`.
 - OpenSSF Scorecard: pushes to `main`, weekly schedule, and manual dispatch.
@@ -43,7 +43,7 @@ The initial workflows are configured to collect a baseline without automatically
 - OSV-Scanner coverage depends on package metadata it can discover. A manifest-only scan is not equivalent to a complete lockfile-based transitive dependency assessment.
 - MobSF performs static APK analysis only in this workflow. Dynamic analysis requires a separately provisioned Android emulator/device and is not claimed here.
 - Trivy and DevSkim may produce false positives; findings require human validation.
-- GitHub repository security settings (Dependency Graph, Dependabot alerts, secret scanning, and code-scanning availability) must be verified separately in repository settings. Workflow files alone do not enable every account-level security feature.
+- GitHub repository security settings (Dependency Graph, Dependabot alerts, secret scanning, and CodeQL default setup) must be verified separately in repository settings. Existing CodeQL default-setup runs were detected; the additional advanced-setup workflow was removed because GitHub rejects simultaneous default and advanced CodeQL configurations.
 - No scanner guarantees absence of vulnerabilities. Third-party action and container versions must be reviewed and updated regularly.
 
 ## Data handling
