@@ -44,9 +44,22 @@ jobs:
             --ignore-unfixed \
             /work
           test -s trivy-results.sarif
-      - name: Upload Trivy findings
+      - name: Upload Trivy findings to code scanning
         if: always() && hashFiles('trivy-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           sarif_file: trivy-results.sarif
           category: trivy-filesystem
+      - name: Generate Trivy human-readable summary
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        run: bash .github/scripts/render-sarif-summary.sh Trivy trivy-results.sarif
+      - name: Archive Trivy machine-readable and human-readable reports
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: jestbox-trivy-report
+          path: |
+            trivy-results.sarif
+            Trivy-security-summary.md
+          if-no-files-found: error
+          retention-days: 30
