@@ -37,14 +37,12 @@ jobs:
           set -euo pipefail
           COUNT="$(jq '[.components[]?] | length' jestbox-sbom.cdx.json)"
           {
-            echo "# JestBox source SBOM"
-            echo
-            echo "- Commit: `$GITHUB_SHA`"
-            echo "- Workflow run: `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`"
-            echo "- CycloneDX components: $COUNT"
-            echo "- Formats: CycloneDX JSON and SPDX JSON"
-            echo
-            echo "This inventory describes components discoverable in the checked-out source tree. It is not an inventory of a signed production APK."
+            printf '# JestBox source SBOM\n\n'
+            printf -- '- Commit: `%s`\n' "$GITHUB_SHA"
+            printf -- '- Workflow run: `%s`\n' "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            printf -- '- CycloneDX components: %s\n' "$COUNT"
+            printf '%s\n' '- Formats: CycloneDX JSON and SPDX JSON'
+            printf '\n%s\n' 'This inventory describes components discoverable in the checked-out source tree. It is not an inventory of a signed production APK.'
           } > jestbox-sbom-summary.md
           cat jestbox-sbom-summary.md >> "$GITHUB_STEP_SUMMARY"
       - name: Archive CycloneDX, SPDX and summary
