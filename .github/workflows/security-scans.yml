@@ -32,16 +32,41 @@ jobs:
 
   osv:
     name: OSV dependency vulnerability scan
-    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@0e457b42d0120153c352875e9b758b1e5c58c7e5 # v2.7.1
-    with:
-      scan-args: |-
-        --recursive
-        ./
-      fail-on-vuln: false
+    runs-on: ubuntu-latest
     permissions:
-      actions: read
       contents: read
       security-events: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: Install pinned OSV-Scanner
+        run: go install github.com/google/osv-scanner/v2/cmd/osv-scanner@v2.7.1
+      - name: Scan repository dependencies
+        shell: bash
+        run: |
+          set +e
+          osv-scanner scan source --recursive --format sarif --output osv-results.sarif .
+          status=$?
+          set -e
+          if [ ! -s osv-results.sarif ]; then
+            echo "::error::OSV-Scanner did not produce a SARIF report (exit $status)."
+            exit 1
+          fi
+          if [ "$status" -ne 0 ]; then
+            echo "::warning::OSV-Scanner reported findings; review the SARIF report."
+          fi
+      - name: Upload OSV findings to GitHub code scanning
+        if: always() && hashFiles('osv-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        with:
+          sarif_file: osv-results.sarif
+          category: osv-scanner
 
   trivy:
     name: Trivy repository vulnerability, secret and misconfiguration scan
