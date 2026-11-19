@@ -31,7 +31,8 @@ jobs:
       - name: Validate source run and download signed artifact
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
+          # GitHub-issued, short-lived workflow token; no credential is stored in source.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SOURCE_RUN_ID: ${{ inputs.source_run_id }}
           EXPECTED_SHA256: "21ad33e9acf156f88d967329869cd997c5f1e622583d34f763ca5ec01631c692"
         run: |
