@@ -39,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "emulator" "platforms;android-36" "build-tools;36.0.0" "system-images;android-30;google_apis;x86_64"
 
       - name: Build disposable JestBox debug APK
         shell: bash
@@ -54,130 +54,150 @@ jobs:
           ./gradlew --no-daemon assembleDebug
           test -s app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Run MobSF dynamic analysis on rooted Android emulator
-        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
-        with:
-          api-level: 30
-          target: google_apis
-          arch: x86_64
-          profile: pixel_2
-          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data
-          disable-animations: true
-          script: |
-            set -euo pipefail
-            APK="$GITHUB_WORKSPACE/android/app/build/outputs/apk/debug/app-debug.apk"
-            test -s "$APK"
-
-            # MobSF's Docker container shares the runner's ADB server.
-            adb kill-server || true
-            adb -a nodaemon server start > "$RUNNER_TEMP/adb-server.log" 2>&1 &
-            for _ in {1..30}; do
-              if adb devices | grep -qE '^emulator-5554[[:space:]]+device$'; then
-                break
-              fi
-              sleep 2
-            done
-            adb devices -l
-            adb root
-            adb wait-for-device
-            adb shell id | grep -q 'uid=0'
-
-            API_KEY="$(openssl rand -hex 32)"
-            echo "::add-mask::$API_KEY"
-            cleanup() {
-              docker logs jestbox-mobsf > "$GITHUB_WORKSPACE/mobsf-container.log" 2>&1 || true
-              docker rm -f jestbox-mobsf >/dev/null 2>&1 || true
-            }
-            trap cleanup EXIT
-
-            docker run -d --name jestbox-mobsf --network host \
-              -e MOBSF_API_KEY="$API_KEY" \
-              -e MOBSF_ANALYZER_IDENTIFIER=emulator-5554 \
-              -e ADB_SERVER_SOCKET=tcp:127.0.0.1:5037 \
-              -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
-              -e MOBSF_VT_ENABLED=0 \
-              opensecurity/mobile-security-framework-mobsf:latest
-
-            ready=false
-            for _ in {1..90}; do
-              if curl --silent --fail http://127.0.0.1:8000/ >/dev/null; then
-                ready=true
-                break
-              fi
-              sleep 5
-            done
-            if [[ "$ready" != "true" ]]; then
-              docker logs jestbox-mobsf
-              exit 1
+      - name: Start rooted Android API 30 emulator and run MobSF dynamic analysis
+        shell: bash
+        env:
+          ANDROID_AVD_HOME: ${{ runner.temp }}/.android/avd
+        run: |
+          set -euo pipefail
+          mkdir -p "$ANDROID_AVD_HOME"
+          echo "no" | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name jestbox_api30 --package "system-images;android-30;google_apis;x86_64" --device pixel_2
+          "$ANDROID_HOME/emulator/emulator" -avd jestbox_api30 -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data -accel auto > "$RUNNER_TEMP/emulator.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/emulator.pid"
+          adb -s emulator-5554 wait-for-device
+          booted=false
+          for _ in {1..90}; do
+            if [[ "$(adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; then
+              booted=true
+              break
             fi
+            sleep 5
+          done
+          if [[ "$booted" != "true" ]]; then
+            cat "$RUNNER_TEMP/emulator.log"
+            exit 1
+          fi
+          adb -s emulator-5554 shell settings put global window_animation_scale 0
+          adb -s emulator-5554 shell settings put global transition_animation_scale 0
+          adb -s emulator-5554 shell settings put global animator_duration_scale 0
+          adb -s emulator-5554 root
+          adb -s emulator-5554 wait-for-device
+          adb -s emulator-5554 shell id | grep -q 'uid=0'
+          set -euo pipefail
+          APK="$GITHUB_WORKSPACE/android/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
 
-            UPLOAD="$(curl --silent --show-error --fail \
-              -H "Authorization: $API_KEY" \
-              -F "file=@$APK" \
-              http://127.0.0.1:8000/api/v1/upload)"
-            HASH="$(printf '%s' "$UPLOAD" | jq -er '.hash')"
-            printf '%s\n' "$UPLOAD" > "$GITHUB_WORKSPACE/mobsf-upload.json"
-
-            curl --silent --show-error --fail -X POST \
-              -H "Authorization: $API_KEY" \
-              --data-urlencode "hash=$HASH" \
-              http://127.0.0.1:8000/api/v1/scan \
-              -o "$GITHUB_WORKSPACE/mobsf-static-scan.json"
-            curl --silent --show-error --fail -X POST \
-              -H "Authorization: $API_KEY" \
-              --data-urlencode "hash=$HASH" \
-              http://127.0.0.1:8000/api/v1/report_json \
-              -o "$GITHUB_WORKSPACE/mobsf-static-report.json"
-            jq -e 'type == "object" and (has("error") | not)' "$GITHUB_WORKSPACE/mobsf-static-report.json" >/dev/null
-
-            curl --silent --show-error --fail -X POST \
-              -H "Authorization: $API_KEY" \
-              --data-urlencode "hash=$HASH" \
-              --data-urlencode "device_mode=rooted" \
-              --data-urlencode "install=1" \
-              --data-urlencode "re_install=1" \
-              http://127.0.0.1:8000/api/v1/dynamic/start_analysis \
-              -o "$GITHUB_WORKSPACE/mobsf-dynamic-start.json"
-            jq -e '.package and .device_identifier' "$GITHUB_WORKSPACE/mobsf-dynamic-start.json" >/dev/null
-            PACKAGE="$(jq -er '.package' "$GITHUB_WORKSPACE/mobsf-dynamic-start.json")"
-
-            adb shell monkey -p "$PACKAGE" 1
-            sleep 60
-            adb logcat -d -v time > "$GITHUB_WORKSPACE/android-logcat.txt"
-
-            if grep -E 'FATAL EXCEPTION|Process: '"$PACKAGE" "$GITHUB_WORKSPACE/android-logcat.txt"; then
-              echo "::error::The app produced a fatal runtime exception during the observation window."
-              exit 1
+          # MobSF's Docker container shares the runner's ADB server.
+          adb kill-server || true
+          adb -a nodaemon server start > "$RUNNER_TEMP/adb-server.log" 2>&1 &
+          for _ in {1..30}; do
+            if adb devices | grep -qE '^emulator-5554[[:space:]]+device$'; then
+              break
             fi
+            sleep 2
+          done
+          adb devices -l
+          adb root
+          adb wait-for-device
+          adb shell id | grep -q 'uid=0'
 
-            curl --silent --show-error --fail -X POST \
-              -H "Authorization: $API_KEY" \
-              --data-urlencode "hash=$HASH" \
-              http://127.0.0.1:8000/api/v1/dynamic/stop_analysis \
-              -o "$GITHUB_WORKSPACE/mobsf-dynamic-stop.json"
-            curl --silent --show-error --fail -X POST \
-              -H "Authorization: $API_KEY" \
-              --data-urlencode "hash=$HASH" \
-              http://127.0.0.1:8000/api/v1/dynamic/report_json \
-              -o "$GITHUB_WORKSPACE/mobsf-dynamic-report.json"
-            jq -e 'type == "object" and (has("error") | not)' "$GITHUB_WORKSPACE/mobsf-dynamic-report.json" >/dev/null
+          API_KEY="$(openssl rand -hex 32)"
+          echo "::add-mask::$API_KEY"
+          cleanup() {
+            docker logs jestbox-mobsf > "$GITHUB_WORKSPACE/mobsf-container.log" 2>&1 || true
+            docker rm -f jestbox-mobsf >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
 
-            {
-              echo "# JestBox MobSF Android dynamic assessment"
-              echo
-              echo "- Commit: $GITHUB_SHA"
-              echo "- Workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-              echo "- Target: disposable debug APK on Android API 30 x86_64 emulator"
-              echo "- Emulator: rooted Google APIs image without Google Play"
-              echo "- Package: $PACKAGE"
-              echo "- Observation window: 60 seconds after launch"
-              echo "- MobSF static report: generated"
-              echo "- MobSF dynamic report: generated"
-              echo "- Scope: local emulator only; no production services or user data"
-              echo
-              echo "This is automated runtime analysis, not a human-led penetration test. Findings require manual validation."
-            } > "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md"
-            cat "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md" >> "$GITHUB_STEP_SUMMARY"
+          docker run -d --name jestbox-mobsf --network host \
+            -e MOBSF_API_KEY="$API_KEY" \
+            -e MOBSF_ANALYZER_IDENTIFIER=emulator-5554 \
+            -e ADB_SERVER_SOCKET=tcp:127.0.0.1:5037 \
+            -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
+            -e MOBSF_VT_ENABLED=0 \
+            opensecurity/mobile-security-framework-mobsf:latest
+
+          ready=false
+          for _ in {1..90}; do
+            if curl --silent --fail http://127.0.0.1:8000/ >/dev/null; then
+              ready=true
+              break
+            fi
+            sleep 5
+          done
+          if [[ "$ready" != "true" ]]; then
+            docker logs jestbox-mobsf
+            exit 1
+          fi
+
+          UPLOAD="$(curl --silent --show-error --fail \
+            -H "Authorization: $API_KEY" \
+            -F "file=@$APK" \
+            http://127.0.0.1:8000/api/v1/upload)"
+          HASH="$(printf '%s' "$UPLOAD" | jq -er '.hash')"
+          printf '%s\n' "$UPLOAD" > "$GITHUB_WORKSPACE/mobsf-upload.json"
+
+          curl --silent --show-error --fail -X POST \
+            -H "Authorization: $API_KEY" \
+            --data-urlencode "hash=$HASH" \
+            http://127.0.0.1:8000/api/v1/scan \
+            -o "$GITHUB_WORKSPACE/mobsf-static-scan.json"
+          curl --silent --show-error --fail -X POST \
+            -H "Authorization: $API_KEY" \
+            --data-urlencode "hash=$HASH" \
+            http://127.0.0.1:8000/api/v1/report_json \
+            -o "$GITHUB_WORKSPACE/mobsf-static-report.json"
+          jq -e 'type == "object" and (has("error") | not)' "$GITHUB_WORKSPACE/mobsf-static-report.json" >/dev/null
+
+          curl --silent --show-error --fail -X POST \
+            -H "Authorization: $API_KEY" \
+            --data-urlencode "hash=$HASH" \
+            --data-urlencode "device_mode=rooted" \
+            --data-urlencode "install=1" \
+            --data-urlencode "re_install=1" \
+            http://127.0.0.1:8000/api/v1/dynamic/start_analysis \
+            -o "$GITHUB_WORKSPACE/mobsf-dynamic-start.json"
+          jq -e '.package and .device_identifier' "$GITHUB_WORKSPACE/mobsf-dynamic-start.json" >/dev/null
+          PACKAGE="$(jq -er '.package' "$GITHUB_WORKSPACE/mobsf-dynamic-start.json")"
+
+          adb shell monkey -p "$PACKAGE" 1
+          sleep 60
+          adb logcat -d -v time > "$GITHUB_WORKSPACE/android-logcat.txt"
+
+          if grep -E 'FATAL EXCEPTION|Process: '"$PACKAGE" "$GITHUB_WORKSPACE/android-logcat.txt"; then
+            echo "::error::The app produced a fatal runtime exception during the observation window."
+            exit 1
+          fi
+
+          curl --silent --show-error --fail -X POST \
+            -H "Authorization: $API_KEY" \
+            --data-urlencode "hash=$HASH" \
+            http://127.0.0.1:8000/api/v1/dynamic/stop_analysis \
+            -o "$GITHUB_WORKSPACE/mobsf-dynamic-stop.json"
+          curl --silent --show-error --fail -X POST \
+            -H "Authorization: $API_KEY" \
+            --data-urlencode "hash=$HASH" \
+            http://127.0.0.1:8000/api/v1/dynamic/report_json \
+            -o "$GITHUB_WORKSPACE/mobsf-dynamic-report.json"
+          jq -e 'type == "object" and (has("error") | not)' "$GITHUB_WORKSPACE/mobsf-dynamic-report.json" >/dev/null
+
+          {
+            echo "# JestBox MobSF Android dynamic assessment"
+            echo
+            echo "- Commit: $GITHUB_SHA"
+            echo "- Workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "- Target: disposable debug APK on Android API 30 x86_64 emulator"
+            echo "- Emulator: rooted Google APIs image without Google Play"
+            echo "- Package: $PACKAGE"
+            echo "- Observation window: 60 seconds after launch"
+            echo "- MobSF static report: generated"
+            echo "- MobSF dynamic report: generated"
+            echo "- Scope: local emulator only; no production services or user data"
+            echo
+            echo "This is automated runtime analysis, not a human-led penetration test. Findings require manual validation."
+          } > "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md"
+          cat "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md" >> "$GITHUB_STEP_SUMMARY"
+
 
       - name: Archive MobSF static and dynamic reports
         if: always()
