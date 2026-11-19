@@ -88,7 +88,7 @@ jobs:
           done
           test -s app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Start Android API 30 emulator and run MobSF dynamic analysis (unrooted)
+      - name: Start Android API 30 emulator and run MobSF dynamic analysis (auto mode)
         shell: bash
         env:
           ANDROID_AVD_HOME: ${{ runner.temp }}/.android/avd
@@ -227,7 +227,7 @@ jobs:
           curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
-            --data-urlencode "device_mode=unrooted" \
+            --data-urlencode "device_mode=auto" \
             --data-urlencode "install=1" \
             --data-urlencode "re_install=1" \
             http://127.0.0.1:8000/api/v1/dynamic/start_analysis \
@@ -262,14 +262,14 @@ jobs:
             echo "- Commit: $GITHUB_SHA"
             echo "- Workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             echo "- Target: disposable debug APK on Android API 30 x86_64 emulator"
-            echo "- Emulator: Google APIs image without Google Play; MobSF device mode: unrooted; ADB endpoint 127.0.0.1:5555"
+            echo "- Emulator: Google APIs image without Google Play; MobSF device mode: auto (rooted or Frida Gadget as supported); ADB endpoint 127.0.0.1:5555"
             echo "- Package: $PACKAGE"
             echo "- Observation window: 60 seconds after launch"
             echo "- MobSF static report: generated"
             echo "- MobSF dynamic report: generated"
             echo "- Scope: local emulator only; no production services or user data"
             echo
-            echo "This is automated unrooted runtime analysis, not a human-led penetration test. Root-dependent inspection and system-level TLS interception are out of scope; findings require manual validation."
+            echo "This is automated MobSF auto-mode runtime analysis, not a human-led penetration test. MobSF may fall back to Frida Gadget when root is unavailable; root-dependent inspection and system-level TLS interception may therefore be limited. Findings require manual validation."
           } > "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md"
           cat "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md" >> "$GITHUB_STEP_SUMMARY"
 
