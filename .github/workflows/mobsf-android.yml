@@ -98,7 +98,7 @@ jobs:
             -e MOBSF_API_KEY="$API_KEY" \
             -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
             -e MOBSF_VT_ENABLED=0 \
-            opensecurity/mobile-security-framework-mobsf:latest
+            opensecurity/mobile-security-framework-mobsf@sha256:82a5a52bc0a9ee093381dbcd86224edb248ddcac9bcadf48216b878cb0cb1fc2
           for _ in {1..60}; do
             if curl --silent --fail --connect-timeout 5 --max-time 15 http://127.0.0.1:8000/ >/dev/null; then
               exit 0
