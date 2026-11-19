@@ -1,16 +1,9 @@
 name: MobSF Android APK static assessment
 
 on:
-  workflow_run:
-    workflows: ["JestBox Android debug build"]
-    types: [completed]
+  push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      run_id:
-        description: "Successful Android debug workflow run ID containing jestbox-android-debug"
-        required: true
-        type: string
 
 permissions:
   contents: read
@@ -18,38 +11,54 @@ permissions:
 jobs:
   mobsf:
     name: MobSF static APK analysis
-    if: >-
-      (github.event_name == 'workflow_dispatch') ||
-      (github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 35
     permissions:
-      actions: read
       contents: read
     steps:
-      - name: Download debug APK artifact
-        uses: actions/download-artifact@v4
+      - name: Check out trusted main source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          name: jestbox-android-debug
-          path: android-artifact
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          run-id: ${{ github.event.workflow_run.id || inputs.run_id }}
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install Android SDK components
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+      - name: Install pinned Capacitor toolchain
+        run: npm install --no-audit --no-fund
+      - name: Prepare local web assets and Android project
+        run: |
+          npm run prepare:web
+          npx cap add android
+          node scripts/prepare-android-branding.mjs
+          npx cap sync android
+      - name: Assemble debug APK
+        run: cd android && ./gradlew --no-daemon assembleDebug
       - name: Verify APK artifact exists
         id: apk
         shell: bash
         run: |
           set -euo pipefail
-          APK="$(find android-artifact -type f -name '*.apk' -print -quit)"
-          test -n "$APK"
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
           echo "path=$APK" >> "$GITHUB_OUTPUT"
       - name: Start isolated MobSF scanner
+        id: mobsf
         shell: bash
         run: |
           set -euo pipefail
           API_KEY="$(openssl rand -hex 32)"
           echo "::add-mask::$API_KEY"
-          echo "MOBSF_API_KEY=$API_KEY" >> "$GITHUB_ENV"
+          echo "api_key=$API_KEY" >> "$GITHUB_OUTPUT"
           docker run -d --name jestbox-mobsf -p 8000:8000 \
             -e MOBSF_API_KEY="$API_KEY" \
             -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
@@ -68,6 +77,7 @@ jobs:
         shell: bash
         env:
           APK_PATH: ${{ steps.apk.outputs.path }}
+          MOBSF_API_KEY: ${{ steps.mobsf.outputs.api_key }}
         run: |
           set -euo pipefail
           UPLOAD="$(curl --silent --show-error --fail \
@@ -115,7 +125,7 @@ jobs:
           cat mobsf-summary.md >> "$GITHUB_STEP_SUMMARY"
       - name: Upload MobSF JSON and Markdown assessment reports
         if: always() && hashFiles('mobsf-report.json') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: jestbox-mobsf-static-report
           path: |
