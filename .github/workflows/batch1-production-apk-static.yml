@@ -1,0 +1,181 @@
+name: JestBox Batch 1 production APK static assessment
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Approved production-signed APK workflow run ID"
+        required: true
+        default: "44590485192"
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: jestbox-batch1-static-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  production-static:
+    name: Verify and scan exact production-signed APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out trusted assessment workflow
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate source run and download signed artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+          EXPECTED_SHA256: "21ad33e9acf156f88d967329869cd997c5f1e622583d34f763ca5ec01631c692"
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$SOURCE_RUN_ID" == "44590485192" ]] || {
+            echo "::error::This Batch 1 workflow is pinned to the approved production APK run 44590485192."
+            exit 1
+          }
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name jestbox-android-production-signed --dir "$RUNNER_TEMP/release"
+          APK="$RUNNER_TEMP/release/jestbox-release-signed.apk"
+          CHECKSUM="$APK.sha256"
+          test -s "$APK"
+          test -s "$CHECKSUM"
+          printf '%s  %s\n' "$EXPECTED_SHA256" "$APK" | sha256sum --check -
+          grep -F "$EXPECTED_SHA256" "$CHECKSUM" >/dev/null
+          echo "apk_path=$APK" >> "$GITHUB_ENV"
+          echo "Verified SHA-256: $EXPECTED_SHA256" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install Android build tools for independent manifest and signature checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +o pipefail
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          set -o pipefail
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+          echo "$ANDROID_HOME/build-tools/36.0.0" >> "$GITHUB_PATH"
+
+      - name: Independently verify production APK metadata and signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          apksigner verify --verbose --print-certs "$apk_path" > apksigner-verification.txt
+          "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest application-id "$apk_path" | tee apk-application-id.txt
+          "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest min-sdk "$apk_path" | tee apk-min-sdk.txt
+          "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest target-sdk "$apk_path" | tee apk-target-sdk.txt
+          "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest debuggable "$apk_path" | tee apk-debuggable.txt
+          test "$(cat apk-application-id.txt)" = "com.jestbox.app"
+          test "$(cat apk-min-sdk.txt)" = "24"
+          test "$(cat apk-debuggable.txt)" = "false"
+          {
+            echo
+            echo "## Independent APK verification"
+            echo "- Package: $(cat apk-application-id.txt)"
+            echo "- Minimum SDK: $(cat apk-min-sdk.txt)"
+            echo "- Target SDK: $(cat apk-target-sdk.txt)"
+            echo "- Debuggable: $(cat apk-debuggable.txt)"
+            echo "- APK signature verification: passed"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Start pinned MobSF scanner
+        id: mobsf
+        shell: bash
+        run: |
+          set -euo pipefail
+          API_KEY="$(openssl rand -hex 32)"
+          echo "::add-mask::$API_KEY"
+          echo "api_key=$API_KEY" >> "$GITHUB_OUTPUT"
+          docker run -d --name jestbox-mobsf-static --network host \
+            -e MOBSF_API_KEY="$API_KEY" \
+            -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
+            -e MOBSF_VT_ENABLED=0 \
+            opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954
+          for _ in {1..90}; do
+            if curl --silent --fail --connect-timeout 5 --max-time 15 http://127.0.0.1:8000/ >/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker logs jestbox-mobsf-static
+          exit 1
+
+      - name: Run MobSF static analysis on exact signed production APK
+        id: scan
+        shell: bash
+        env:
+          MOBSF_API_KEY: ${{ steps.mobsf.outputs.api_key }}
+        run: |
+          set -euo pipefail
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 120 \
+            -H "Authorization: $MOBSF_API_KEY" \
+            -F "file=@$apk_path" \
+            http://127.0.0.1:8000/api/v1/upload > mobsf-upload.json
+          HASH="$(jq -er '.hash' mobsf-upload.json)"
+          FILE_NAME="$(jq -er '.file_name' mobsf-upload.json)"
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
+            -H "Authorization: $MOBSF_API_KEY" \
+            --data-urlencode "hash=$HASH" \
+            --data-urlencode "file_name=$FILE_NAME" \
+            --data-urlencode "scan_type=apk" \
+            http://127.0.0.1:8000/api/v1/scan > mobsf-scan-response.json
+          report_ready=false
+          for _ in {1..60}; do
+            if curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
+              -H "Authorization: $MOBSF_API_KEY" \
+              --data-urlencode "hash=$HASH" \
+              http://127.0.0.1:8000/api/v1/report_json -o mobsf-report.json; then
+              if jq -e 'type == "object" and (has("error") | not) and has("security_score")' mobsf-report.json >/dev/null; then
+                report_ready=true
+                break
+              fi
+            fi
+            sleep 5
+          done
+          [[ "$report_ready" == "true" ]] || {
+            docker logs jestbox-mobsf-static
+            echo "::error::MobSF did not produce a complete static JSON report."
+            exit 1
+          }
+          {
+            echo "# JestBox Batch 1 — production APK static assessment"
+            echo
+            echo "- Source release workflow: 44590485192"
+            echo "- Source commit: 7d741574790303558d5baadcd4c15e3341d55c1f"
+            echo "- APK SHA-256: 21ad33e9acf156f88d967329869cd997c5f1e622583d34f763ca5ec01631c692"
+            echo "- Package: $(jq -r '.package_name // "not reported"' mobsf-report.json)"
+            echo "- MobSF security score: $(jq -r '.security_score // "not reported"' mobsf-report.json)"
+            echo "- High findings: $(jq -r '.security_analysis | [.. | objects | select(.severity? == "high")] | length' mobsf-report.json)"
+            echo
+            echo "The JSON report is the authoritative machine-readable output. Findings require manual validation. This is static analysis, not dynamic testing or a penetration test."
+          } > mobsf-production-summary.md
+          cat mobsf-production-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload production APK assessment evidence
+        if: always() && hashFiles('mobsf-report.json') != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-batch1-production-static-evidence
+          path: |
+            mobsf-upload.json
+            mobsf-scan-response.json
+            mobsf-report.json
+            mobsf-production-summary.md
+            apksigner-verification.txt
+            apk-application-id.txt
+            apk-min-sdk.txt
+            apk-target-sdk.txt
+            apk-debuggable.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Stop MobSF container
+        if: always()
+        shell: bash
+        run: docker rm -f jestbox-mobsf-static || true
