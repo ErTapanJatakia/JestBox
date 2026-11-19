@@ -80,6 +80,7 @@ jobs:
             echo "::error::Unsigned release APK must not be debuggable (reported: $DEBUGGABLE)."
             exit 1
           fi
+          sha256sum "$APK" | tee "$APK.sha256"
           echo "path=$APK" >> "$GITHUB_OUTPUT"
           echo "Release APK manifest debuggable flag: false" >> "$GITHUB_STEP_SUMMARY"
       - name: Start isolated MobSF scanner
@@ -161,6 +162,8 @@ jobs:
         with:
           name: jestbox-mobsf-static-report
           path: |
+            android/app/build/outputs/apk/release/app-release-unsigned.apk
+            android/app/build/outputs/apk/release/app-release-unsigned.apk.sha256
             mobsf-report.json
             mobsf-scan-response.json
             mobsf-summary.md
