@@ -71,7 +71,7 @@ jobs:
       - name: Start rooted Android API 30 emulator and run MobSF dynamic analysis
         shell: bash
         env:
-          ANDROID_AVD_HOME: \${{ runner.temp }}/.android/avd
+          ANDROID_AVD_HOME: ${{ runner.temp }}/.android/avd
         run: |
           set -euo pipefail
           export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
