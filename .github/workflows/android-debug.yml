@@ -44,7 +44,10 @@ jobs:
           java-version: "21"
       - name: Install Android SDK components
         run: |
+          set -euo pipefail
+          set +o pipefail
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          set -o pipefail
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
       - name: Install pinned Capacitor toolchain
         run: npm install --no-audit --no-fund
@@ -57,7 +60,23 @@ jobs:
       - name: Synchronize native project
         run: npx cap sync android
       - name: Assemble debug APK
-        run: cd android && ./gradlew --no-daemon assembleDebug
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android
+          for attempt in 1 2 3; do
+            if ./gradlew --no-daemon --max-workers=2 assembleDebug 2>&1 | tee "$RUNNER_TEMP/gradle-build.log"; then
+              break
+            else
+              status=$?
+            fi
+            if grep -q "Received status code 429" "$RUNNER_TEMP/gradle-build.log" && [[ "$attempt" -lt 3 ]]; then
+              echo "Maven Central rate-limited dependency resolution (HTTP 429); retrying after backoff."
+              sleep "$((attempt * 20))"
+            else
+              exit "$status"
+            fi
+          done
       - name: Verify APK signature, alignment, and checksum
         shell: bash
         run: |
