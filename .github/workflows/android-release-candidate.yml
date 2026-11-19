@@ -13,6 +13,10 @@ on:
         required: true
         default: false
         type: boolean
+      expected_apk_sha256:
+        description: Approved production APK SHA-256 digest (64 hexadecimal characters)
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -207,8 +211,12 @@ jobs:
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/release/jestbox-release-signed.apk"
-          # Public APK integrity digest, split to avoid secret-scanner classification as a credential.
-          APPROVED_APK_DIGEST="$(printf '%s%s' '21ad33e9acf156f88d967329869cd997' 'c5f1e622583d34f763ca5ec01631c692')"
+          APPROVED_APK_DIGEST="${{ inputs.expected_apk_sha256 }}"
+          test -s "$APK"
+          [[ "$APPROVED_APK_DIGEST" =~ ^[a-fA-F0-9]{64}$ ]] || {
+            echo "::error::Provide the approved production APK SHA-256 digest as a 64-character hexadecimal workflow input."
+            exit 1
+          }
           test -s "$APK"
           ACTUAL_SHA256="$(sha256sum "$APK" | awk '{print $1}')"
           if [[ "$ACTUAL_SHA256" != "$APPROVED_APK_DIGEST" ]]; then
@@ -278,7 +286,7 @@ jobs:
             echo
             echo "- Source release workflow: this run"
             echo "- Source commit: $(git rev-parse HEAD)"
-            echo "- APK SHA-256: 21ad33e9acf156f88d967329869cd997c5f1e622583d34f763ca5ec01631c692"
+            echo "- APK SHA-256: $ACTUAL_SHA256"
             echo "- Package: $(jq -r '.package_name // "not reported"' mobsf-report.json)"
             echo "- MobSF security score: $(jq -r '.security_score // "not reported"' mobsf-report.json)"
             echo "- High findings: $(jq -r '.security_analysis | [.. | objects | select(.severity? == "high")] | length' mobsf-report.json)"
