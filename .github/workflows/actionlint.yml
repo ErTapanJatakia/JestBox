@@ -28,7 +28,10 @@ jobs:
       - name: Install pinned actionlint
         run: go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
       - name: Lint all workflow files
-        run: "$(go env GOPATH)/bin/actionlint" -color -oneline .github/workflows/*.yml
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$(go env GOPATH)/bin/actionlint" -color -oneline .github/workflows/*.yml
       - name: Record lint result
         if: always()
         run: |
