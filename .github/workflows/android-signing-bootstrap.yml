@@ -57,6 +57,7 @@ jobs:
         shell: bash
         env:
           ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_BACKUP_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           set -euo pipefail
           ENCRYPTED="$RUNNER_TEMP/jestbox-release-keystore.gpg"
@@ -70,10 +71,7 @@ jobs:
           keytool -list -keystore "$RESTORED" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias jestbox-release >/dev/null
           cmp --silent "$KEYSTORE_PATH" "$RESTORED"
           echo "Encrypted backup successfully decrypted and byte-for-byte verified on the ephemeral runner."
-        env:
-          ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_BACKUP_PASSWORD }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-
+      
       - name: Publish encrypted backup artifact and secret payload
         shell: bash
         env:
