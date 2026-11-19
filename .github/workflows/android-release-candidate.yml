@@ -135,19 +135,19 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           sha256sum "$APK" | tee "$APK.sha256"
 
-      - name: Check whether production signing credentials are configured
+      - name: Check whether encrypted production signing credentials are configured
         id: signing_check
         shell: bash
         env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_ENCRYPTED_BASE64: ${{ secrets.ANDROID_KEYSTORE_ENCRYPTED_BASE64 }}
+          ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_BACKUP_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          if [[ -n "$ANDROID_KEYSTORE_BASE64" && -n "$ANDROID_KEYSTORE_PASSWORD" && -n "$ANDROID_KEY_ALIAS" && -n "$ANDROID_KEY_PASSWORD" ]]; then
+          if [[ -n "$ANDROID_KEYSTORE_ENCRYPTED_BASE64" && -n "$ANDROID_KEYSTORE_BACKUP_PASSWORD" && -n "$ANDROID_KEYSTORE_PASSWORD" && -n "$ANDROID_KEY_PASSWORD" ]]; then
             echo "configured=true" >> "$GITHUB_OUTPUT"
-            echo "Production signing secrets are configured."
+            echo "Encrypted production signing credentials are configured."
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
             {
@@ -157,30 +157,34 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Sign and verify production APK
+      - name: Decrypt, sign and verify production APK
         if: steps.signing_check.outputs.configured == 'true'
         shell: bash
         env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_ENCRYPTED_BASE64: ${{ secrets.ANDROID_KEYSTORE_ENCRYPTED_BASE64 }}
+          ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_BACKUP_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
           APK="$UNSIGNED_APK"
+          ENCRYPTED="$RUNNER_TEMP/jestbox-release.jks.gpg"
           KEYSTORE="$RUNNER_TEMP/jestbox-release.jks"
           ALIGNED="$RUNNER_TEMP/jestbox-release-aligned.apk"
           SIGNED="android/app/build/outputs/apk/release/jestbox-release-signed.apk"
 
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          printf '%s' "$ANDROID_KEYSTORE_ENCRYPTED_BASE64" | base64 --decode > "$ENCRYPTED"
+          chmod 600 "$ENCRYPTED"
+          test -s "$ENCRYPTED"
+          printf '%s' "$ANDROID_KEYSTORE_BACKUP_PASSWORD" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --output "$KEYSTORE" --decrypt "$ENCRYPTED"
           chmod 600 "$KEYSTORE"
           test -s "$KEYSTORE"
-          keytool -list -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null
+          keytool -list -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias jestbox-release >/dev/null
 
           "$ANDROID_HOME/build-tools/36.0.0/zipalign" -p -f 4 "$APK" "$ALIGNED"
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" sign \
             --ks "$KEYSTORE" \
-            --ks-key-alias "$ANDROID_KEY_ALIAS" \
+            --ks-key-alias jestbox-release \
             --ks-pass env:ANDROID_KEYSTORE_PASSWORD \
             --key-pass env:ANDROID_KEY_PASSWORD \
             --out "$SIGNED" "$ALIGNED"
@@ -189,7 +193,7 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -v 4 "$SIGNED"
           sha256sum "$SIGNED" | tee "$SIGNED.sha256"
           echo "Production-signed APK successfully verified." >> "$GITHUB_STEP_SUMMARY"
-          rm -f "$KEYSTORE" "$ALIGNED"
+          rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"
 
       - name: Upload unsigned release candidate
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

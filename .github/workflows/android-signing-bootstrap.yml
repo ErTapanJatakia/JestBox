@@ -1,0 +1,108 @@
+name: JestBox Android signing identity bootstrap
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jestbox-android-signing-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  generate-and-back-up:
+    name: Generate and encrypt first-release signing identity
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Validate required repository secrets
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_BACKUP_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_PASSWORD ANDROID_KEYSTORE_BACKUP_PASSWORD; do
+            value="${!name}"
+            if [[ -z "$value" || ${#value} -lt 24 ]]; then
+              echo "::error::Required signing secret is missing or shorter than 24 characters: $name"
+              exit 1
+            fi
+          done
+
+      - name: Generate one dedicated JestBox release keystore
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          KEYSTORE="$RUNNER_TEMP/jestbox-release.jks"
+          keytool -genkeypair -noprompt -v -keystore "$KEYSTORE" -storetype JKS -storepass "$ANDROID_KEYSTORE_PASSWORD" -keypass "$ANDROID_KEY_PASSWORD" -alias jestbox-release -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=JestBox Android Release, OU=JestBox, O=JestBox"
+          chmod 600 "$KEYSTORE"
+          keytool -list -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias jestbox-release >/dev/null
+          echo "KEYSTORE_PATH=$KEYSTORE" >> "$GITHUB_ENV"
+
+      - name: Encrypt and verify offline recovery backup
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_BACKUP_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          ENCRYPTED="$RUNNER_TEMP/jestbox-release-keystore.gpg"
+          RESTORED="$RUNNER_TEMP/jestbox-release-restored.jks"
+          printf '%s' "$ANDROID_KEYSTORE_BACKUP_PASSWORD" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --s2k-mode 3 --s2k-digest-algo SHA512 --s2k-count 65011712 --output "$ENCRYPTED" "$KEYSTORE_PATH"
+          chmod 600 "$ENCRYPTED"
+          printf '%s' "$ANDROID_KEYSTORE_BACKUP_PASSWORD" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --output "$RESTORED" --decrypt "$ENCRYPTED"
+          keytool -list -keystore "$RESTORED" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias jestbox-release >/dev/null
+          cmp --silent "$KEYSTORE_PATH" "$RESTORED"
+          echo "Encrypted backup successfully decrypted and byte-for-byte verified on the ephemeral runner."
+
+      - name: Publish encrypted backup artifact and secret payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          ENCRYPTED="$RUNNER_TEMP/jestbox-release-keystore.gpg"
+          base64 -w 0 "$ENCRYPTED" > "$RUNNER_TEMP/encrypted-keystore.base64"
+          {
+            cat <<'SUMMARY'
+          ## JestBox encrypted signing-key backup
+
+          The encrypted backup was decrypted and byte-for-byte verified on the runner.
+
+          Download the artifact `jestbox-android-encrypted-signing-backup` and store it offline.
+
+          Add the following **encrypted ciphertext only** as repository Actions secret `ANDROID_KEYSTORE_ENCRYPTED_BASE64`.
+
+          It is not the plaintext private key. The independent backup passphrase is required to decrypt it.
+
+          ```text
+          SUMMARY
+            cat "$RUNNER_TEMP/encrypted-keystore.base64"
+            cat <<'SUMMARY'
+
+          ```
+
+          Never publish or share the backup passphrase or keystore passwords.
+          SUMMARY
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload encrypted signing-key recovery artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-android-encrypted-signing-backup
+          path: ${{ runner.temp }}/jestbox-release-keystore.gpg
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Remove plaintext key material from ephemeral runner
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "$RUNNER_TEMP/jestbox-release.jks" "$RUNNER_TEMP/jestbox-release-restored.jks" "$RUNNER_TEMP/jestbox-release-keystore.gpg" "$RUNNER_TEMP/encrypted-keystore.base64"
+          echo "Temporary key material cleanup completed."
