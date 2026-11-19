@@ -35,6 +35,13 @@ jobs:
           set -euo pipefail
           "$RUNNER_TEMP/devskim/devskim" analyze -I . -O devskim-results.sarif -f sarif --skip-excerpts -g "**/.git/**,**/node_modules/**"
           test -s devskim-results.sarif
+      - name: Normalize DevSkim SARIF rendered snippets
+        if: always() && hashFiles('devskim-results.sarif') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq '(.runs[].results[]?.locations[]?.physicalLocation.region.snippet.rendered) |= (if type == "object" and has("markdown") and (has("text") | not) then . + {"text": .markdown} else . end)' devskim-results.sarif > devskim-results.normalized.sarif
+          mv devskim-results.normalized.sarif devskim-results.sarif
       - name: Upload DevSkim findings
         if: always() && hashFiles('devskim-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
