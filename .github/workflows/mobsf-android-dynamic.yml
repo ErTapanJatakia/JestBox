@@ -229,9 +229,9 @@ jobs:
           jq -e '.package and .device_identifier' "$GITHUB_WORKSPACE/mobsf-dynamic-start.json" >/dev/null
           PACKAGE="$(jq -er '.package' "$GITHUB_WORKSPACE/mobsf-dynamic-start.json")"
 
-          timeout 30s adb shell monkey -p "$PACKAGE" 1
+          timeout 30s adb -s emulator-5554 shell monkey -p "$PACKAGE" 1
           sleep 60
-          timeout 30s adb logcat -d -v time > "$GITHUB_WORKSPACE/android-logcat.txt"
+          timeout 30s adb -s emulator-5554 logcat -d -v time > "$GITHUB_WORKSPACE/android-logcat.txt"
 
           if grep -E 'FATAL EXCEPTION|Process: '"$PACKAGE" "$GITHUB_WORKSPACE/android-logcat.txt"; then
             echo "::error::The app produced a fatal runtime exception during the observation window."
