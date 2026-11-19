@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: "22"
       - name: Resolve npm dependency tree for this scan
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run pinned Trivy container scan
         shell: bash
         run: |
