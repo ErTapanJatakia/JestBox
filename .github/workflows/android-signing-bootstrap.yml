@@ -41,14 +41,7 @@ jobs:
         run: |
           set -euo pipefail
           KEYSTORE="$RUNNER_TEMP/jestbox-release.jks"
-          keytool -genkeypair -noprompt -v \\
-            -keystore "$KEYSTORE" \\
-            -storetype JKS \\
-            -storepass "$ANDROID_KEYSTORE_PASSWORD" \\
-            -keypass "$ANDROID_KEY_PASSWORD" \\
-            -alias jestbox-release \\
-            -keyalg RSA -keysize 4096 -validity 10000 \\
-            -dname "CN=JestBox Android Release, OU=JestBox, O=JestBox"
+          keytool -genkeypair -noprompt -v -keystore "$KEYSTORE" -storetype JKS -storepass "$ANDROID_KEYSTORE_PASSWORD" -keypass "$ANDROID_KEY_PASSWORD" -alias jestbox-release -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=JestBox Android Release, OU=JestBox, O=JestBox"
           chmod 600 "$KEYSTORE"
           keytool -list -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias jestbox-release >/dev/null
           echo "KEYSTORE_PATH=$KEYSTORE" >> "$GITHUB_ENV"
@@ -62,12 +55,9 @@ jobs:
           set -euo pipefail
           ENCRYPTED="$RUNNER_TEMP/jestbox-release-keystore.gpg"
           RESTORED="$RUNNER_TEMP/jestbox-release-restored.jks"
-          printf '%s' "$ANDROID_KEYSTORE_BACKUP_PASSWORD" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \\
-            --symmetric --cipher-algo AES256 --s2k-mode 3 --s2k-digest-algo SHA512 --s2k-count 65011712 \\
-            --output "$ENCRYPTED" "$KEYSTORE_PATH"
+          printf '%s' "$ANDROID_KEYSTORE_BACKUP_PASSWORD" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --s2k-mode 3 --s2k-digest-algo SHA512 --s2k-count 65011712 --output "$ENCRYPTED" "$KEYSTORE_PATH"
           chmod 600 "$ENCRYPTED"
-          printf '%s' "$ANDROID_KEYSTORE_BACKUP_PASSWORD" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \\
-            --output "$RESTORED" --decrypt "$ENCRYPTED"
+          printf '%s' "$ANDROID_KEYSTORE_BACKUP_PASSWORD" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --output "$RESTORED" --decrypt "$ENCRYPTED"
           keytool -list -keystore "$RESTORED" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias jestbox-release >/dev/null
           cmp --silent "$KEYSTORE_PATH" "$RESTORED"
           echo "Encrypted backup successfully decrypted and byte-for-byte verified on the ephemeral runner."
