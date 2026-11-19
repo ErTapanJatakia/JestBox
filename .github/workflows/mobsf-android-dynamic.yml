@@ -2,6 +2,10 @@ name: MobSF Android dynamic assessment
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/mobsf-android-dynamic.yml"
   push:
     branches: [main]
     paths:
@@ -19,7 +23,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: jestbox-mobsf-dynamic
+  group: jestbox-mobsf-dynamic-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -29,7 +33,7 @@ jobs:
     timeout-minutes: 50
     steps:
       - name: Check out trusted source
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -57,7 +61,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm install --no-audit --no-fund
+          npm ci --no-audit --no-fund
           npm run prepare:web
           npx cap add android
           node scripts/prepare-android-branding.mjs
@@ -78,7 +82,7 @@ jobs:
           done
           test -s app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Start rooted Android API 30 emulator and run MobSF dynamic analysis
+      - name: Start Android API 30 emulator and run MobSF dynamic analysis (auto mode)
         shell: bash
         env:
           ANDROID_AVD_HOME: ${{ runner.temp }}/.android/avd
@@ -92,9 +96,15 @@ jobs:
           echo "no" | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name jestbox_api30 --package "system-images;android-30;google_apis;x86_64" --device pixel_2
 
           diagnostics() {
-            docker logs jestbox-mobsf > "$GITHUB_WORKSPACE/mobsf-container.log" 2>&1 || true
+            if [[ -n "${API_KEY:-}" ]]; then
+              docker logs jestbox-mobsf 2>&1 | sed "s/${API_KEY}/[REDACTED]/g" > "$GITHUB_WORKSPACE/mobsf-container.log" || true
+            else
+              docker logs jestbox-mobsf > "$GITHUB_WORKSPACE/mobsf-container.log" 2>&1 || true
+            fi
             docker rm -f jestbox-mobsf >/dev/null 2>&1 || true
             timeout 15s adb devices -l > "$GITHUB_WORKSPACE/adb-devices.txt" 2>&1 || true
+            { id; ls -l /dev/kvm; } > "$GITHUB_WORKSPACE/kvm-permissions.txt" 2>&1 || true
+            cp "$RUNNER_TEMP/device-identity.txt" "$GITHUB_WORKSPACE/device-identity.txt" 2>/dev/null || true
             cat "$RUNNER_TEMP/adb-server.log" > "$GITHUB_WORKSPACE/adb-server.log" 2>/dev/null || true
             cat "$RUNNER_TEMP/emulator.log" > "$GITHUB_WORKSPACE/emulator.log" 2>/dev/null || true
             if [[ -f "$RUNNER_TEMP/emulator.pid" ]]; then
@@ -103,7 +113,19 @@ jobs:
           }
           trap diagnostics EXIT
 
-          "$ANDROID_HOME/emulator/emulator" -avd jestbox_api30 -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data -accel auto > "$RUNNER_TEMP/emulator.log" 2>&1 &
+          if [[ ! -e /dev/kvm ]]; then
+            echo "::error::KVM device /dev/kvm is unavailable on this runner."
+            exit 1
+          fi
+          sudo chown "$USER":kvm /dev/kvm
+          sudo chmod 660 /dev/kvm
+          if [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
+            echo "::error::The runner user cannot read/write /dev/kvm after permission setup."
+            ls -l /dev/kvm
+            exit 1
+          fi
+          ls -l /dev/kvm
+          "$ANDROID_HOME/emulator/emulator" -avd jestbox_api30 -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data -accel on > "$RUNNER_TEMP/emulator.log" 2>&1 &
           echo $! > "$RUNNER_TEMP/emulator.pid"
 
           # Bound transport discovery separately from the Android boot deadline.
@@ -125,44 +147,34 @@ jobs:
           timeout 30s adb -s emulator-5554 shell settings put global window_animation_scale 0
           timeout 30s adb -s emulator-5554 shell settings put global transition_animation_scale 0
           timeout 30s adb -s emulator-5554 shell settings put global animator_duration_scale 0
-          timeout 30s adb -s emulator-5554 root
-          timeout 120s adb -s emulator-5554 wait-for-device
-          timeout 30s adb -s emulator-5554 shell id | grep -q 'uid=0'
+          DEVICE_ID="$(timeout 30s adb -s emulator-5554 shell id)"
+          printf '%s\n' "$DEVICE_ID" | tee "$RUNNER_TEMP/device-identity.txt"
+          timeout 15s adb -s emulator-5554 shell getprop ro.build.type
 
           APK="$GITHUB_WORKSPACE/android/app/build/outputs/apk/debug/app-debug.apk"
           test -s "$APK"
 
-          # Restart ADB in TCP mode for MobSF, then verify reconnection.
-          adb kill-server || true
-          adb -a nodaemon server start > "$RUNNER_TEMP/adb-server.log" 2>&1 &
-          adb_ready=false
-          for _ in {1..30}; do
-            if timeout 10s adb devices | grep -qE '^emulator-5554[[:space:]]+device$'; then
-              adb_ready=true
-              break
-            fi
-            sleep 2
-          done
-          if [[ "$adb_ready" != "true" ]]; then
-            echo "::error::Emulator did not reconnect to the shared ADB server within 60 seconds."
-            timeout 10s adb devices -l || true
-            cat "$RUNNER_TEMP/adb-server.log" || true
+          # Keep the runner's existing ADB server; host networking lets MobSF
+          # reach its loopback endpoint without racing a second daemon startup.
+          timeout 15s adb -s emulator-5554 devices -l
+          timeout 15s adb connect 127.0.0.1:5555
+          timeout 15s adb devices -l | grep -qE '^127\.0\.0\.1:5555[[:space:]]+device([[:space:]]|$)'
+          timeout 15s adb devices -l
+          if ! ss -ltn | grep -qE '127\.0\.0\.1:5037|0\.0\.0\.0:5037'; then
+            echo "::error::ADB server is not listening on the host network namespace at port 5037."
             exit 1
           fi
-          timeout 15s adb devices -l
-          timeout 30s adb root
-          timeout 120s adb wait-for-device
-          timeout 30s adb shell id | grep -q 'uid=0'
 
           API_KEY="$(openssl rand -hex 32)"
           echo "::add-mask::$API_KEY"
           docker run -d --name jestbox-mobsf --network host \
             -e MOBSF_API_KEY="$API_KEY" \
-            -e MOBSF_ANALYZER_IDENTIFIER=emulator-5554 \
+            -e MOBSF_PLATFORM=linux \
+            -e MOBSF_ANALYZER_IDENTIFIER=127.0.0.1:5555 \
             -e ADB_SERVER_SOCKET=tcp:127.0.0.1:5037 \
             -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
             -e MOBSF_VT_ENABLED=0 \
-            opensecurity/mobile-security-framework-mobsf:latest
+            opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954 # MobSF v4.6.9
 
           ready=false
           for _ in {1..90}; do
@@ -199,7 +211,7 @@ jobs:
           curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
-            --data-urlencode "device_mode=rooted" \
+            --data-urlencode "device_mode=auto" \
             --data-urlencode "install=1" \
             --data-urlencode "re_install=1" \
             http://127.0.0.1:8000/api/v1/dynamic/start_analysis \
@@ -207,9 +219,9 @@ jobs:
           jq -e '.package and .device_identifier' "$GITHUB_WORKSPACE/mobsf-dynamic-start.json" >/dev/null
           PACKAGE="$(jq -er '.package' "$GITHUB_WORKSPACE/mobsf-dynamic-start.json")"
 
-          timeout 30s adb shell monkey -p "$PACKAGE" 1
+          timeout 30s adb -s emulator-5554 shell monkey -p "$PACKAGE" 1
           sleep 60
-          timeout 30s adb logcat -d -v time > "$GITHUB_WORKSPACE/android-logcat.txt"
+          timeout 30s adb -s emulator-5554 logcat -d -v time > "$GITHUB_WORKSPACE/android-logcat.txt"
 
           if grep -E 'FATAL EXCEPTION|Process: '"$PACKAGE" "$GITHUB_WORKSPACE/android-logcat.txt"; then
             echo "::error::The app produced a fatal runtime exception during the observation window."
@@ -234,20 +246,20 @@ jobs:
             echo "- Commit: $GITHUB_SHA"
             echo "- Workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             echo "- Target: disposable debug APK on Android API 30 x86_64 emulator"
-            echo "- Emulator: rooted Google APIs image without Google Play"
+            echo "- Emulator: Google APIs image without Google Play; MobSF device mode: auto (rooted or Frida Gadget as supported); ADB endpoint 127.0.0.1:5555"
             echo "- Package: $PACKAGE"
             echo "- Observation window: 60 seconds after launch"
             echo "- MobSF static report: generated"
             echo "- MobSF dynamic report: generated"
             echo "- Scope: local emulator only; no production services or user data"
             echo
-            echo "This is automated runtime analysis, not a human-led penetration test. Findings require manual validation."
+            echo "This is automated MobSF auto-mode runtime analysis, not a human-led penetration test. MobSF may fall back to Frida Gadget when root is unavailable; root-dependent inspection and system-level TLS interception may therefore be limited. Findings require manual validation."
           } > "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md"
           cat "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Archive MobSF static and dynamic reports
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: jestbox-mobsf-android-dynamic-report
           path: |
@@ -265,5 +277,7 @@ jobs:
             emulator-process.txt
             adb-server.log
             adb-devices.txt
+            kvm-permissions.txt
+            device-identity.txt
           if-no-files-found: warn
           retention-days: 30

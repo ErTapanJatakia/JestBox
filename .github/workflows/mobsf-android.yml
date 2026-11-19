@@ -3,6 +3,13 @@ name: MobSF Android APK static assessment
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/mobsf-android.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/**"
   workflow_dispatch:
 
 permissions:
@@ -17,7 +24,7 @@ jobs:
       contents: read
     steps:
       - name: Check out trusted main source
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Set up Node.js
@@ -31,26 +38,54 @@ jobs:
           java-version: "21"
       - name: Install Android SDK components
         run: |
+          set -euo pipefail
+          set +o pipefail
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          set -o pipefail
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
       - name: Install pinned Capacitor toolchain
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Prepare local web assets and Android project
         run: |
           npm run prepare:web
           npx cap add android
           node scripts/prepare-android-branding.mjs
           npx cap sync android
-      - name: Assemble debug APK
-        run: cd android && ./gradlew --no-daemon assembleDebug
-      - name: Verify APK artifact exists
+      - name: Assemble unsigned release APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android
+          for attempt in 1 2 3; do
+            if ./gradlew --no-daemon --max-workers=2 assembleRelease 2>&1 | tee "$RUNNER_TEMP/gradle-release.log"; then
+              break
+            else
+              status=$?
+            fi
+            if grep -q "Received status code 429" "$RUNNER_TEMP/gradle-release.log" && [[ "$attempt" -lt 3 ]]; then
+              echo "Maven Central rate-limited dependency resolution (HTTP 429); retrying after backoff."
+              sleep "$((attempt * 20))"
+            else
+              exit "$status"
+            fi
+          done
+      - name: Verify unsigned release APK is not debuggable
         id: apk
         shell: bash
         run: |
           set -euo pipefail
-          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
           test -s "$APK"
+          test -x "$APKANALYZER"
+          DEBUGGABLE="$("$APKANALYZER" manifest debuggable "$APK")"
+          if [[ "$DEBUGGABLE" != "false" ]]; then
+            echo "::error::Unsigned release APK must not be debuggable (reported: $DEBUGGABLE)."
+            exit 1
+          fi
+          sha256sum "$APK" | tee "$APK.sha256"
           echo "path=$APK" >> "$GITHUB_OUTPUT"
+          echo "Release APK manifest debuggable flag: false" >> "$GITHUB_STEP_SUMMARY"
       - name: Start isolated MobSF scanner
         id: mobsf
         shell: bash
@@ -65,7 +100,7 @@ jobs:
             -e MOBSF_VT_ENABLED=0 \
             opensecurity/mobile-security-framework-mobsf:latest
           for _ in {1..60}; do
-            if curl --silent --fail http://127.0.0.1:8000/ >/dev/null; then
+            if curl --silent --fail --connect-timeout 5 --max-time 15 http://127.0.0.1:8000/ >/dev/null; then
               exit 0
             fi
             sleep 5
@@ -80,21 +115,21 @@ jobs:
           MOBSF_API_KEY: ${{ steps.mobsf.outputs.api_key }}
         run: |
           set -euo pipefail
-          UPLOAD="$(curl --silent --show-error --fail \
+          UPLOAD="$(curl --silent --show-error --fail --connect-timeout 10 --max-time 120 \
             -H "Authorization: $MOBSF_API_KEY" \
             -F "file=@$APK_PATH" \
             http://127.0.0.1:8000/api/v1/upload)"
           HASH="$(printf '%s' "$UPLOAD" | jq -er '.hash')"
           FILE_NAME="$(printf '%s' "$UPLOAD" | jq -er '.file_name')"
           echo "hash=$HASH" >> "$GITHUB_OUTPUT"
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $MOBSF_API_KEY" \
             --data-urlencode "hash=$HASH" \
             --data-urlencode "file_name=$FILE_NAME" \
             --data-urlencode "scan_type=apk" \
             http://127.0.0.1:8000/api/v1/scan > mobsf-scan-response.json
           for _ in {1..60}; do
-            if curl --silent --show-error --fail -X POST \
+            if curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
               -H "Authorization: $MOBSF_API_KEY" \
               --data-urlencode "hash=$HASH" \
               http://127.0.0.1:8000/api/v1/report_json \
@@ -118,6 +153,7 @@ jobs:
             echo "- Commit: $GITHUB_SHA"
             echo "- App: $(jq -r '.app_name // .file_name // "Not supplied"' mobsf-report.json)"
             echo "- Package: $(jq -r '.package_name // "Not supplied"' mobsf-report.json)"
+            echo "- APK variant: unsigned release build (production signing intentionally not configured)"
             echo "- Security score: $(jq -r '.security_score // "Not supplied"' mobsf-report.json)"
             echo
             echo "The full MobSF JSON is the machine-readable source. Validate findings manually; this is static analysis, not dynamic testing or a penetration test."
@@ -125,10 +161,12 @@ jobs:
           cat mobsf-summary.md >> "$GITHUB_STEP_SUMMARY"
       - name: Upload MobSF JSON and Markdown assessment reports
         if: always() && hashFiles('mobsf-report.json') != ''
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: jestbox-mobsf-static-report
           path: |
+            android/app/build/outputs/apk/release/app-release-unsigned.apk
+            android/app/build/outputs/apk/release/app-release-unsigned.apk.sha256
             mobsf-report.json
             mobsf-scan-response.json
             mobsf-summary.md

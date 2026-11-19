@@ -2,6 +2,7 @@ name: JestBox Android debug build
 
 on:
   push:
+    branches: [main]
   pull_request:
     branches:
       - main
@@ -21,7 +22,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Check out source
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Set up Node.js
@@ -50,7 +51,7 @@ jobs:
           set -o pipefail
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
       - name: Install pinned Capacitor toolchain
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Prepare local web assets
         run: npm run prepare:web
       - name: Generate Android platform project
@@ -88,12 +89,44 @@ jobs:
           "$APKSIGNER" verify --verbose --print-certs "$APK"
           "$ZIPALIGN" -c -v 4 "$APK"
           sha256sum "$APK" | tee "$APK.sha256"
+      - name: Assemble and validate unsigned release APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android
+          for attempt in 1 2 3; do
+            if ./gradlew --no-daemon --max-workers=2 assembleRelease 2>&1 | tee "$RUNNER_TEMP/gradle-release.log"; then
+              break
+            else
+              status=$?
+            fi
+            if grep -q "Received status code 429" "$RUNNER_TEMP/gradle-release.log" && [[ "$attempt" -lt 3 ]]; then
+              echo "Maven Central rate-limited dependency resolution (HTTP 429); retrying after backoff."
+              sleep "$((attempt * 20))"
+            else
+              exit "$status"
+            fi
+          done
+          cd ..
+          APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
+          test -s "$APK"
+          test -x "$APKANALYZER"
+          DEBUGGABLE="$("$APKANALYZER" manifest debuggable "$APK")"
+          if [[ "$DEBUGGABLE" != "false" ]]; then
+            echo "::error::Unsigned release APK must not be debuggable (reported: $DEBUGGABLE)."
+            exit 1
+          fi
+          sha256sum "$APK" | tee "$APK.sha256"
+          echo "Unsigned release APK manifest debuggable flag: false" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload debug APK and checksum
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: jestbox-android-debug
           path: |
             android/app/build/outputs/apk/debug/app-debug.apk
             android/app/build/outputs/apk/debug/app-debug.apk.sha256
+            android/app/build/outputs/apk/release/app-release-unsigned.apk
+            android/app/build/outputs/apk/release/app-release-unsigned.apk.sha256
           if-no-files-found: error
           retention-days: 14
