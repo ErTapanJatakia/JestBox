@@ -64,8 +64,8 @@ jobs:
           npm ci --no-audit --no-fund
           npm run prepare:web
           npx cap add android
-          node scripts/prepare-android-branding.mjs
           npx cap sync android
+          node scripts/prepare-android-branding.mjs
           cd android
           for attempt in 1 2 3; do
             if ./gradlew --no-daemon --max-workers=2 assembleDebug 2>&1 | tee "$RUNNER_TEMP/gradle-build.log"; then
