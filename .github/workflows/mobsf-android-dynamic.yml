@@ -251,6 +251,7 @@ jobs:
         with:
           name: jestbox-mobsf-android-dynamic-report
           path: |
+            package-lock.json
             mobsf-upload.json
             mobsf-static-scan.json
             mobsf-static-report.json
