@@ -23,7 +23,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: jestbox-mobsf-dynamic
+  group: jestbox-mobsf-dynamic-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
