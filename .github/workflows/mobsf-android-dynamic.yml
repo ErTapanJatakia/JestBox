@@ -151,7 +151,9 @@ jobs:
           # treating that transient disconnect as a root failure.
           timeout 30s adb -s emulator-5554 root || echo "ADB root caused a transient disconnect; waiting for adbd to restart."
           timeout 120s adb -s emulator-5554 wait-for-device
-          timeout 30s adb -s emulator-5554 shell id | tee "$RUNNER_TEMP/root-check.txt" | grep -q 'uid=0'
+          ROOT_ID="$(timeout 30s adb -s emulator-5554 shell id)"
+          printf '%s\n' "$ROOT_ID" | tee "$RUNNER_TEMP/root-check.txt"
+          grep -q 'uid=0' "$RUNNER_TEMP/root-check.txt"
           timeout 15s adb -s emulator-5554 shell getprop ro.build.type
           timeout 15s adb -s emulator-5554 shell getprop ro.debuggable
 
@@ -178,7 +180,9 @@ jobs:
           timeout 15s adb devices -l
           timeout 30s adb root || echo "ADB root caused a transient disconnect; waiting for adbd to restart."
           timeout 120s adb wait-for-device
-          timeout 30s adb shell id | grep -q 'uid=0'
+          ROOT_ID="$(timeout 30s adb shell id)"
+          printf '%s\n' "$ROOT_ID"
+          grep -q 'uid=0' <<< "$ROOT_ID"
           timeout 15s adb connect 127.0.0.1:5555
           timeout 15s adb devices -l | grep -qE '^127\.0\.0\.1:5555[[:space:]]+device$'
 
