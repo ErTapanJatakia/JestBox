@@ -167,7 +167,7 @@ jobs:
             -o "$GITHUB_WORKSPACE/mobsf-static-report.json"
           jq -e 'type == "object" and (has("error") | not)' "$GITHUB_WORKSPACE/mobsf-static-report.json" >/dev/null
 
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
             --data-urlencode "device_mode=rooted" \
@@ -187,12 +187,12 @@ jobs:
             exit 1
           fi
 
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
             http://127.0.0.1:8000/api/v1/dynamic/stop_analysis \
             -o "$GITHUB_WORKSPACE/mobsf-dynamic-stop.json"
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
             http://127.0.0.1:8000/api/v1/dynamic/report_json \
@@ -297,19 +297,19 @@ jobs:
           HASH="$(printf '%s' "$UPLOAD" | jq -er '.hash')"
           printf '%s\n' "$UPLOAD" > "$GITHUB_WORKSPACE/mobsf-upload.json"
 
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
             http://127.0.0.1:8000/api/v1/scan \
             -o "$GITHUB_WORKSPACE/mobsf-static-scan.json"
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
             http://127.0.0.1:8000/api/v1/report_json \
             -o "$GITHUB_WORKSPACE/mobsf-static-report.json"
           jq -e 'type == "object" and (has("error") | not)' "$GITHUB_WORKSPACE/mobsf-static-report.json" >/dev/null
 
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
             --data-urlencode "device_mode=rooted" \
@@ -329,12 +329,12 @@ jobs:
             exit 1
           fi
 
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
             http://127.0.0.1:8000/api/v1/dynamic/stop_analysis \
             -o "$GITHUB_WORKSPACE/mobsf-dynamic-stop.json"
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
             http://127.0.0.1:8000/api/v1/dynamic/report_json \
