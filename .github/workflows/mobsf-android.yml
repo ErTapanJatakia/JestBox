@@ -3,6 +3,13 @@ name: MobSF Android APK static assessment
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/mobsf-android.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/**"
   workflow_dispatch:
 
 permissions:
@@ -89,7 +96,7 @@ jobs:
             -e MOBSF_VT_ENABLED=0 \
             opensecurity/mobile-security-framework-mobsf:latest
           for _ in {1..60}; do
-            if curl --silent --fail http://127.0.0.1:8000/ >/dev/null; then
+            if curl --silent --fail --connect-timeout 5 --max-time 15 http://127.0.0.1:8000/ >/dev/null; then
               exit 0
             fi
             sleep 5
@@ -104,21 +111,21 @@ jobs:
           MOBSF_API_KEY: ${{ steps.mobsf.outputs.api_key }}
         run: |
           set -euo pipefail
-          UPLOAD="$(curl --silent --show-error --fail \
+          UPLOAD="$(curl --silent --show-error --fail --connect-timeout 10 --max-time 120 \
             -H "Authorization: $MOBSF_API_KEY" \
             -F "file=@$APK_PATH" \
             http://127.0.0.1:8000/api/v1/upload)"
           HASH="$(printf '%s' "$UPLOAD" | jq -er '.hash')"
           FILE_NAME="$(printf '%s' "$UPLOAD" | jq -er '.file_name')"
           echo "hash=$HASH" >> "$GITHUB_OUTPUT"
-          curl --silent --show-error --fail -X POST \
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $MOBSF_API_KEY" \
             --data-urlencode "hash=$HASH" \
             --data-urlencode "file_name=$FILE_NAME" \
             --data-urlencode "scan_type=apk" \
             http://127.0.0.1:8000/api/v1/scan > mobsf-scan-response.json
           for _ in {1..60}; do
-            if curl --silent --show-error --fail -X POST \
+            if curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
               -H "Authorization: $MOBSF_API_KEY" \
               --data-urlencode "hash=$HASH" \
               http://127.0.0.1:8000/api/v1/report_json \
