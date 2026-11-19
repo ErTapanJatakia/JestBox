@@ -28,7 +28,7 @@ jobs:
       contents: read
     steps:
       - name: Download debug APK artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: jestbox-android-debug
           path: android-artifact
