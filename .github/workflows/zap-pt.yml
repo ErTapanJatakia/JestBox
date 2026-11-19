@@ -36,7 +36,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22"
 
@@ -75,8 +75,10 @@ jobs:
               -t http://127.0.0.1:8080 \
               -m 5 \
               -I \
-              -J /zap/wrk/zap-baseline.json \
-              -r /zap/wrk/zap-baseline.html
+              -J zap-baseline.json \
+              -r zap-baseline.html
+          test -s zap-baseline.json
+          test -s zap-baseline.html
 
       - name: Run bounded active ZAP scan when explicitly requested
         if: github.event_name == 'workflow_dispatch' && inputs.active_scan
@@ -91,8 +93,10 @@ jobs:
               -m 5 \
               -T 10 \
               -I \
-              -J /zap/wrk/zap-active.json \
-              -r /zap/wrk/zap-active.html
+              -J zap-active.json \
+              -r zap-active.html
+          test -s zap-active.json
+          test -s zap-active.html
 
       - name: Generate PT report summary
         if: always()
@@ -130,7 +134,7 @@ jobs:
 
       - name: Upload ZAP PT reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: jestbox-owasp-zap-pt-report
           path: |
