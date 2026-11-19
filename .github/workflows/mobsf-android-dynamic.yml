@@ -24,7 +24,7 @@ permissions:
 
 concurrency:
   group: jestbox-mobsf-dynamic
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   dynamic-analysis:
