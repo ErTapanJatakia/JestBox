@@ -32,7 +32,6 @@ jobs:
 
   osv:
     name: OSV dependency vulnerability scan
-    if: github.event_name != 'pull_request'
     uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@0e457b42d0120153c352875e9b758b1e5c58c7e5 # v2.7.1
     with:
       scan-args: |-
