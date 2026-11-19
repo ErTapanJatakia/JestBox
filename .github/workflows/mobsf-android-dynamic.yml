@@ -2,6 +2,8 @@ name: MobSF Android dynamic assessment
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 0"
 
 permissions:
   contents: read
