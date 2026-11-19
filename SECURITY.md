@@ -19,7 +19,7 @@ Allow the maintainer a reasonable opportunity to investigate and remediate befor
 JestBox is under development and has no stable release support window yet. The current development branch is reviewed as part of ongoing work; old commits and unreleased snapshots have no separate support commitment.
 
 ## Automated Security Checks
-The repository uses CodeQL, OSV-Scanner, Trivy, Microsoft DevSkim, Dependency Review, OpenSSF Scorecard, and MobSF static APK analysis. Their scope, reporting locations, limitations, and remediation process are documented in [SECURITY-ASSESSMENT.md](SECURITY-ASSESSMENT.md). Automated checks do not constitute a penetration test, independent audit, certification, or guarantee that the application is vulnerability-free.
+The repository uses CodeQL, OSV-Scanner, Trivy, Microsoft DevSkim, Dependency Review, OpenSSF Scorecard, and MobSF static APK analysis. Their scope, reporting locations, limitations, and remediation process are documented in [Security Assessment Programme](#2-current-assessment-snapshot). Automated checks do not constitute a penetration test, independent audit, certification, or guarantee that the application is vulnerability-free.
 
 ## Safe Harbor
 Good-faith research that follows this policy and applicable law is welcome. Avoid privacy violations, destructive testing, service disruption, and unauthorized access. Stop and report privately if sensitive data is encountered. This policy does not authorize otherwise unlawful activity.
@@ -49,13 +49,13 @@ The programme covers:
 - Local-build web dynamic application security testing (DAST) with OWASP ZAP.
 - Android runtime/dynamic assessment using MobSF and an isolated Android API 30 emulator, when that workflow can complete.
 
-The automated ZAP workflow scans a disposable local web build. It does not test the production hosting environment. MobSF static analysis is distinct from MobSF dynamic runtime analysis. The current MobSF dynamic attempt did not complete successfully; no successful dynamic report is available yet.
+The automated ZAP workflow scans a disposable local web build. It does not test the production hosting environment. MobSF static analysis is distinct from MobSF dynamic runtime analysis. MobSF Android dynamic analysis completed successfully in automatic Frida Gadget mode on an isolated Android API 30 emulator. The report and logs are available in [run #44545632539](https://github.com/ErTapanJatakia/JestBox/actions/runs/44545632539) and [artifact 14540387667](https://github.com/ErTapanJatakia/JestBox/actions/runs/44545632539/artifacts/14540387667). Root-dependent inspection and TLS tests were unavailable because MobSF could not remount the system partition writable; this limitation is recorded below.
 
 Out of scope unless separately authorised: production signing, production credentials, app-store submission, production deployment, hosted production testing, and changes to application content or functionality made solely to silence a scanner.
 
 ## 2. Current Assessment Snapshot
 
-The following snapshot reflects the latest documented main-branch security workflow batch on **19 November 2026**, at commit `d4b6e13dfb5e0f56a078eb29ef8d36a85a95dba1`.
+The following is the historical main-branch baseline before PR #26, recorded on **19 November 2026** at commit `d4b6e13dfb5e0f56a078eb29ef8d36a85a95dba1`. The newer PR #26 validation batch is recorded immediately below.
 
 | Assessment / Control | Latest recorded state | Evidence |
 |---|---|---|
@@ -71,9 +71,28 @@ The following snapshot reflects the latest documented main-branch security workf
 | Syft SBOM generation | Completed successfully; SBOM artifact available | [Run #44455530058](https://github.com/ErTapanJatakia/JestBox/actions/runs/44455530058) · [Download SBOM](https://github.com/ErTapanJatakia/JestBox/actions/runs/44455530058/artifacts/14497004351) |
 | GitHub CodeQL | Completed successfully; findings surface is GitHub code scanning | [Run #44455529177](https://github.com/ErTapanJatakia/JestBox/actions/runs/44455529177) · [Security / code scanning](https://github.com/ErTapanJatakia/JestBox/security/code-scanning) |
 | Dependency Review | Completed successfully on PR #22 validation | [Run #44454850848](https://github.com/ErTapanJatakia/JestBox/actions/runs/44454850848) |
-| MobSF Android dynamic assessment | **Not completed**; latest run cancelled during emulator startup/boot stage | [Run #44457340221](https://github.com/ErTapanJatakia/JestBox/actions/runs/44457340221) · No dynamic report artifact was produced |
+| MobSF Android dynamic assessment | Not completed at this historical baseline; later completed in PR #26 using Frida Gadget mode | [Historical cancelled run #44457340221](https://github.com/ErTapanJatakia/JestBox/actions/runs/44457340221) · [Successful PR #26 run #44545632539](https://github.com/ErTapanJatakia/JestBox/actions/runs/44545632539) |
 
 **Important:** “Completed successfully” above records workflow execution status, not a clean scan or a finding-free result. Scanner output must be reviewed and findings validated before risk can be accepted or remediation declared complete. This document does not currently assert a total vulnerability count or a zero-findings outcome.
+
+### PR #26 validation batch — 19 November 2026
+
+These runs validate the dependency-lockfile and Android-assessment workflow changes on the PR branch. They are not production-host or signed-release assessments.
+
+| Assessment | Result reviewed | Evidence |
+|---|---|---|
+| MobSF Android dynamic | Completed; auto mode selected Frida Gadget; dynamic report and runtime logs generated | [Run #44545632539](https://github.com/ErTapanJatakia/JestBox/actions/runs/44545632539) · [Artifact 14540387667](https://github.com/ErTapanJatakia/JestBox/actions/runs/44545632539/artifacts/14540387667) |
+| MobSF release APK static | Completed against unsigned release APK; findings triaged below | [Run #44476246772](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246772) · [Artifact 14506926059](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246772/artifacts/14506926059) |
+| OWASP ZAP baseline | Completed against local 127.0.0.1:8080 test server | [Run #44476246577](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246577) · [Artifact 14506163218](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246577/artifacts/14506163218) |
+| OSV-Scanner | 0 SARIF findings in the reviewed report | [Run #44476246805](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246805) · [Artifact 14507045265](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246805/artifacts/14507045265) |
+| Trivy | 3 informational license notices; no vulnerability findings in this SARIF report | [Run #44476246837](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246837) · [Artifact 14507035133](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246837/artifacts/14507035133) |
+| Gitleaks | 0 SARIF findings | [Run #44476246759](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246759) · [Artifact 14506361683](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246759/artifacts/14506361683) |
+| Microsoft DevSkim | 20 notes, 0 warnings/errors; contextual triage below | [Run #44476246743](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246743) · [Artifact 14506481555](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246743/artifacts/14506481555) |
+| OpenSSF Scorecard | Score 6.4/10; improvement areas recorded below | [Run #44476246690](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246690) · [Artifact 14505894499](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246690/artifacts/14505894499) |
+| zizmor | 0 SARIF findings | [Run #44476246822](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246822) · [Artifact 14506397421](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246822/artifacts/14506397421) |
+| Syft source SBOM | 68 CycloneDX components; CycloneDX and SPDX reports generated | [Run #44476246868](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246868) · [Artifact 14506366585](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246868/artifacts/14506366585) |
+
+
 
 ## 3. Downloadable Report Index
 
@@ -117,7 +136,7 @@ The active scan summary recorded 137 PASS, 6 WARN, 0 FAIL-NEW and 0 FAIL-INPROG.
 | Syft | Generates CycloneDX and SPDX software bill of materials for source/dependency inventory. | [Run and artifact](https://github.com/ErTapanJatakia/JestBox/actions/runs/44455530058/artifacts/14497004351) |
 | MobSF static | Analyses the generated Android debug APK and its manifest/components/permissions and other supported static indicators. | [Run and artifact](https://github.com/ErTapanJatakia/JestBox/actions/runs/44455530144/artifacts/14497274347) |
 | OWASP ZAP | Baseline and optionally manually dispatched active DAST against a locally served disposable web build. Active scan is manual-only and bounded. | [Latest run and artifact](https://github.com/ErTapanJatakia/JestBox/actions/runs/44455530108/artifacts/14497119307) |
-| MobSF dynamic | Attempts Android runtime analysis on an isolated, rooted API 30 emulator using a freshly built debug APK. | [Latest cancelled run](https://github.com/ErTapanJatakia/JestBox/actions/runs/44457340221); no dynamic report |
+| MobSF dynamic | Android runtime analysis on an isolated API 30 x86_64 emulator; automatic mode can use rooted preparation or Frida Gadget fallback. | [Successful run and report](https://github.com/ErTapanJatakia/JestBox/actions/runs/44545632539/artifacts/14540387667) |
 
 ### 4.1 Automated OWASP ZAP DAST — detailed execution scope
 
@@ -149,34 +168,38 @@ The security automation was introduced and hardened in a series of changes:
 - [PR #20](https://github.com/ErTapanJatakia/JestBox/pull/20): replaced a blocked third-party emulator action with native Android SDK emulator commands.
 - [PR #21](https://github.com/ErTapanJatakia/JestBox/pull/21): Android SDK licence-pipeline handling and bounded Gradle retries for Maven Central HTTP 429 responses.
 - [PR #22](https://github.com/ErTapanJatakia/JestBox/pull/22): added Android SDK platform-tools/emulator paths to the dynamic workflow so `adb` and `emulator` resolve correctly.
+- [PR #24](https://github.com/ErTapanJatakia/JestBox/pull/24): consolidated the security policy, assessment history and testing procedures into this SECURITY.md.
+- [PR #26](https://github.com/ErTapanJatakia/JestBox/pull/26): committed package-lock.json, moved CI installs to npm ci, added unsigned release-APK static assessment, stabilised MobSF dynamic ADB handling, and incorporated Dependabot updates for checkout, upload-artifact, deploy-pages and setup-dotnet.
 
 These changes concern security automation and workflow reliability. They did not authorise production signing, store submission, or production deployment.
 
-## 5. MobSF Android Dynamic Assessment: Execution History and Blocker
+## 5. MobSF Android Dynamic Assessment: Execution History and Results
 
-The dynamic workflow is intentionally separate from the static APK scan. It builds a disposable debug APK, provisions an Android API 30 emulator, starts MobSF and attempts runtime analysis. A successful static scan must not be represented as a successful dynamic scan.
+The dynamic workflow builds a disposable debug APK, provisions an Android API 30 x86_64 emulator, starts MobSF and performs a bounded runtime observation. A successful static scan is not a substitute for this dynamic control.
 
 | Attempt / change | Observed outcome | Evidence / interpretation |
 |---|---|---|
-| Initial workflow runs | Blocked by repository Actions policy | GitHub disallowed `reactivecircus/android-emulator-runner`; the workflow was redesigned to use native Android SDK commands rather than asking for broad allowlisting. [Run #44447154285](https://github.com/ErTapanJatakia/JestBox/actions/runs/44447154285) · [Run #44448122699](https://github.com/ErTapanJatakia/JestBox/actions/runs/44448122699) |
-| Native SDK remediation | Emulator workflow progressed to SDK installation/build, but did not complete | [PR #20](https://github.com/ErTapanJatakia/JestBox/pull/20) |
-| SDK licence and Maven retry remediation | Android build/related checks passed; dynamic assessment still needed execution | [PR #21](https://github.com/ErTapanJatakia/JestBox/pull/21) |
-| Missing Android SDK PATH remediation | `adb` and `emulator` became available; emulator startup then appeared to stall | [PR #22](https://github.com/ErTapanJatakia/JestBox/pull/22) |
-| Latest observed attempt | Run was cancelled while the emulator-startup step was in progress; no MobSF dynamic report artifact was produced | [Run #44457340221](https://github.com/ErTapanJatakia/JestBox/actions/runs/44457340221) |
+| Initial third-party action attempts | Blocked by repository Actions policy | GitHub disallowed reactivecircus/android-emulator-runner; replaced with native Android SDK commands. [Run #44447154285](https://github.com/ErTapanJatakia/JestBox/actions/runs/44447154285) · [Run #44448122699](https://github.com/ErTapanJatakia/JestBox/actions/runs/44448122699) |
+| SDK, licence and PATH fixes | Android SDK and emulator became available; earlier run was cancelled during device startup | [PR #20](https://github.com/ErTapanJatakia/JestBox/pull/20) · [PR #21](https://github.com/ErTapanJatakia/JestBox/pull/21) · [PR #22](https://github.com/ErTapanJatakia/JestBox/pull/22) |
+| Earlier cancelled attempt | Unbounded ADB wait was a plausible design weakness; logs did not prove the exact hang point | [Run #44457340221](https://github.com/ErTapanJatakia/JestBox/actions/runs/44457340221) |
+| First MobSF execution after lockfile workflow changes | Failed when an unqualified ADB command saw both emulator-5554 and 127.0.0.1:5555 and returned “more than one device/emulator” | [Run #44476246717](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246717) · [Artifact 14506646841](https://github.com/ErTapanJatakia/JestBox/actions/runs/44476246717/artifacts/14506646841) |
+| Intermediate PR update | Run was cancelled by a later PR update because concurrency used cancel-in-progress: true; no completed report from that attempt | [Run #44544804967](https://github.com/ErTapanJatakia/JestBox/actions/runs/44544804967) |
+| Successful dynamic assessment | ADB transport, APK launch, 60-second observation, MobSF stop and JSON report generation completed; artifact uploaded | [Run #44545632539](https://github.com/ErTapanJatakia/JestBox/actions/runs/44545632539) · [Artifact 14540387667](https://github.com/ErTapanJatakia/JestBox/actions/runs/44545632539/artifacts/14540387667) |
 
-The latest logs confirmed that the Android SDK executables resolved and that the AVD creation/emulator launch commands were reached. The run then waited for the emulator device. An unbounded `adb wait-for-device` is a plausible workflow design weakness because it can prevent a later bounded boot loop from running; however, the available log evidence does **not** prove the exact point of the hang or prove that MobSF dynamic analysis started.
+### Successful run details and coverage boundary
 
-### Required next engineering actions
+- MobSF version: v4.6.9.
+- Target: disposable JestBox debug APK, package com.ertapanjatakia.jestbox.
+- Emulator: Android API 30 / Android 11, x86_64 Google APIs image without Google Play.
+- ADB endpoints: emulator-5554 and its TCP transport 127.0.0.1:5555; all host-side app and logcat commands explicitly target emulator-5554.
+- MobSF dynamic start returned device_mode: gadget, data_collected: true at stop, and a dynamic JSON report was generated.
+- MobSF could not remount /system writable and explicitly fell back to Frida Gadget. The report has tls_tests_available: false; rooted/system-level CA and TLS interception tests were therefore not performed.
+- The dynamic report detected 0 trackers. Its URL list includes Android emulator/system-service traffic; this is not proof that all app network behaviour is absent.
+- The 60-second observation completed without a matching JestBox fatal-exception signature in the captured logcat.
 
-1. Replace unbounded ADB/device waits with explicit timeouts.
-2. Separate emulator process startup, ADB device availability and Android boot-completion deadlines.
-3. On failure, capture emulator process state, emulator logs, `adb devices -l`, `adb get-state` and boot-property diagnostics.
-4. Verify root access before attempting MobSF dynamic analysis.
-5. Apply bounded timeouts and response validation to MobSF API calls.
-6. Preserve failure diagnostics with an always-run artifact-upload step.
-7. Perform one controlled run after the workflow fix; do not repeatedly rerun an unchanged failing strategy.
+The workflow fix uses explicit ADB serials, bounded commands, one existing ADB server, and always-run diagnostic artifact collection. A later workflow hardening change sets cancel-in-progress: false so an ordinary PR update does not cancel an already-running assessment.
 
-**Dynamic-assessment acceptance criteria:** emulator boots within the defined deadline; the debug APK installs and launches; MobSF confirms the target device; dynamic analysis starts and completes; JSON/report evidence and relevant logs are uploaded. Until then, dynamic Android testing remains outstanding.
+Acceptance status: the automated MobSF dynamic run is complete in Frida Gadget mode. Root-dependent inspection and TLS tests remain a documented coverage limitation, not a passed test. This is not a human-led penetration test and does not assess production hosting or third-party infrastructure.
 
 ## 6. Trigger Schedule and Execution Model
 
@@ -218,15 +241,43 @@ No blanket dismissals, blanket suppressions or test weakening are permitted. Acc
 - Repository-level Dependabot alert and secret-scanning settings/status must be verified in GitHub Security settings. Their status must not be inferred from scanner workflow success.
 - The report artifacts are generated and linked, but their complete finding contents have not all been manually reviewed in this document update. No finding should be marked remediated solely because a scan workflow passed.
 
+### Results reviewed — PR #26 assessment batch
+
+| Tool | Observed report result | Triage |
+|---|---|---|
+| OSV-Scanner | 0 SARIF findings | No known-vulnerability finding in this scanned lockfile snapshot; not a guarantee of zero vulnerabilities. |
+| Gitleaks | 0 SARIF findings | No secret-pattern finding in the scanned repository/history scope. |
+| zizmor | 0 SARIF findings | No workflow-security finding reported by this zizmor run. |
+| Trivy | 3 SARIF notes: MIT notices for @capacitor/core and @capacitor/share, and 0BSD for tslib | License inventory notices, not vulnerability findings. |
+| DevSkim | 20 SARIF notes, 0 warnings/errors | 19 DS162092 localhost references are confined to local CI scanner/test-server workflows. One DS172411 note is on setTimeout(dismiss, 5000); the callback is a fixed local function, not an untrusted string. Contextual notes; not confirmed exploitable findings. |
+| OWASP ZAP | 9 alert categories: 2 medium, 6 low, 1 informational | All alert instances target the disposable Python HTTP server at 127.0.0.1:8080. Missing CSP/anti-clickjacking and other headers, Python Server disclosure and cacheability describe this local test server, not a verified production host. |
+| MobSF unsigned release APK | MobSF security score 60; 2 high, 6 warning, 1 informational in the report | One high is the expected missing signing certificate on an intentionally unsigned assessment APK. The other high is minSdk=24 (Android 7.0 support), which is a compatibility/security-policy decision and was not changed without approval. Warnings include allowBackup=true, a dependency-generated ProfileInstallReceiver protected by android.permission.DUMP, and generic Capacitor/Cordova storage, temporary-file, hardcoded-string and wildcard-access heuristics; these require contextual review and are not automatically confirmed vulnerabilities. |
+| MobSF dynamic | Report generated in Frida Gadget mode; 0 trackers detected; tls_tests_available=false | Runtime observation completed, but root-dependent and system-level TLS tests were unavailable because /system could not be remounted writable. |
+| OpenSSF Scorecard | 6.4/10 | Main gaps: Branch-Protection 0, Code-Review 0 (0/28 approved changesets), Fuzzing 0, CII Best Practices 0, Maintained 0 (new repository), Pinned-Dependencies 8, SAST 9. Packaging and Signed-Releases were not scored because no release workflow/releases exist; production release remains intentionally deferred. |
+
+### GitHub repository settings verification
+
+- Verified: .github/dependabot.yml schedules npm updates weekly on Monday at 04:00 Asia/Kolkata and GitHub Actions updates weekly at 04:15 Asia/Kolkata.
+- Verified: CodeQL analysis runs are active and PR #26 checks passed for the changed code.
+- Verified gap: no repository rulesets were returned; Scorecard independently reports that main has no branch protection.
+- Not independently verified: Dependabot security alerts/security updates toggles, secret scanning, push protection and Dependency Graph. The connector did not expose the required settings/alert endpoints. Do not infer these are enabled.
+- No GitHub Actions allowlist change was required for the current workflows.
+
+### Dependency and Android release-readiness review
+
+- A reviewed package-lock.json is now committed on PR #26 (lockfile version 3; 127 package entries) and CI installs use npm ci; OSV and Trivy scan that lockfile.
+- Android debug build and unsigned release APK build completed in CI. The release APK is deliberately unsigned and is not a store-ready artifact. Production signing, RuStore submission and deployment were not performed.
+- The MobSF unsigned-release finding for minSdk=24 was not silently changed because raising the minimum to API 29 would drop Android 7/8/9 compatibility. The backup setting and generated Cordova/Capacitor heuristics also need an explicit product/security decision before changing data-restore or navigation behaviour.
+
 ## 8. Known coverage limitations and caveats
 
-1. **Dependency Lockfile:** the repository currently has no committed `package-lock.json`. OSV-Scanner and Trivy generate a temporary lockfile on the ephemeral runner using `npm install --package-lock-only --ignore-scripts --no-audit --no-fund`. This allows dependency scanning, including transitive dependency discovery, but it is not equivalent to a reviewed, committed reproducible lockfile. A committed lockfile should be considered as a separate dependency-management improvement.
-2. **MobSF Static vs Dynamic:** static APK analysis has completed. Dynamic analysis has not completed successfully and must remain explicitly outstanding.
+1. **Dependency Lockfile:** PR #26 adds a reviewed package-lock.json (lockfile version 3; 127 package entries) and changes CI installs to npm ci. OSV and Trivy now consume the committed lockfile.
+2. **MobSF Static vs Dynamic:** release-APK static analysis and an Android API 30 Frida Gadget dynamic run have completed. The dynamic run did not have a writable /system; root-dependent and TLS tests remain unavailable.
 3. **ZAP Target:** the ZAP workflow scans a local disposable build/test server. Local test-server headers and disclosures must not automatically be attributed to the production deployment.
 4. **Automated DAST Limits:** ZAP automation does not replace authenticated manual testing, business-logic testing, backend/API assessment, production-host testing, or human-led penetration testing.
 5. **Scanner Classifications:** SARIF error/warning/note and tool-specific severity labels are not interchangeable with CVSS. Validate findings and exposure context.
 6. **False Positives:** Trivy, DevSkim, MobSF and other automated tools can report false positives or context-dependent observations.
-7. **Repository Settings:** Dependency Graph, Dependabot alerts, secret scanning, push protection and CodeQL default setup require separate verification in repository settings.
+7. **Repository Settings:** CodeQL runs and Dependabot version-update configuration are verified. No main-branch ruleset/branch protection was found. Dependabot security-alert toggles, Dependency Graph, secret scanning and push protection remain unverified because the available connector cannot read those settings.
 8. **No Guarantee:** absence of findings in a particular scan does not prove absence of vulnerabilities.
 9. **Artifact Expiry:** the artifacts linked in the 19 November 2026 run batch reported an expiry date of **19 December 2026** when checked. Download and preserve evidence before expiry. Future updates must verify artifact existence and expiry before adding direct artifact links.
 10. **Data Handling:** MobSF runs locally in an ephemeral GitHub-hosted runner. VirusTotal integration and external domain-malware lookups are disabled. Do not place production credentials, private signing keys or user data in reports/artifacts.
@@ -265,14 +316,14 @@ For a cancelled or failed workflow, link the run and describe what actually exec
 
 | Priority | Action | Exit Condition |
 |---|---|---|
-| P1 | Stabilise MobSF dynamic emulator startup and diagnostics | Bounded startup/boot handling and useful failure artifacts |
-| P1 | Complete one controlled MobSF dynamic run | Dynamic report generated and uploaded; APK launch/runtime evidence captured |
-| P1 | Review CodeQL and GitHub Security alerts | Current alerts validated and recorded in the findings register |
-| P1 | Inspect MobSF static, ZAP, OSV, Trivy, Gitleaks and DevSkim report contents | Findings classified; false positives and real issues distinguished |
-| P2 | Remediate verified high-risk findings | Targeted fix plus passing relevant regression/security checks |
-| P2 | Review dependency reproducibility | Decision recorded on committing a reviewed npm lockfile |
+| P1 | Verify/enable main branch protection and required status checks | Ruleset/branch-protection configuration verified; keep merge automation compatible |
+| P1 | Verify Dependabot security alerts, secret scanning, push protection and Dependency Graph | Settings confirmed in GitHub repository security settings |
+| P1 | Decide Android minimum supported API | Product decision recorded for MobSF minSdk=24 observation; do not silently drop older-device support |
+| P2 | Review allowBackup, ProfileInstallReceiver permission and generated Cordova/Capacitor static-analysis heuristics | Findings confirmed, mitigated or documented as accepted/deferred with rationale |
+| P2 | Improve rooted MobSF coverage if TLS/system-level testing is required | A supported writable-system API 30 emulator completes rooted mode; otherwise retain Gadget-mode limitation |
 | P2 | Preserve time-limited report artifacts | Evidence downloaded or retained before artifact expiry |
-| P3 | Perform release-readiness regression | App-specific functional, locale, accessibility and Android checks recorded separately |
+| P3 | Human-led penetration test and production-host assessment | Separately authorised assessment with defined scope |
+| P3 | Production signing, RuStore submission and deployment | Remain deferred until separately authorised |
 
 ## 12. Reference Links
 
