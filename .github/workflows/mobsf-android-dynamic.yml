@@ -83,7 +83,7 @@ jobs:
           adb -s emulator-5554 root
           adb -s emulator-5554 wait-for-device
           adb -s emulator-5554 shell id | grep -q 'uid=0'
-set -euo pipefail
+          set -euo pipefail
           APK="$GITHUB_WORKSPACE/android/app/build/outputs/apk/debug/app-debug.apk"
           test -s "$APK"
 
