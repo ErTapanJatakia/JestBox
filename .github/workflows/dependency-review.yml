@@ -20,7 +20,7 @@ jobs:
           persist-credentials: false
       - name: Review dependency changes
         id: dependency-review
-        uses: actions/dependency-review-action@v4
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
         with:
           fail-on-severity: critical
       - name: Create review run summary
@@ -41,7 +41,7 @@ jobs:
           PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
       - name: Archive Dependency Review summary
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: jestbox-dependency-review-summary
           path: dependency-review-summary.md
