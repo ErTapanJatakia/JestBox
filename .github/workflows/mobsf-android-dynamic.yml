@@ -175,7 +175,10 @@ jobs:
           timeout 120s adb wait-for-device
           timeout 30s adb shell id | grep -q 'uid=0'
           timeout 15s adb connect 127.0.0.1:5555
-          timeout 15s adb devices -l | grep -qE '^127\.0\.0\.1:5555[[:space:]]+device
+          timeout 15s adb devices -l | grep -qE '^127\.0\.0\.1:5555[[:space:]]+device$'
+
+          API_KEY="$(openssl rand -hex 32)"
+          echo "::add-mask::$API_KEY"
           docker run -d --name jestbox-mobsf --network host \
             -e MOBSF_API_KEY="$API_KEY" \
             -e MOBSF_PLATFORM=linux \
