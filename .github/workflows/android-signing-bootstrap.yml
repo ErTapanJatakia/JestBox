@@ -74,8 +74,6 @@ jobs:
       
       - name: Publish encrypted backup artifact and secret payload
         shell: bash
-        env:
-          ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_BACKUP_PASSWORD }}
         run: |
           set -euo pipefail
           ENCRYPTED="$RUNNER_TEMP/jestbox-release-keystore.gpg"
