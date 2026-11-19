@@ -281,7 +281,7 @@ jobs:
             echo "# JestBox Batch 1 — production APK static assessment"
             echo
             echo "- Source release workflow: this run"
-            echo "- Source commit: $GITHUB_SHA"
+            echo "- Source commit: $(git rev-parse HEAD)"
             echo "- APK SHA-256: 21ad33e9acf156f88d967329869cd997c5f1e622583d34f763ca5ec01631c692"
             echo "- Package: $(jq -r '.package_name // "not reported"' mobsf-report.json)"
             echo "- MobSF security score: $(jq -r '.security_score // "not reported"' mobsf-report.json)"
