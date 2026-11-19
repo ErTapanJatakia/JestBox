@@ -82,9 +82,9 @@ jobs:
             echo "## JestBox encrypted signing-key backup"
             echo ""
             echo "The encrypted backup was decrypted and byte-for-byte verified on the runner."
-            echo "Download the artifact `jestbox-android-encrypted-signing-backup` and store it offline."
+            echo 'Download the artifact `jestbox-android-encrypted-signing-backup` and store it offline.'
             echo ""
-            echo "Add the following **encrypted ciphertext only** as repository Actions secret `ANDROID_KEYSTORE_ENCRYPTED_BASE64`."
+            echo 'Add the following **encrypted ciphertext only** as repository Actions secret `ANDROID_KEYSTORE_ENCRYPTED_BASE64`.'
             echo "It is not the plaintext private key. The independent backup passphrase is required to decrypt it."
             echo ""
             echo '~~~text'
