@@ -38,7 +38,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          set +o pipefail
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          set -o pipefail
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "emulator" "platforms;android-36" "build-tools;36.0.0" "system-images;android-30;google_apis;x86_64"
 
       - name: Build disposable JestBox debug APK
@@ -51,7 +53,19 @@ jobs:
           node scripts/prepare-android-branding.mjs
           npx cap sync android
           cd android
-          ./gradlew --no-daemon assembleDebug
+          for attempt in 1 2 3; do
+            if ./gradlew --no-daemon --max-workers=2 assembleDebug 2>&1 | tee "$RUNNER_TEMP/gradle-build.log"; then
+              break
+            else
+              status=$?
+            fi
+            if grep -q "Received status code 429" "$RUNNER_TEMP/gradle-build.log" && [[ "$attempt" -lt 3 ]]; then
+              echo "Maven Central rate-limited dependency resolution (HTTP 429); retrying after backoff."
+              sleep "$((attempt * 20))"
+            else
+              exit "$status"
+            fi
+          done
           test -s app/build/outputs/apk/debug/app-debug.apk
 
       - name: Start rooted Android API 30 emulator and run MobSF dynamic analysis
