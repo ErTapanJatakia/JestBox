@@ -154,26 +154,16 @@ jobs:
           APK="$GITHUB_WORKSPACE/android/app/build/outputs/apk/debug/app-debug.apk"
           test -s "$APK"
 
-          # Restart ADB in TCP mode for MobSF, then verify reconnection.
-          adb kill-server || true
-          adb -a nodaemon server start > "$RUNNER_TEMP/adb-server.log" 2>&1 &
-          adb_ready=false
-          for _ in {1..30}; do
-            if timeout 10s adb devices | grep -qE '^emulator-5554[[:space:]]+device$'; then
-              adb_ready=true
-              break
-            fi
-            sleep 2
-          done
-          if [[ "$adb_ready" != "true" ]]; then
-            echo "::error::Emulator did not reconnect to the shared ADB server within 60 seconds."
-            timeout 10s adb devices -l || true
-            cat "$RUNNER_TEMP/adb-server.log" || true
-            exit 1
-          fi
-          timeout 15s adb devices -l
+          # Keep the runner's existing ADB server; host networking lets MobSF
+          # reach its loopback endpoint without racing a second daemon startup.
+          timeout 15s adb -s emulator-5554 devices -l
           timeout 15s adb connect 127.0.0.1:5555
           timeout 15s adb devices -l | grep -qE '^127\.0\.0\.1:5555[[:space:]]+device([[:space:]]|$)'
+          timeout 15s adb devices -l
+          if ! ss -ltn | grep -qE '127\.0\.0\.1:5037|0\.0\.0\.0:5037'; then
+            echo "::error::ADB server is not listening on the host network namespace at port 5037."
+            exit 1
+          fi
 
           API_KEY="$(openssl rand -hex 32)"
           echo "::add-mask::$API_KEY"
