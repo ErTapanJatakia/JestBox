@@ -19,6 +19,32 @@ jobs:
         with:
           persist-credentials: false
       - name: Review dependency changes
+        id: dependency-review
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: critical
+      - name: Create review run summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "# Dependency Review"
+            echo
+            echo "- Commit: `$GITHUB_SHA`"
+            echo "- Pull request: #${{ github.event.pull_request.number }}"
+            echo "- Workflow run: `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`"
+            echo "- Review step outcome: `$DEPENDENCY_REVIEW_OUTCOME`"
+            echo
+            echo "The Dependency Review action gates critical-severity dependency additions. Consult the pull-request check and action logs for package-level details."
+          } > dependency-review-summary.md
+          cat dependency-review-summary.md >> "$GITHUB_STEP_SUMMARY"
+        env:
+          DEPENDENCY_REVIEW_OUTCOME: ${{ steps.dependency-review.outcome }}
+      - name: Archive Dependency Review summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jestbox-dependency-review-summary
+          path: dependency-review-summary.md
+          if-no-files-found: error
+          retention-days: 30
