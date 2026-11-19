@@ -2,6 +2,10 @@ name: MobSF Android dynamic assessment
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/mobsf-android-dynamic.yml"
   push:
     branches: [main]
     paths:
