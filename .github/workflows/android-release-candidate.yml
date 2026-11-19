@@ -92,7 +92,6 @@ jobs:
           set -euo pipefail
           APK="$UNSIGNED_APK"
           APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
-          APKSIGNER="$ANDROID_HOME/build-tools/36.0.0/apksigner"
           ZIPALIGN="$ANDROID_HOME/build-tools/36.0.0/zipalign"
 
           APPLICATION_ID="$("$APKANALYZER" manifest application-id "$APK")"
@@ -108,18 +107,20 @@ jobs:
 
           {
             echo "### Android release candidate"
-            echo "- Source commit: `$GITHUB_SHA`"
-            echo "- Application ID: `$APPLICATION_ID`"
-            echo "- Version: `$VERSION_NAME` (`$VERSION_CODE`)"
-            echo "- Release debuggable flag: `$DEBUGGABLE`"
+            echo "- Source commit: ${GITHUB_SHA}"
+            echo "- Application ID: ${APPLICATION_ID}"
+            echo "- Version: ${VERSION_NAME} (${VERSION_CODE})"
+            echo "- Release debuggable flag: ${DEBUGGABLE}"
             echo "- Bundled offline entry point: present"
             echo "- APK alignment: passed"
             echo "- Signing: evaluated separately; unsigned output is not distributable"
           } >> "$GITHUB_STEP_SUMMARY"
 
-          echo "application_id=$APPLICATION_ID" >> "$GITHUB_OUTPUT"
-          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
-          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          {
+            echo "application_id=$APPLICATION_ID"
+            echo "version_code=$VERSION_CODE"
+            echo "version_name=$VERSION_NAME"
+          } >> "$GITHUB_OUTPUT"
           sha256sum "$APK" | tee "$APK.sha256"
 
       - name: Check whether production signing credentials are configured
