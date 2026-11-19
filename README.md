@@ -27,6 +27,7 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 - [Release QA Checklist](QA-CHECKLIST.md)
 - [Proprietary Licence — All Rights Reserved](LICENSE)
 - [Security Policy](SECURITY.md)
+- [Security Assessment Programme](SECURITY-ASSESSMENT.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Android Implementation Plan](ANDROID-IMPLEMENTATION.md)
@@ -50,6 +51,10 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 - No app-created cookies, analytics, trackers, or remote preference sync.
 - Locale, category, and current joke remain in page memory; display/accessibility preferences are saved locally on the device only.
 - Sharing is user-initiated; the operating system and selected recipient app apply their own privacy practices.
+
+## Security automation
+
+The public repository is configured for automated source, dependency, supply-chain, and Android APK security checks. See [SECURITY-ASSESSMENT.md](SECURITY-ASSESSMENT.md) for scanner scope, schedules, report locations, and known limitations. Automated scanning is not a substitute for manual assessment or physical-device testing.
 
 ## Run and validate
 
