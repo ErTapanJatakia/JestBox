@@ -24,7 +24,7 @@ permissions:
 
 concurrency:
   group: jestbox-mobsf-dynamic
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   dynamic-analysis:
@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 50
     steps:
       - name: Check out trusted source
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -174,7 +174,7 @@ jobs:
             -e ADB_SERVER_SOCKET=tcp:127.0.0.1:5037 \
             -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
             -e MOBSF_VT_ENABLED=0 \
-            opensecurity/mobile-security-framework-mobsf:latest
+            opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954 # MobSF v4.6.9
 
           ready=false
           for _ in {1..90}; do
@@ -259,7 +259,7 @@ jobs:
 
       - name: Archive MobSF static and dynamic reports
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: jestbox-mobsf-android-dynamic-report
           path: |
