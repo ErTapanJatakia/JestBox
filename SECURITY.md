@@ -30,7 +30,8 @@ Good-faith research that follows this policy and applicable law is welcome. Avoi
 
 **Last updated:** 19 November 2026  
 **Repository:** [ErTapanJatakia/JestBox](https://github.com/ErTapanJatakia/JestBox)  
-**Latest documented main commit:** `d4b6e13dfb5e0f56a078eb29ef8d36a85a95dba1`  
+**Main commit before this documentation consolidation:** `6e5368da55499ec86b69e3c919004a5e7e1dd21a`  
+**Security-workflow baseline commit covered by the 19 November assessment snapshot:** `d4b6e13dfb5e0f56a078eb29ef8d36a85a95dba1`  
 **Primary purpose:** maintain one auditable record of security workflows, automated testing, assessments, evidence, findings and remediation for JestBox.
 
 > **Assessment statement:** This document records automated defensive security checks and their evidence. A successful workflow means that the relevant automation completed; it does not mean that the application has zero vulnerabilities. These checks do not constitute a human-led penetration test, independent security audit, certification, or guarantee of security.
