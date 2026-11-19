@@ -14,8 +14,8 @@ test("removes wildcard Cordova access while preserving explicit origins", () => 
   const result = restrictCordovaAccess(input);
 
   assert.equal(result.removed, 1);
-  assert.doesNotMatch(result.xml, /<access\\b[^>]*origin=["']\\*["']/);
-  assert.match(result.xml, /<access origin="https:\/\/trusted\\.example" \/>/);
+  assert.doesNotMatch(result.xml, /<access\b[^>]*origin=["']\*["']/);
+  assert.ok(result.xml.includes('<access origin="https://trusted.example" />'));
 });
 
 test("is idempotent when no wildcard access is present", () => {
@@ -31,7 +31,7 @@ test("removes every wildcard access declaration", () => {
   const result = restrictCordovaAccess(input);
 
   assert.equal(result.removed, 2);
-  assert.doesNotMatch(result.xml, /<access\\b[^>]*origin=["']\\*["']/);
+  assert.doesNotMatch(result.xml, /<access\b[^>]*origin=["']\*["']/);
 });
 
 test("rejects non-string XML input", () => {
