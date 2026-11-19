@@ -1,0 +1,151 @@
+name: JestBox OWASP ZAP penetration testing
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "41 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      active_scan:
+        description: "Run the bounded active ZAP scan against the isolated local build"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jestbox-zap-pt-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zap-dast:
+    name: OWASP ZAP DAST against local application
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install application build dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Run application regression tests
+        run: node --test
+
+      - name: Prepare local web application
+        run: npm run prepare:web
+
+      - name: Start isolated local application
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8080 --bind 0.0.0.0 --directory www > /tmp/jestbox-http.log 2>&1 &
+          echo "$!" > /tmp/jestbox-http.pid
+          for _ in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:8080/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/jestbox-http.log
+          exit 1
+
+      - name: Run OWASP ZAP baseline DAST
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --network host \
+            -v "$GITHUB_WORKSPACE:/zap/wrk/:rw" \
+            ghcr.io/zaproxy/zaproxy:2.16.1 \
+            zap-baseline.py \
+              -t http://127.0.0.1:8080 \
+              -m 5 \
+              -I \
+              -J /zap/wrk/zap-baseline.json \
+              -r /zap/wrk/zap-baseline.html
+
+      - name: Run bounded active ZAP scan when explicitly requested
+        if: github.event_name == 'workflow_dispatch' && inputs.active_scan
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --network host \
+            -v "$GITHUB_WORKSPACE:/zap/wrk/:rw" \
+            ghcr.io/zaproxy/zaproxy:2.16.1 \
+            zap-full-scan.py \
+              -t http://127.0.0.1:8080 \
+              -m 5 \
+              -T 10 \
+              -I \
+              -J /zap/wrk/zap-active.json \
+              -r /zap/wrk/zap-active.html
+
+      - name: Generate PT report summary
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            printf "# JestBox OWASP ZAP DAST / PT report\n\n"
+            printf -- "- Commit: %s\n" "$GITHUB_SHA"
+            printf -- "- Workflow run: %s\n" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            printf -- "- Target: isolated local build at 127.0.0.1:8080\n"
+            printf -- "- Scan mode: "
+            if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.active_scan }}" == "true" ]]; then
+              printf "baseline plus bounded active scan\n"
+            else
+              printf "baseline passive scan\n"
+            fi
+            for report in zap-baseline.json zap-active.json; do
+              if [[ -s "$report" ]]; then
+                printf "\n## %s\n\n" "$report"
+                jq -r '
+                  [.site[]?.alerts[]?] as $alerts |
+                  "| Risk | Count |\n|---|---:|\n" +
+                  (["High","Medium","Low","Informational"] | map(
+                    . as $risk |
+                    "| " + $risk + " | " +
+                    ([$alerts[]? | select((.riskdesc // "" | ascii_downcase) | startswith($risk | ascii_downcase))] | length | tostring) + " |"
+                  ) | join("\n"))
+                ' "$report"
+              fi
+            done
+            printf "\n> Scope: automated DAST against a disposable local static build. This does not test production hosting, external services, authenticated flows, backend APIs, or all Android runtime behavior. Findings require manual validation; this is not a human-led penetration test.\n"
+          } > jestbox-zap-pt-summary.md
+          cat jestbox-zap-pt-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload ZAP PT reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jestbox-owasp-zap-pt-report
+          path: |
+            zap-baseline.json
+            zap-baseline.html
+            zap-active.json
+            zap-active.html
+            jestbox-zap-pt-summary.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Stop local application server
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f /tmp/jestbox-http.pid ]]; then
+            kill "$(cat /tmp/jestbox-http.pid)" 2>/dev/null || true
+          fi
