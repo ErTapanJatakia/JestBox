@@ -2,6 +2,16 @@ name: MobSF Android dynamic assessment
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/mobsf-android-dynamic.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "src/**"
+      - "public/**"
+      - "capacitor.config.*"
+      - "scripts/**"
   schedule:
     - cron: "0 4 * * 0"
 
