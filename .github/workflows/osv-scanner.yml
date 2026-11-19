@@ -43,9 +43,22 @@ jobs:
           if [ "$status" -ne 0 ]; then
             echo "::warning::OSV-Scanner reported findings; review the SARIF report."
           fi
-      - name: Upload OSV findings
+      - name: Upload OSV findings to code scanning
         if: always() && hashFiles('osv-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           sarif_file: osv-results.sarif
           category: osv-scanner
+      - name: Generate OSV human-readable summary
+        if: always() && hashFiles('osv-results.sarif') != ''
+        run: bash .github/scripts/render-sarif-summary.sh OSV-Scanner osv-results.sarif
+      - name: Archive OSV machine-readable and human-readable reports
+        if: always() && hashFiles('osv-results.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: jestbox-osv-scanner-report
+          path: |
+            osv-results.sarif
+            OSV-Scanner-security-summary.md
+          if-no-files-found: error
+          retention-days: 30
