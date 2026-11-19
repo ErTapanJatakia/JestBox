@@ -28,12 +28,12 @@ jobs:
         shell: bash
         run: |
           {
-            printf '# Dependency Review\n\n'
-            printf -- '- Commit: `%s`\n' "$GITHUB_SHA"
-            printf -- '- Pull request: #%s\n' "$PULL_REQUEST_NUMBER"
-            printf -- '- Workflow run: `%s`\n' "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-            printf -- '- Review step outcome: `%s`\n' "$DEPENDENCY_REVIEW_OUTCOME"
-            printf '\n%s\n' 'The Dependency Review action gates critical-severity dependency additions. Consult the pull-request check and action logs for package-level details.'
+            printf "# Dependency Review\n\n"
+            printf -- "- Commit: %s\n" "$GITHUB_SHA"
+            printf -- "- Pull request: #%s\n" "$PULL_REQUEST_NUMBER"
+            printf -- "- Workflow run: %s\n" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            printf -- "- Review step outcome: %s\n" "$DEPENDENCY_REVIEW_OUTCOME"
+            printf "\n%s\n" "The Dependency Review action gates critical-severity dependency additions. Consult the pull-request check and action logs for package-level details."
           } > dependency-review-summary.md
           cat dependency-review-summary.md >> "$GITHUB_STEP_SUMMARY"
         env:
