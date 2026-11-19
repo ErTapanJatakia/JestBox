@@ -105,6 +105,7 @@ jobs:
             timeout 15s adb devices -l > "$GITHUB_WORKSPACE/adb-devices.txt" 2>&1 || true
             { id; ls -l /dev/kvm; } > "$GITHUB_WORKSPACE/kvm-permissions.txt" 2>&1 || true
             cp "$RUNNER_TEMP/remount.log" "$GITHUB_WORKSPACE/remount.log" 2>/dev/null || true
+            cp "$RUNNER_TEMP/root-check-after-remount.txt" "$GITHUB_WORKSPACE/root-check-after-remount.txt" 2>/dev/null || true
             cat "$RUNNER_TEMP/adb-server.log" > "$GITHUB_WORKSPACE/adb-server.log" 2>/dev/null || true
             cat "$RUNNER_TEMP/emulator.log" > "$GITHUB_WORKSPACE/emulator.log" 2>/dev/null || true
             if [[ -f "$RUNNER_TEMP/emulator.pid" ]]; then
@@ -188,6 +189,28 @@ jobs:
             cat "$RUNNER_TEMP/remount.log"
             echo "::error::MobSF requires a writable /system partition; ADB remount failed."
             exit 1
+          fi
+          if grep -q "Now reboot your device" "$RUNNER_TEMP/remount.log"; then
+            echo "Overlayfs/verity settings require a reboot; restarting the emulator before checking /system."
+            timeout 30s adb reboot
+            timeout 120s adb wait-for-device
+            booted=false
+            for _ in {1..90}; do
+              if [[ "$(timeout 15s adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; then
+                booted=true
+                break
+              fi
+              sleep 5
+            done
+            if [[ "$booted" != "true" ]]; then
+              echo "::error::Emulator did not finish rebooting after enabling writable-system."
+              exit 1
+            fi
+            timeout 30s adb root || echo "ADB root caused a transient disconnect after remount reboot."
+            timeout 120s adb wait-for-device
+            ROOT_ID="$(timeout 30s adb shell id)"
+            printf '%s\n' "$ROOT_ID" | tee "$RUNNER_TEMP/root-check-after-remount.txt"
+            grep -q 'uid=0' "$RUNNER_TEMP/root-check-after-remount.txt"
           fi
           timeout 15s adb shell touch /system/.jestbox-mobsf-write-test
           timeout 15s adb shell rm /system/.jestbox-mobsf-write-test
@@ -309,5 +332,6 @@ jobs:
             kvm-permissions.txt
             root-check.txt
             remount.log
+            root-check-after-remount.txt
           if-no-files-found: warn
           retention-days: 30
