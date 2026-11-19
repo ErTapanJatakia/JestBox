@@ -208,10 +208,11 @@ jobs:
       - name: Verify exact approved production APK digest for Batch 1
         if: inputs.run_batch1_mobsf
         shell: bash
+        env:
+          APPROVED_APK_DIGEST: ${{ inputs.expected_apk_sha256 }}
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/release/jestbox-release-signed.apk"
-          APPROVED_APK_DIGEST="${{ inputs.expected_apk_sha256 }}"
           test -s "$APK"
           [[ "$APPROVED_APK_DIGEST" =~ ^[a-fA-F0-9]{64}$ ]] || {
             echo "::error::Provide the approved production APK SHA-256 digest as a 64-character hexadecimal workflow input."
