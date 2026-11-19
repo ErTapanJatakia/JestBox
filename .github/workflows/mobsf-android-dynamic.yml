@@ -295,5 +295,6 @@ jobs:
             adb-server.log
             adb-devices.txt
             kvm-permissions.txt
+            root-check.txt
           if-no-files-found: warn
           retention-days: 30
