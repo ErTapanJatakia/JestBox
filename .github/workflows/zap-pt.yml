@@ -71,7 +71,7 @@ jobs:
           docker run --rm --user 0:0 --network host \
             -e HOME=/root \
             -v "$GITHUB_WORKSPACE:/zap/wrk/:rw" \
-            ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af # ZAP 2.17.0 \
+            ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af \
             zap-baseline.py \
               -t http://127.0.0.1:8080 \
               -m 5 \
@@ -89,7 +89,7 @@ jobs:
           docker run --rm --user 0:0 --network host \
             -e HOME=/root \
             -v "$GITHUB_WORKSPACE:/zap/wrk/:rw" \
-            ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af # ZAP 2.17.0 \
+            ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af \
             zap-full-scan.py \
               -t http://127.0.0.1:8080 \
               -m 5 \
