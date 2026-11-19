@@ -3,7 +3,7 @@
 ## Reporting
 Report suspected vulnerabilities privately. Do not publish exploit details in public issues or pull requests.
 
-- General security and privacy: cyber.litigation.advisor@gmail.com
+- General Security and Privacy: cyber.litigation.advisor@gmail.com
 - Russia: ertapanjatakia@yandex.com
 - Other regions: tapan_ditu_17.20@outlook.com
 
@@ -12,21 +12,21 @@ Include the affected commit/version, impact, reproduction steps, and minimal evi
 ## Scope
 This policy covers the JestBox source, all eight locale experiences (`en-US`, `es-PE`, `ru-RU`, `es-ES`, `en-IN`, `hi-IN`, `ur-IN`, and `ur-PK`), the Android wrapper and generated development APKs. Hosting providers, browsers, operating systems, app stores, and recipient share apps remain governed by their own security processes.
 
-## Coordinated disclosure
+## Coordinated Disclosure
 Allow the maintainer a reasonable opportunity to investigate and remediate before public disclosure. The maintainer will make reasonable efforts to acknowledge and assess reports, but no fixed response or remediation SLA is promised.
 
-## Supported versions
+## Supported Versions
 JestBox is under development and has no stable release support window yet. The current development branch is reviewed as part of ongoing work; old commits and unreleased snapshots have no separate support commitment.
 
-## Automated security checks
+## Automated Security Checks
 The repository uses CodeQL, OSV-Scanner, Trivy, Microsoft DevSkim, Dependency Review, OpenSSF Scorecard, and MobSF static APK analysis. Their scope, reporting locations, limitations, and remediation process are documented in [SECURITY-ASSESSMENT.md](SECURITY-ASSESSMENT.md). Automated checks do not constitute a penetration test, independent audit, certification, or guarantee that the application is vulnerability-free.
 
-## Safe harbor
+## Safe Harbor
 Good-faith research that follows this policy and applicable law is welcome. Avoid privacy violations, destructive testing, service disruption, and unauthorized access. Stop and report privately if sensitive data is encountered. This policy does not authorize otherwise unlawful activity.
 
 ---
 
-## Security assessment programme
+## Security Assessment Programme
 
 **Last updated:** 19 November 2026  
 **Repository:** [ErTapanJatakia/JestBox](https://github.com/ErTapanJatakia/JestBox)  
@@ -34,9 +34,9 @@ Good-faith research that follows this policy and applicable law is welcome. Avoi
 **Security-workflow baseline commit covered by the 19 November assessment snapshot:** `d4b6e13dfb5e0f56a078eb29ef8d36a85a95dba1`  
 **Primary purpose:** maintain one auditable record of security workflows, automated testing, assessments, evidence, findings and remediation for JestBox.
 
-> **Assessment statement:** This document records automated defensive security checks and their evidence. A successful workflow means that the relevant automation completed; it does not mean that the application has zero vulnerabilities. These checks do not constitute a human-led penetration test, independent security audit, certification, or guarantee of security.
+> **Assessment Statement:** This document records automated defensive security checks and their evidence. A successful workflow means that the relevant automation completed; it does not mean that the application has zero vulnerabilities. These checks do not constitute a human-led penetration test, independent security audit, certification, or guarantee of security.
 
-## 1. Scope and boundaries
+## 1. Scope and Boundaries
 
 The programme covers:
 
@@ -53,11 +53,11 @@ The automated ZAP workflow scans a disposable local web build. It does not test 
 
 Out of scope unless separately authorised: production signing, production credentials, app-store submission, production deployment, hosted production testing, and changes to application content or functionality made solely to silence a scanner.
 
-## 2. Current assessment snapshot
+## 2. Current Assessment Snapshot
 
 The following snapshot reflects the latest documented main-branch security workflow batch on **19 November 2026**, at commit `d4b6e13dfb5e0f56a078eb29ef8d36a85a95dba1`.
 
-| Assessment / control | Latest recorded state | Evidence |
+| Assessment / Control | Latest recorded state | Evidence |
 |---|---|---|
 | Android debug build | Completed successfully | [Workflow run #44455530109](https://github.com/ErTapanJatakia/JestBox/actions/runs/44455530109) |
 | MobSF Android APK static assessment | Completed successfully; report artifact available | [Run #44455530144](https://github.com/ErTapanJatakia/JestBox/actions/runs/44455530144) · [Download static report](https://github.com/ErTapanJatakia/JestBox/actions/runs/44455530144/artifacts/14497274347) |
@@ -75,7 +75,7 @@ The following snapshot reflects the latest documented main-branch security workf
 
 **Important:** “Completed successfully” above records workflow execution status, not a clean scan or a finding-free result. Scanner output must be reviewed and findings validated before risk can be accepted or remediation declared complete. This document does not currently assert a total vulnerability count or a zero-findings outcome.
 
-## 3. Downloadable report index
+## 3. Downloadable Report Index
 
 The following links point to the actual GitHub Actions artifacts verified as present and unexpired when this document was updated.
 
@@ -93,7 +93,7 @@ The following links point to the actual GitHub Actions artifacts verified as pre
 
 GitHub CodeQL findings are available in the repository's [Code Scanning alerts](https://github.com/ErTapanJatakia/JestBox/security/code-scanning), not as a downloadable artifact in the run above. Dependency Review results are available in the linked pull-request workflow check and run summary.
 
-### Earlier ZAP assessment evidence
+### Earlier ZAP Assessment Evidence
 
 An earlier ZAP baseline execution scanned 13 URLs and recorded the following scanner summary: 59 PASS, 8 WARN, 0 FAIL-NEW and 0 FAIL-INPROG. Its report was generated against a disposable local test server. The warnings included missing or weak browser security headers and server/test-environment disclosures; they must not be assumed to describe the production hosting environment.
 
@@ -102,7 +102,7 @@ An earlier ZAP baseline execution scanned 13 URLs and recorded the following sca
 
 The active scan summary recorded 137 PASS, 6 WARN, 0 FAIL-NEW and 0 FAIL-INPROG. Its JSON report contained scanner alert categories, including two medium, six low and two informational categories. These are scanner classifications and require manual validation; they are not confirmed exploitable vulnerabilities or CVSS ratings. The active scan also ran against a disposable local build, not the production site.
 
-## 4. Tooling and workflow register
+## 4. Tooling and Workflow Register
 
 | Tool / workflow | Purpose and coverage | Current reporting surface |
 |---|---|---|
@@ -129,13 +129,13 @@ The `JestBox OWASP ZAP penetration testing` workflow builds the app locally, ser
 - The workflow has read-only repository permissions and does not scan production or third-party hosts.
 - This is automated web-layer DAST, not a human-led penetration test.
 
-**Coverage limitations:** the workflow does not cover production hosting, authenticated user journeys, backend APIs (JestBox is designed as an offline-first static app), third-party infrastructure, or comprehensive Android runtime behavior. It does not replace authenticated manual testing, business-logic testing, backend/API assessment, production-host testing, or a human-led penetration test.
+**Coverage Limitations:** the workflow does not cover production hosting, authenticated user journeys, backend APIs (JestBox is designed as an offline-first static app), third-party infrastructure, or comprehensive Android runtime behavior. It does not replace authenticated manual testing, business-logic testing, backend/API assessment, production-host testing, or a human-led penetration test.
 
 **Triage:** review each alert manually, reproduce it, record the affected URL and evidence, assess exploitability and impact, and track confirmed issues through remediation and retesting. Do not suppress scanner rules or delete tests merely to obtain a green workflow.
 
 MobSF static APK analysis remains a separate control. Android dynamic assessment requires a deliberately provisioned emulator and a validated MobSF dynamic-analysis setup; it must not be represented as covered by ZAP.
 
-### 4.2 Workflow hardening history
+### 4.2 Workflow Hardening History
 
 The security automation was introduced and hardened in a series of changes:
 
@@ -152,7 +152,7 @@ The security automation was introduced and hardened in a series of changes:
 
 These changes concern security automation and workflow reliability. They did not authorise production signing, store submission, or production deployment.
 
-## 5. MobSF Android dynamic assessment: execution history and blocker
+## 5. MobSF Android Dynamic Assessment: Execution History and Blocker
 
 The dynamic workflow is intentionally separate from the static APK scan. It builds a disposable debug APK, provisions an Android API 30 emulator, starts MobSF and attempts runtime analysis. A successful static scan must not be represented as a successful dynamic scan.
 
@@ -178,7 +178,7 @@ The latest logs confirmed that the Android SDK executables resolved and that the
 
 **Dynamic-assessment acceptance criteria:** emulator boots within the defined deadline; the debug APK installs and launches; MobSF confirms the target device; dynamic analysis starts and completes; JSON/report evidence and relevant logs are uploaded. Until then, dynamic Android testing remains outstanding.
 
-## 6. Trigger schedule and execution model
+## 6. Trigger Schedule and Execution Model
 
 The exact triggers are defined in the workflow YAML files under `.github/workflows/`. The current design includes:
 
@@ -192,7 +192,7 @@ The exact triggers are defined in the workflow YAML files under `.github/workflo
 
 Workflow runs and artifacts can be browsed from [GitHub Actions](https://github.com/ErTapanJatakia/JestBox/actions).
 
-## 7. Findings triage and remediation register
+## 7. Findings Triage and Remediation Register
 
 A scanner run is not a remediation decision. Each finding should be recorded with enough evidence to reproduce and verify it.
 
@@ -212,7 +212,7 @@ A scanner run is not a remediation decision. Each finding should be recorded wit
 
 No blanket dismissals, blanket suppressions or test weakening are permitted. Accepted risks must have a rationale, owner, affected version and review condition. Security alert counts and remediation status must be taken from live GitHub/report evidence; do not infer them from green workflow badges.
 
-### Current triage limitations
+### Current Triage Limitations
 
 - The CodeQL workflow run is visible, but individual alert details have not yet been reliably retrieved through the available repository API access. Use the [Code Scanning alerts page](https://github.com/ErTapanJatakia/JestBox/security/code-scanning) to inspect current alerts.
 - Repository-level Dependabot alert and secret-scanning settings/status must be verified in GitHub Security settings. Their status must not be inferred from scanner workflow success.
@@ -220,19 +220,19 @@ No blanket dismissals, blanket suppressions or test weakening are permitted. Acc
 
 ## 8. Known coverage limitations and caveats
 
-1. **Dependency lockfile:** the repository currently has no committed `package-lock.json`. OSV-Scanner and Trivy generate a temporary lockfile on the ephemeral runner using `npm install --package-lock-only --ignore-scripts --no-audit --no-fund`. This allows dependency scanning, including transitive dependency discovery, but it is not equivalent to a reviewed, committed reproducible lockfile. A committed lockfile should be considered as a separate dependency-management improvement.
-2. **MobSF static vs dynamic:** static APK analysis has completed. Dynamic analysis has not completed successfully and must remain explicitly outstanding.
-3. **ZAP target:** the ZAP workflow scans a local disposable build/test server. Local test-server headers and disclosures must not automatically be attributed to the production deployment.
-4. **Automated DAST limits:** ZAP automation does not replace authenticated manual testing, business-logic testing, backend/API assessment, production-host testing, or human-led penetration testing.
-5. **Scanner classifications:** SARIF error/warning/note and tool-specific severity labels are not interchangeable with CVSS. Validate findings and exposure context.
-6. **False positives:** Trivy, DevSkim, MobSF and other automated tools can report false positives or context-dependent observations.
-7. **Repository settings:** Dependency Graph, Dependabot alerts, secret scanning, push protection and CodeQL default setup require separate verification in repository settings.
-8. **No guarantee:** absence of findings in a particular scan does not prove absence of vulnerabilities.
-9. **Artifact expiry:** the artifacts linked in the 19 November 2026 run batch reported an expiry date of **19 December 2026** when checked. Download and preserve evidence before expiry. Future updates must verify artifact existence and expiry before adding direct artifact links.
-10. **Data handling:** MobSF runs locally in an ephemeral GitHub-hosted runner. VirusTotal integration and external domain-malware lookups are disabled. Do not place production credentials, private signing keys or user data in reports/artifacts.
-11. **Public disclosure:** publish only sanitised summaries. Do not expose raw secrets, personal data, sensitive exploit details or private vulnerability information in a public repository document.
+1. **Dependency Lockfile:** the repository currently has no committed `package-lock.json`. OSV-Scanner and Trivy generate a temporary lockfile on the ephemeral runner using `npm install --package-lock-only --ignore-scripts --no-audit --no-fund`. This allows dependency scanning, including transitive dependency discovery, but it is not equivalent to a reviewed, committed reproducible lockfile. A committed lockfile should be considered as a separate dependency-management improvement.
+2. **MobSF Static vs Dynamic:** static APK analysis has completed. Dynamic analysis has not completed successfully and must remain explicitly outstanding.
+3. **ZAP Target:** the ZAP workflow scans a local disposable build/test server. Local test-server headers and disclosures must not automatically be attributed to the production deployment.
+4. **Automated DAST Limits:** ZAP automation does not replace authenticated manual testing, business-logic testing, backend/API assessment, production-host testing, or human-led penetration testing.
+5. **Scanner Classifications:** SARIF error/warning/note and tool-specific severity labels are not interchangeable with CVSS. Validate findings and exposure context.
+6. **False Positives:** Trivy, DevSkim, MobSF and other automated tools can report false positives or context-dependent observations.
+7. **Repository Settings:** Dependency Graph, Dependabot alerts, secret scanning, push protection and CodeQL default setup require separate verification in repository settings.
+8. **No Guarantee:** absence of findings in a particular scan does not prove absence of vulnerabilities.
+9. **Artifact Expiry:** the artifacts linked in the 19 November 2026 run batch reported an expiry date of **19 December 2026** when checked. Download and preserve evidence before expiry. Future updates must verify artifact existence and expiry before adding direct artifact links.
+10. **Data Handling:** MobSF runs locally in an ephemeral GitHub-hosted runner. VirusTotal integration and external domain-malware lookups are disabled. Do not place production credentials, private signing keys or user data in reports/artifacts.
+11. **Public Disclosure:** publish only sanitised summaries. Do not expose raw secrets, personal data, sensitive exploit details or private vulnerability information in a public repository document.
 
-## 9. Security assessment operating rules
+## 9. Security Assessment Operating Rules
 
 - Prefer free/open-source tooling and repository-native GitHub capabilities.
 - Keep workflow permissions least-privilege and third-party actions pinned to reviewed immutable commit SHAs where feasible.
@@ -242,7 +242,7 @@ No blanket dismissals, blanket suppressions or test weakening are permitted. Acc
 - Merge workflow/documentation PRs only after all required CI checks pass.
 - Do not initiate production signing, store submission or deployment without separate authorisation.
 
-## 10. Ongoing report maintenance protocol
+## 10. Ongoing Report Maintenance Protocol
 
 Update this file whenever a security workflow is added, changed, executed, fails, is cancelled, or produces a material finding/remediation result.
 
@@ -261,9 +261,9 @@ For every material execution, record:
 
 For a cancelled or failed workflow, link the run and describe what actually executed. Do not create a report link when no artifact exists. For GitHub code scanning results, link the Security alerts surface as well as the relevant workflow run. Preserve previous entries as historical evidence; add a dated entry rather than silently replacing prior results.
 
-## 11. Outstanding work
+## 11. Outstanding Work
 
-| Priority | Action | Exit condition |
+| Priority | Action | Exit Condition |
 |---|---|---|
 | P1 | Stabilise MobSF dynamic emulator startup and diagnostics | Bounded startup/boot handling and useful failure artifacts |
 | P1 | Complete one controlled MobSF dynamic run | Dynamic report generated and uploaded; APK launch/runtime evidence captured |
@@ -274,7 +274,7 @@ For a cancelled or failed workflow, link the run and describe what actually exec
 | P2 | Preserve time-limited report artifacts | Evidence downloaded or retained before artifact expiry |
 | P3 | Perform release-readiness regression | App-specific functional, locale, accessibility and Android checks recorded separately |
 
-## 12. Reference links
+## 12. Reference Links
 
 - [JestBox repository](https://github.com/ErTapanJatakia/JestBox)
 - [GitHub Actions workflow history](https://github.com/ErTapanJatakia/JestBox/actions)
