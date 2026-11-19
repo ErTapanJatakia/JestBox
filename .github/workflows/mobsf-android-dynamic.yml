@@ -74,6 +74,10 @@ jobs:
           ANDROID_AVD_HOME: ${{ runner.temp }}/.android/avd
         run: |
           set -euo pipefail
+          export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+          command -v adb
+          command -v emulator
+          adb version
           mkdir -p "$ANDROID_AVD_HOME"
           echo "no" | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name jestbox_api30 --package "system-images;android-30;google_apis;x86_64" --device pixel_2
           "$ANDROID_HOME/emulator/emulator" -avd jestbox_api30 -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data -accel auto > "$RUNNER_TEMP/emulator.log" 2>&1 &
