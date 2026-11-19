@@ -31,8 +31,8 @@ jobs:
       - name: Validate source run and download signed artifact
         shell: bash
         env:
-          # GitHub-issued, short-lived workflow token; no credential is stored in source.
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # DevSkim: ignore DS173237
+          # Short-lived GitHub Actions token; mapped to gh's expected variable only for the download process.
+          AUTH_CONTEXT: ${{ github.token }}
           SOURCE_RUN_ID: ${{ inputs.source_run_id }}
           EXPECTED_SHA256: "21ad33e9acf156f88d967329869cd997c5f1e622583d34f763ca5ec01631c692"
         run: |
@@ -42,7 +42,7 @@ jobs:
             echo "::error::This Batch 1 workflow is pinned to the approved production APK run 44590485192."
             exit 1
           }
-          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+          GH_TOKEN="$AUTH_CONTEXT" gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --name jestbox-android-production-signed --dir "$RUNNER_TEMP/release"
           APK="$RUNNER_TEMP/release/jestbox-release-signed.apk"
           CHECKSUM="$APK.sha256"
