@@ -42,9 +42,22 @@ jobs:
           set -euo pipefail
           jq '(.runs[].results[]?.locations[]?.physicalLocation.region.snippet.rendered) |= (if type == "object" and has("markdown") and (has("text") | not) then . + {"text": .markdown} else . end)' devskim-results.sarif > devskim-results.normalized.sarif
           mv devskim-results.normalized.sarif devskim-results.sarif
-      - name: Upload DevSkim findings
+      - name: Upload DevSkim findings to code scanning
         if: always() && hashFiles('devskim-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           sarif_file: devskim-results.sarif
           category: devskim
+      - name: Generate DevSkim human-readable summary
+        if: always() && hashFiles('devskim-results.sarif') != ''
+        run: bash .github/scripts/render-sarif-summary.sh DevSkim devskim-results.sarif
+      - name: Archive DevSkim machine-readable and human-readable reports
+        if: always() && hashFiles('devskim-results.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: jestbox-devskim-report
+          path: |
+            devskim-results.sarif
+            DevSkim-security-summary.md
+          if-no-files-found: error
+          retention-days: 30
