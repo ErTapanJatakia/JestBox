@@ -70,7 +70,7 @@ jobs:
             import { readFileSync } from "node:fs";
             const config = JSON.parse(readFileSync("capacitor.config.json", "utf8"));
             if (config.appId !== "com.jestbox.app") {
-              throw new Error(`Expected com.jestbox.app, received ${config.appId}`);
+              throw new Error("Expected com.jestbox.app, received " + config.appId);
             }
           '
 
