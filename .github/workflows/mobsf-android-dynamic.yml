@@ -146,9 +146,14 @@ jobs:
           timeout 30s adb -s emulator-5554 shell settings put global window_animation_scale 0
           timeout 30s adb -s emulator-5554 shell settings put global transition_animation_scale 0
           timeout 30s adb -s emulator-5554 shell settings put global animator_duration_scale 0
-          timeout 30s adb -s emulator-5554 root
+          # adb root restarts adbd; some emulator builds close the control socket
+          # before returning. Verify the resulting device identity instead of
+          # treating that transient disconnect as a root failure.
+          timeout 30s adb -s emulator-5554 root || echo "ADB root caused a transient disconnect; waiting for adbd to restart."
           timeout 120s adb -s emulator-5554 wait-for-device
-          timeout 30s adb -s emulator-5554 shell id | grep -q 'uid=0'
+          timeout 30s adb -s emulator-5554 shell id | tee "$RUNNER_TEMP/root-check.txt" | grep -q 'uid=0'
+          timeout 15s adb -s emulator-5554 shell getprop ro.build.type
+          timeout 15s adb -s emulator-5554 shell getprop ro.debuggable
 
           APK="$GITHUB_WORKSPACE/android/app/build/outputs/apk/debug/app-debug.apk"
           test -s "$APK"
@@ -171,7 +176,7 @@ jobs:
             exit 1
           fi
           timeout 15s adb devices -l
-          timeout 30s adb root
+          timeout 30s adb root || echo "ADB root caused a transient disconnect; waiting for adbd to restart."
           timeout 120s adb wait-for-device
           timeout 30s adb shell id | grep -q 'uid=0'
           timeout 15s adb connect 127.0.0.1:5555
