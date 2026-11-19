@@ -68,7 +68,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker run --rm --network host \
+          docker run --rm --user "$(id -u):$(id -g)" --network host \
+            -e HOME=/tmp \
             -v "$GITHUB_WORKSPACE:/zap/wrk/:rw" \
             ghcr.io/zaproxy/zaproxy:2.16.1 \
             zap-baseline.py \
