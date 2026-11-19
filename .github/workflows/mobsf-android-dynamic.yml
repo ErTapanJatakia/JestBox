@@ -1,0 +1,196 @@
+name: MobSF Android dynamic assessment
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jestbox-mobsf-dynamic
+  cancel-in-progress: false
+
+jobs:
+  dynamic-analysis:
+    name: Isolated Android API 30 dynamic assessment
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Check out trusted source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Build disposable JestBox debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npm run prepare:web
+          npx cap add android
+          node scripts/prepare-android-branding.mjs
+          npx cap sync android
+          cd android
+          ./gradlew --no-daemon assembleDebug
+          test -s app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Run MobSF dynamic analysis on rooted Android emulator
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            APK="$GITHUB_WORKSPACE/android/app/build/outputs/apk/debug/app-debug.apk"
+            test -s "$APK"
+
+            # MobSF's Docker container shares the runner's ADB server.
+            adb kill-server || true
+            adb -a nodaemon server start > "$RUNNER_TEMP/adb-server.log" 2>&1 &
+            for _ in {1..30}; do
+              if adb devices | grep -qE '^emulator-5554[[:space:]]+device$'; then
+                break
+              fi
+              sleep 2
+            done
+            adb devices -l
+            adb root
+            adb wait-for-device
+            adb shell id | grep -q 'uid=0'
+
+            API_KEY="$(openssl rand -hex 32)"
+            echo "::add-mask::$API_KEY"
+            cleanup() {
+              docker logs jestbox-mobsf > "$GITHUB_WORKSPACE/mobsf-container.log" 2>&1 || true
+              docker rm -f jestbox-mobsf >/dev/null 2>&1 || true
+            }
+            trap cleanup EXIT
+
+            docker run -d --name jestbox-mobsf --network host \
+              -e MOBSF_API_KEY="$API_KEY" \
+              -e MOBSF_ANALYZER_IDENTIFIER=emulator-5554 \
+              -e ADB_SERVER_SOCKET=tcp:127.0.0.1:5037 \
+              -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
+              -e MOBSF_VT_ENABLED=0 \
+              opensecurity/mobile-security-framework-mobsf:latest
+
+            ready=false
+            for _ in {1..90}; do
+              if curl --silent --fail http://127.0.0.1:8000/ >/dev/null; then
+                ready=true
+                break
+              fi
+              sleep 5
+            done
+            if [[ "$ready" != "true" ]]; then
+              docker logs jestbox-mobsf
+              exit 1
+            fi
+
+            UPLOAD="$(curl --silent --show-error --fail \
+              -H "Authorization: $API_KEY" \
+              -F "file=@$APK" \
+              http://127.0.0.1:8000/api/v1/upload)"
+            HASH="$(printf '%s' "$UPLOAD" | jq -er '.hash')"
+            printf '%s\n' "$UPLOAD" > "$GITHUB_WORKSPACE/mobsf-upload.json"
+
+            curl --silent --show-error --fail -X POST \
+              -H "Authorization: $API_KEY" \
+              --data-urlencode "hash=$HASH" \
+              http://127.0.0.1:8000/api/v1/scan \
+              -o "$GITHUB_WORKSPACE/mobsf-static-scan.json"
+            curl --silent --show-error --fail -X POST \
+              -H "Authorization: $API_KEY" \
+              --data-urlencode "hash=$HASH" \
+              http://127.0.0.1:8000/api/v1/report_json \
+              -o "$GITHUB_WORKSPACE/mobsf-static-report.json"
+            jq -e 'type == "object" and (has("error") | not)' "$GITHUB_WORKSPACE/mobsf-static-report.json" >/dev/null
+
+            curl --silent --show-error --fail -X POST \
+              -H "Authorization: $API_KEY" \
+              --data-urlencode "hash=$HASH" \
+              --data-urlencode "device_mode=rooted" \
+              --data-urlencode "install=1" \
+              --data-urlencode "re_install=1" \
+              http://127.0.0.1:8000/api/v1/dynamic/start_analysis \
+              -o "$GITHUB_WORKSPACE/mobsf-dynamic-start.json"
+            jq -e '.package and .device_identifier' "$GITHUB_WORKSPACE/mobsf-dynamic-start.json" >/dev/null
+            PACKAGE="$(jq -er '.package' "$GITHUB_WORKSPACE/mobsf-dynamic-start.json")"
+
+            adb shell monkey -p "$PACKAGE" 1
+            sleep 60
+            adb logcat -d -v time > "$GITHUB_WORKSPACE/android-logcat.txt"
+
+            if grep -E 'FATAL EXCEPTION|Process: '"$PACKAGE" "$GITHUB_WORKSPACE/android-logcat.txt"; then
+              echo "::error::The app produced a fatal runtime exception during the observation window."
+              exit 1
+            fi
+
+            curl --silent --show-error --fail -X POST \
+              -H "Authorization: $API_KEY" \
+              --data-urlencode "hash=$HASH" \
+              http://127.0.0.1:8000/api/v1/dynamic/stop_analysis \
+              -o "$GITHUB_WORKSPACE/mobsf-dynamic-stop.json"
+            curl --silent --show-error --fail -X POST \
+              -H "Authorization: $API_KEY" \
+              --data-urlencode "hash=$HASH" \
+              http://127.0.0.1:8000/api/v1/dynamic/report_json \
+              -o "$GITHUB_WORKSPACE/mobsf-dynamic-report.json"
+            jq -e 'type == "object" and (has("error") | not)' "$GITHUB_WORKSPACE/mobsf-dynamic-report.json" >/dev/null
+
+            {
+              echo "# JestBox MobSF Android dynamic assessment"
+              echo
+              echo "- Commit: $GITHUB_SHA"
+              echo "- Workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+              echo "- Target: disposable debug APK on Android API 30 x86_64 emulator"
+              echo "- Emulator: rooted Google APIs image without Google Play"
+              echo "- Package: $PACKAGE"
+              echo "- Observation window: 60 seconds after launch"
+              echo "- MobSF static report: generated"
+              echo "- MobSF dynamic report: generated"
+              echo "- Scope: local emulator only; no production services or user data"
+              echo
+              echo "This is automated runtime analysis, not a human-led penetration test. Findings require manual validation."
+            } > "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md"
+            cat "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Archive MobSF static and dynamic reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: jestbox-mobsf-android-dynamic-report
+          path: |
+            mobsf-upload.json
+            mobsf-static-scan.json
+            mobsf-static-report.json
+            mobsf-dynamic-start.json
+            mobsf-dynamic-stop.json
+            mobsf-dynamic-report.json
+            mobsf-dynamic-summary.md
+            mobsf-container.log
+            android-logcat.txt
+          if-no-files-found: warn
+          retention-days: 30
