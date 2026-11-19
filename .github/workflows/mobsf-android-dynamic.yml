@@ -82,7 +82,7 @@ jobs:
           done
           test -s app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Start rooted Android API 30 emulator and run MobSF dynamic analysis
+      - name: Start Android API 30 emulator and run MobSF dynamic analysis (unrooted)
         shell: bash
         env:
           ANDROID_AVD_HOME: ${{ runner.temp }}/.android/avd
@@ -104,8 +104,7 @@ jobs:
             docker rm -f jestbox-mobsf >/dev/null 2>&1 || true
             timeout 15s adb devices -l > "$GITHUB_WORKSPACE/adb-devices.txt" 2>&1 || true
             { id; ls -l /dev/kvm; } > "$GITHUB_WORKSPACE/kvm-permissions.txt" 2>&1 || true
-            cp "$RUNNER_TEMP/remount.log" "$GITHUB_WORKSPACE/remount.log" 2>/dev/null || true
-            cp "$RUNNER_TEMP/root-check-after-remount.txt" "$GITHUB_WORKSPACE/root-check-after-remount.txt" 2>/dev/null || true
+            cp "$RUNNER_TEMP/device-identity.txt" "$GITHUB_WORKSPACE/device-identity.txt" 2>/dev/null || true
             cat "$RUNNER_TEMP/adb-server.log" > "$GITHUB_WORKSPACE/adb-server.log" 2>/dev/null || true
             cat "$RUNNER_TEMP/emulator.log" > "$GITHUB_WORKSPACE/emulator.log" 2>/dev/null || true
             if [[ -f "$RUNNER_TEMP/emulator.pid" ]]; then
@@ -126,7 +125,7 @@ jobs:
             exit 1
           fi
           ls -l /dev/kvm
-          "$ANDROID_HOME/emulator/emulator" -avd jestbox_api30 -writable-system -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data -accel on > "$RUNNER_TEMP/emulator.log" 2>&1 &
+          "$ANDROID_HOME/emulator/emulator" -avd jestbox_api30 -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data -accel on > "$RUNNER_TEMP/emulator.log" 2>&1 &
           echo $! > "$RUNNER_TEMP/emulator.pid"
 
           # Bound transport discovery separately from the Android boot deadline.
@@ -148,16 +147,9 @@ jobs:
           timeout 30s adb -s emulator-5554 shell settings put global window_animation_scale 0
           timeout 30s adb -s emulator-5554 shell settings put global transition_animation_scale 0
           timeout 30s adb -s emulator-5554 shell settings put global animator_duration_scale 0
-          # adb root restarts adbd; some emulator builds close the control socket
-          # before returning. Verify the resulting device identity instead of
-          # treating that transient disconnect as a root failure.
-          timeout 30s adb -s emulator-5554 root || echo "ADB root caused a transient disconnect; waiting for adbd to restart."
-          timeout 120s adb -s emulator-5554 wait-for-device
-          ROOT_ID="$(timeout 30s adb -s emulator-5554 shell id)"
-          printf '%s\n' "$ROOT_ID" | tee "$RUNNER_TEMP/root-check.txt"
-          grep -q 'uid=0' "$RUNNER_TEMP/root-check.txt"
+          DEVICE_ID="$(timeout 30s adb -s emulator-5554 shell id)"
+          printf '%s\n' "$DEVICE_ID" | tee "$RUNNER_TEMP/device-identity.txt"
           timeout 15s adb -s emulator-5554 shell getprop ro.build.type
-          timeout 15s adb -s emulator-5554 shell getprop ro.debuggable
 
           APK="$GITHUB_WORKSPACE/android/app/build/outputs/apk/debug/app-debug.apk"
           test -s "$APK"
@@ -180,40 +172,6 @@ jobs:
             exit 1
           fi
           timeout 15s adb devices -l
-          timeout 30s adb root || echo "ADB root caused a transient disconnect; waiting for adbd to restart."
-          timeout 120s adb wait-for-device
-          ROOT_ID="$(timeout 30s adb shell id)"
-          printf '%s\n' "$ROOT_ID"
-          grep -q 'uid=0' <<< "$ROOT_ID"
-          if ! timeout 60s adb remount > "$RUNNER_TEMP/remount.log" 2>&1; then
-            cat "$RUNNER_TEMP/remount.log"
-            echo "::error::MobSF requires a writable /system partition; ADB remount failed."
-            exit 1
-          fi
-          if grep -q "Now reboot your device" "$RUNNER_TEMP/remount.log"; then
-            echo "Overlayfs/verity settings require a reboot; restarting the emulator before checking /system."
-            timeout 30s adb reboot
-            timeout 120s adb wait-for-device
-            booted=false
-            for _ in {1..90}; do
-              if [[ "$(timeout 15s adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; then
-                booted=true
-                break
-              fi
-              sleep 5
-            done
-            if [[ "$booted" != "true" ]]; then
-              echo "::error::Emulator did not finish rebooting after enabling writable-system."
-              exit 1
-            fi
-            timeout 30s adb root || echo "ADB root caused a transient disconnect after remount reboot."
-            timeout 120s adb wait-for-device
-            ROOT_ID="$(timeout 30s adb shell id)"
-            printf '%s\n' "$ROOT_ID" | tee "$RUNNER_TEMP/root-check-after-remount.txt"
-            grep -q 'uid=0' "$RUNNER_TEMP/root-check-after-remount.txt"
-          fi
-          timeout 15s adb shell touch /system/.jestbox-mobsf-write-test
-          timeout 15s adb shell rm /system/.jestbox-mobsf-write-test
           timeout 15s adb connect 127.0.0.1:5555
           timeout 15s adb devices -l | grep -qE '^127\.0\.0\.1:5555[[:space:]]+device([[:space:]]|$)'
 
@@ -263,7 +221,7 @@ jobs:
           curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $API_KEY" \
             --data-urlencode "hash=$HASH" \
-            --data-urlencode "device_mode=rooted" \
+            --data-urlencode "device_mode=unrooted" \
             --data-urlencode "install=1" \
             --data-urlencode "re_install=1" \
             http://127.0.0.1:8000/api/v1/dynamic/start_analysis \
@@ -298,14 +256,14 @@ jobs:
             echo "- Commit: $GITHUB_SHA"
             echo "- Workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             echo "- Target: disposable debug APK on Android API 30 x86_64 emulator"
-            echo "- Emulator: rooted Google APIs image without Google Play; MobSF ADB endpoint 127.0.0.1:5555"
+            echo "- Emulator: Google APIs image without Google Play; MobSF device mode: unrooted; ADB endpoint 127.0.0.1:5555"
             echo "- Package: $PACKAGE"
             echo "- Observation window: 60 seconds after launch"
             echo "- MobSF static report: generated"
             echo "- MobSF dynamic report: generated"
             echo "- Scope: local emulator only; no production services or user data"
             echo
-            echo "This is automated runtime analysis, not a human-led penetration test. Findings require manual validation."
+            echo "This is automated unrooted runtime analysis, not a human-led penetration test. Root-dependent inspection and system-level TLS interception are out of scope; findings require manual validation."
           } > "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md"
           cat "$GITHUB_WORKSPACE/mobsf-dynamic-summary.md" >> "$GITHUB_STEP_SUMMARY"
 
@@ -330,8 +288,6 @@ jobs:
             adb-server.log
             adb-devices.txt
             kvm-permissions.txt
-            root-check.txt
-            remount.log
-            root-check-after-remount.txt
+            device-identity.txt
           if-no-files-found: warn
           retention-days: 30
