@@ -88,6 +88,36 @@ jobs:
           "$APKSIGNER" verify --verbose --print-certs "$APK"
           "$ZIPALIGN" -c -v 4 "$APK"
           sha256sum "$APK" | tee "$APK.sha256"
+      - name: Assemble and validate unsigned release APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android
+          for attempt in 1 2 3; do
+            if ./gradlew --no-daemon --max-workers=2 assembleRelease 2>&1 | tee "$RUNNER_TEMP/gradle-release.log"; then
+              break
+            else
+              status=$?
+            fi
+            if grep -q "Received status code 429" "$RUNNER_TEMP/gradle-release.log" && [[ "$attempt" -lt 3 ]]; then
+              echo "Maven Central rate-limited dependency resolution (HTTP 429); retrying after backoff."
+              sleep "$((attempt * 20))"
+            else
+              exit "$status"
+            fi
+          done
+          cd ..
+          APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
+          test -s "$APK"
+          test -x "$APKANALYZER"
+          DEBUGGABLE="$("$APKANALYZER" manifest debuggable "$APK")"
+          if [[ "$DEBUGGABLE" != "false" ]]; then
+            echo "::error::Unsigned release APK must not be debuggable (reported: $DEBUGGABLE)."
+            exit 1
+          fi
+          sha256sum "$APK" | tee "$APK.sha256"
+          echo "Unsigned release APK manifest debuggable flag: false" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload debug APK and checksum
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
