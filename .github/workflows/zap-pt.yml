@@ -81,7 +81,7 @@ jobs:
           test -s zap-baseline.json
           test -s zap-baseline.html
 
-      - name: Run bounded active ZAP scan when explicitly requested
+      - name: Run bounded active ZAP scan for main and scheduled assessments
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.active_scan) || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         shell: bash
         run: |
@@ -89,7 +89,7 @@ jobs:
           docker run --rm --user 0:0 --network host \
             -e HOME=/root \
             -v "$GITHUB_WORKSPACE:/zap/wrk/:rw" \
-            ghcr.io/zaproxy/zaproxy:2.16.1 \
+            ghcr.io/zaproxy/zaproxy:stable \
             zap-full-scan.py \
               -t http://127.0.0.1:8080 \
               -m 5 \
