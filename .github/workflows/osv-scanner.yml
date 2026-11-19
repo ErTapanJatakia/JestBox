@@ -1,0 +1,51 @@
+name: OSV-Scanner dependency assessment
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "41 2 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Resolve npm dependency tree for this scan
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Run pinned OSV-Scanner container
+        shell: bash
+        run: |
+          set +e
+          docker run --rm -v "$GITHUB_WORKSPACE:/src" ghcr.io/google/osv-scanner:v2.7.1 scan source --recursive --format sarif --output /src/osv-results.sarif /src
+          status=$?
+          set -e
+          if [ ! -s osv-results.sarif ]; then
+            echo "::error::OSV-Scanner did not produce a SARIF report (exit $status)."
+            exit 1
+          fi
+          if [ "$status" -ne 0 ]; then
+            echo "::warning::OSV-Scanner reported findings; review the SARIF report."
+          fi
+      - name: Upload OSV findings
+        if: always() && hashFiles('osv-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        with:
+          sarif_file: osv-results.sarif
+          category: osv-scanner

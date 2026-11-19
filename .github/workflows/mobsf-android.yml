@@ -1,0 +1,111 @@
+name: MobSF Android APK static assessment
+
+on:
+  workflow_run:
+    workflows: ["JestBox Android debug build"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Successful Android debug workflow run ID containing jestbox-android-debug"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  mobsf:
+    name: MobSF static APK analysis
+    if: >-
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Download debug APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jestbox-android-debug
+          path: android-artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id || inputs.run_id }}
+      - name: Verify APK artifact exists
+        id: apk
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$(find android-artifact -type f -name '*.apk' -print -quit)"
+          test -n "$APK"
+          echo "path=$APK" >> "$GITHUB_OUTPUT"
+      - name: Start isolated MobSF scanner
+        shell: bash
+        run: |
+          set -euo pipefail
+          API_KEY="$(openssl rand -hex 32)"
+          echo "::add-mask::$API_KEY"
+          echo "MOBSF_API_KEY=$API_KEY" >> "$GITHUB_ENV"
+          docker run -d --name jestbox-mobsf -p 8000:8000 \
+            -e MOBSF_API_KEY="$API_KEY" \
+            -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
+            -e MOBSF_VT_ENABLED=0 \
+            opensecurity/mobile-security-framework-mobsf:latest
+          for attempt in $(seq 1 60); do
+            if curl --silent --fail http://127.0.0.1:8000/ >/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker logs jestbox-mobsf
+          exit 1
+      - name: Upload and statically analyse APK
+        id: scan
+        shell: bash
+        env:
+          APK_PATH: ${{ steps.apk.outputs.path }}
+        run: |
+          set -euo pipefail
+          UPLOAD="$(curl --silent --show-error --fail \
+            -H "Authorization: $MOBSF_API_KEY" \
+            -F "file=@$APK_PATH" \
+            http://127.0.0.1:8000/api/v1/upload)"
+          HASH="$(printf '%s' "$UPLOAD" | jq -er '.hash')"
+          FILE_NAME="$(printf '%s' "$UPLOAD" | jq -er '.file_name')"
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          curl --silent --show-error --fail -X POST \
+            -H "Authorization: $MOBSF_API_KEY" \
+            --data-urlencode "hash=$HASH" \
+            --data-urlencode "file_name=$FILE_NAME" \
+            --data-urlencode "scan_type=apk" \
+            http://127.0.0.1:8000/api/v1/scan > mobsf-scan-response.json
+          for attempt in $(seq 1 60); do
+            if curl --silent --show-error --fail -X POST \
+              -H "Authorization: $MOBSF_API_KEY" \
+              --data-urlencode "hash=$HASH" \
+              http://127.0.0.1:8000/api/v1/report_json \
+              -o mobsf-report.json; then
+              if jq -e 'type == "object" and (has("error") | not)' mobsf-report.json >/dev/null; then
+                exit 0
+              fi
+            fi
+            sleep 5
+          done
+          docker logs jestbox-mobsf
+          exit 1
+      - name: Upload MobSF JSON assessment report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jestbox-mobsf-static-report
+          path: |
+            mobsf-report.json
+            mobsf-scan-response.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Stop MobSF container
+        if: always()
+        run: docker rm -f jestbox-mobsf || true
