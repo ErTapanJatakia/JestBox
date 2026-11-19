@@ -1,0 +1,201 @@
+name: JestBox Android release candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Branch, tag, or commit to build
+        required: true
+        default: main
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jestbox-android-release-candidate
+  cancel-in-progress: false
+
+jobs:
+  build-release-candidate:
+    name: Build and validate Android release candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out selected source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.source_ref }}
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +o pipefail
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          set -o pipefail
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Install locked JavaScript dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run source regression tests
+        run: |
+          node --check script.js
+          node --check jokes.js
+          node --check share-bridge.entry.js
+          node --check scripts/prepare-web.mjs
+          node --check scripts/prepare-android-branding.mjs
+          node --test
+
+      - name: Prepare canonical offline web assets
+        run: npm run prepare:web
+
+      - name: Generate Capacitor Android project
+        run: npx cap add android
+
+      - name: Apply JestBox Android branding
+        run: node scripts/prepare-android-branding.mjs
+
+      - name: Synchronize Capacitor Android project
+        run: npx cap sync android
+
+      - name: Assemble release APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android
+          ./gradlew --no-daemon --max-workers=2 assembleRelease
+          cd ..
+          APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          test -s "$APK"
+          echo "UNSIGNED_APK=$APK" >> "$GITHUB_ENV"
+
+      - name: Validate package identity, release flags, assets and alignment
+        id: validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$UNSIGNED_APK"
+          APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
+          ZIPALIGN="$ANDROID_HOME/build-tools/36.0.0/zipalign"
+
+          APPLICATION_ID="$("$APKANALYZER" manifest application-id "$APK")"
+          VERSION_CODE="$("$APKANALYZER" manifest version-code "$APK")"
+          VERSION_NAME="$("$APKANALYZER" manifest version-name "$APK")"
+          DEBUGGABLE="$("$APKANALYZER" manifest debuggable "$APK")"
+
+          test "$APPLICATION_ID" = "com.ertapanjatakia.jestbox"
+          test "$VERSION_CODE" -ge 1
+          test "$DEBUGGABLE" = "false"
+          "$ZIPALIGN" -c -v 4 "$APK"
+          unzip -l "$APK" | grep -q 'assets/public/index.html'
+
+          {
+            echo "### Android release candidate"
+            echo "- Source commit: ${GITHUB_SHA}"
+            echo "- Application ID: ${APPLICATION_ID}"
+            echo "- Version: ${VERSION_NAME} (${VERSION_CODE})"
+            echo "- Release debuggable flag: ${DEBUGGABLE}"
+            echo "- Bundled offline entry point: present"
+            echo "- APK alignment: passed"
+            echo "- Signing: evaluated separately; unsigned output is not distributable"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          {
+            echo "application_id=$APPLICATION_ID"
+            echo "version_code=$VERSION_CODE"
+            echo "version_name=$VERSION_NAME"
+          } >> "$GITHUB_OUTPUT"
+          sha256sum "$APK" | tee "$APK.sha256"
+
+      - name: Check whether production signing credentials are configured
+        id: signing_check
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$ANDROID_KEYSTORE_BASE64" && -n "$ANDROID_KEYSTORE_PASSWORD" && -n "$ANDROID_KEY_ALIAS" && -n "$ANDROID_KEY_PASSWORD" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "Production signing secrets are configured."
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "### Signing status"
+              echo "::warning::Production signing is not configured. This run will produce an unsigned release candidate only."
+              echo "No signing credentials were exposed or generated by this workflow."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Sign and verify production APK
+        if: steps.signing_check.outputs.configured == 'true'
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          APK="$UNSIGNED_APK"
+          KEYSTORE="$RUNNER_TEMP/jestbox-release.jks"
+          ALIGNED="$RUNNER_TEMP/jestbox-release-aligned.apk"
+          SIGNED="android/app/build/outputs/apk/release/jestbox-release-signed.apk"
+
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          chmod 600 "$KEYSTORE"
+          test -s "$KEYSTORE"
+          keytool -list -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null
+
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -p -f 4 "$APK" "$ALIGNED"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" sign \
+            --ks "$KEYSTORE" \
+            --ks-key-alias "$ANDROID_KEY_ALIAS" \
+            --ks-pass env:ANDROID_KEYSTORE_PASSWORD \
+            --key-pass env:ANDROID_KEY_PASSWORD \
+            --out "$SIGNED" "$ALIGNED"
+
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$SIGNED"
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -v 4 "$SIGNED"
+          sha256sum "$SIGNED" | tee "$SIGNED.sha256"
+          echo "Production-signed APK successfully verified." >> "$GITHUB_STEP_SUMMARY"
+          rm -f "$KEYSTORE" "$ALIGNED"
+
+      - name: Upload unsigned release candidate
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-android-unsigned-release-candidate
+          path: |
+            android/app/build/outputs/apk/release/app-release-unsigned.apk
+            android/app/build/outputs/apk/release/app-release-unsigned.apk.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload production-signed APK
+        if: steps.signing_check.outputs.configured == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-android-production-signed
+          path: |
+            android/app/build/outputs/apk/release/jestbox-release-signed.apk
+            android/app/build/outputs/apk/release/jestbox-release-signed.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
