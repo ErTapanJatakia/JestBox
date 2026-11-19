@@ -56,10 +56,10 @@ jobs:
         run: npm run prepare:web
       - name: Generate Android platform project
         run: npx cap add android
-      - name: Apply original JestBox launcher artwork
-        run: node scripts/prepare-android-branding.mjs
       - name: Synchronize native project
         run: npx cap sync android
+      - name: Apply original artwork and restrict Android WebView access
+        run: node scripts/prepare-android-branding.mjs
       - name: Assemble debug APK
         shell: bash
         run: |
