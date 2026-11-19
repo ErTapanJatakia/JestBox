@@ -19,9 +19,9 @@ OTHER="$((TOTAL - ERRORS - WARNINGS - NOTES))"
 {
   echo "# ${SCANNER} security scan"
   echo
-  echo "- Commit: `$GITHUB_SHA`"
-  echo "- Workflow run: `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`"
-  echo "- Generated (UTC): `$(date -u +'%Y-%m-%dT%H:%M:%SZ')`"
+  echo "- Commit: \`$GITHUB_SHA\`"
+  echo "- Workflow run: \`$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\`"
+  echo "- Generated (UTC): \`$(date -u +'%Y-%m-%dT%H:%M:%SZ')\`"
   echo
   echo "| SARIF level | Findings |"
   echo "|---|---:|"
