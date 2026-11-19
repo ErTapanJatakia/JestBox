@@ -103,6 +103,10 @@ jobs:
       - name: Generate PT report summary
         if: always()
         shell: bash
+        env:
+          SCAN_EVENT: ${{ github.event_name }}
+          SCAN_ACTIVE_INPUT: ${{ inputs.active_scan }}
+          SCAN_REF: ${{ github.ref }}
         run: |
           set -euo pipefail
           {
@@ -111,7 +115,7 @@ jobs:
             printf -- "- Workflow run: %s\n" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             printf -- "- Target: isolated local build at 127.0.0.1:8080\n"
             printf -- "- Scan mode: "
-            if [[ "${{ github.event_name }}" == "schedule" || ( "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.active_scan }}" == "true" ) || ( "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ) ]]; then
+            if [[ "$SCAN_EVENT" == "schedule" || ( "$SCAN_EVENT" == "workflow_dispatch" && "$SCAN_ACTIVE_INPUT" == "true" ) || ( "$SCAN_EVENT" == "push" && "$SCAN_REF" == "refs/heads/main" ) ]]; then
               printf "baseline plus bounded active scan (scheduled, main push, or manual opt-in)\n"
             else
               printf "baseline passive scan\n"
