@@ -47,4 +47,4 @@ The initial workflows are configured to collect a baseline without automatically
 
 ## Data handling
 
-The MobSF workflow runs its scanner locally in an ephemeral GitHub-hosted runner. VirusTotal integration is explicitly disabled. The generated APK and JSON report are retained as GitHub Actions artifacts for 14 days. Do not add private signing keys, production credentials, or user data to these artifacts.
+The MobSF workflow runs its scanner locally in an ephemeral GitHub-hosted runner. VirusTotal integration and external domain-malware lookups are explicitly disabled. The generated APK and JSON report are retained as GitHub Actions artifacts for 14 days. Do not add private signing keys, production credentials, or user data to these artifacts.
