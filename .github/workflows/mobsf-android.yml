@@ -97,15 +97,33 @@ jobs:
           done
           docker logs jestbox-mobsf
           exit 1
-      - name: Upload MobSF JSON assessment report
+      - name: Generate MobSF human-readable summary
+        if: always() && hashFiles('mobsf-report.json') != ''
+        shell: bash
+        run: |
+          {
+            echo "# MobSF Android static assessment"
+            echo
+            echo "- Workflow run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "- Commit: $GITHUB_SHA"
+            echo "- App: $(jq -r '.app_name // .file_name // "Not supplied"' mobsf-report.json)"
+            echo "- Package: $(jq -r '.package_name // "Not supplied"' mobsf-report.json)"
+            echo "- Security score: $(jq -r '.security_score // "Not supplied"' mobsf-report.json)"
+            echo
+            echo "The full MobSF JSON is the machine-readable source. Validate findings manually; this is static analysis, not dynamic testing or a penetration test."
+          } > mobsf-summary.md
+          cat mobsf-summary.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload MobSF JSON and Markdown assessment reports
+        if: always() && hashFiles('mobsf-report.json') != ''
         uses: actions/upload-artifact@v4
         with:
           name: jestbox-mobsf-static-report
           path: |
             mobsf-report.json
             mobsf-scan-response.json
+            mobsf-summary.md
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
       - name: Stop MobSF container
         if: always()
         run: docker rm -f jestbox-mobsf || true
