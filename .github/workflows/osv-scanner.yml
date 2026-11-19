@@ -60,5 +60,6 @@ jobs:
           path: |
             osv-results.sarif
             OSV-Scanner-security-summary.md
+            package-lock.json
           if-no-files-found: error
           retention-days: 30
