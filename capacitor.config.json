@@ -1,5 +1,5 @@
 {
-  "appId": "com.ertapanjatakia.jestbox",
+  "appId": "com.jestbox.app",
   "appName": "JestBox",
   "webDir": "www",
   "bundledWebRuntime": false,

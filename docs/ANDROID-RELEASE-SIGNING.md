@@ -6,17 +6,25 @@ JestBox uses the Capacitor Android project generated from the canonical web appl
 
 The standalone native WebView implementation in the draft Android wrapper PR is not the selected production architecture. Do not merge a second Android application module alongside Capacitor.
 
+## Android application identity
+
+- **Application ID:** `com.jestbox.app` (canonical value in `capacitor.config.json`).
+- The Android release-candidate workflow checks the source configuration before project generation and independently checks the final APK manifest after assembly.
+- Keep this application ID stable after the first store release. Changing it later makes Android and app stores treat the application as a different app.
+- Before the first store upload, confirm that the RuStore app card is created with exactly this application ID.
+
 ## Release candidate workflow
 
 Run **JestBox Android release candidate** from GitHub Actions and select the branch, tag, or commit to build. The workflow:
 
 1. Installs the locked npm dependencies and Android SDK in an ephemeral GitHub-hosted runner.
 2. Runs the JavaScript regression suite.
-3. Generates and synchronizes the Capacitor Android project.
-4. Builds the unsigned release APK.
-5. checks the application ID, version code/name, non-debuggable release manifest, bundled offline entry point, and APK alignment.
-6. Uploads the unsigned candidate with a SHA-256 checksum.
-7. Signs and verifies a second APK only when all four production signing secrets are configured.
+3. Verifies that the canonical Capacitor application ID is `com.jestbox.app`.
+4. Generates and synchronizes the Capacitor Android project.
+5. Builds the unsigned release APK.
+6. Checks the final APK application ID, version code/name, non-debuggable release manifest, bundled offline entry point, and APK alignment.
+7. Uploads the unsigned candidate with a SHA-256 checksum.
+8. Signs and verifies a second APK only when all four production signing secrets are configured.
 
 An unsigned APK is an engineering artifact only. It must not be distributed, uploaded to RuStore, or treated as a production release.
 
@@ -31,21 +39,19 @@ Configure these repository Actions secrets only after the production signing ide
 
 Never commit the keystore or passwords, print secret values, pass them as workflow inputs, or place them in build logs. The workflow writes the decoded keystore only to the ephemeral runner's temporary directory, restricts file permissions, uses it for signing, and removes the temporary copy after successful signing. GitHub-hosted runners are ephemeral; do not rely on runner storage for backup.
 
-## Unknown or existing keystore
+## Production signing identity
 
-The maintainer has not confirmed whether a production keystore already exists. This workflow deliberately does not generate, replace, or rotate a signing key.
+The maintainer confirmed that no APK with the previous package ID `com.ertapanjatakia.jestbox` had been uploaded to RuStore or distributed outside development/testing. A new signing identity may therefore be created for the first production identity, subject to preserving the key securely.
 
-Before creating a new key, establish whether any APK for package `com.ertapanjatakia.jestbox` has already been distributed or uploaded to a store, and whether a signing key was created for it. If an existing release identity exists, preserve and use that exact key. If no production identity exists, create one dedicated long-lived JestBox release key, securely back it up in at least two controlled locations, then add the four secrets above. Losing the key can prevent updates to installations signed with it.
+Create one dedicated long-lived JestBox release key, securely back it up in at least two controlled locations, then add the four secrets above. Losing the key can prevent updates to installations signed with it.
 
 Do not use the debug signing key. Do not publish the unsigned candidate.
 
-## Release identity currently encoded in source
+## Release metadata
 
-- Application ID: `com.ertapanjatakia.jestbox` (from `capacitor.config.json`).
+- Application ID: `com.jestbox.app`.
 - npm project version: `1.0.0`.
 - The generated Android version code/name are validated from the actual APK at build time. Increase versionCode for each subsequent store release and keep the application ID stable.
-
-The package ID is treated as the current engineering identity; confirm it matches the RuStore app card before the first store upload.
 
 ## Out of scope for this workflow
 
