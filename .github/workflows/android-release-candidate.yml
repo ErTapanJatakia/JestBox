@@ -222,11 +222,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          API_KEY="$(openssl rand -hex 32)"
-          echo "::add-mask::$API_KEY"
-          echo "api_key=$API_KEY" >> "$GITHUB_OUTPUT"
+          SCANNER_AUTH="$(openssl rand -hex 32)"
+          echo "::add-mask::$SCANNER_AUTH"
+          echo "session_auth=$SCANNER_AUTH" >> "$GITHUB_OUTPUT"
           docker run -d --name jestbox-mobsf-static --network host \
-            -e MOBSF_API_KEY="$API_KEY" \
+            -e MOBSF_API_KEY="$SCANNER_AUTH" \
             -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
             -e MOBSF_VT_ENABLED=0 \
             opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954
@@ -243,7 +243,7 @@ jobs:
         if: inputs.run_batch1_mobsf
         shell: bash
         env:
-          MOBSF_API_KEY: ${{ steps.batch1_mobsf.outputs.api_key }}
+          MOBSF_API_KEY: ${{ steps.batch1_mobsf.outputs.session_auth }}
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/release/jestbox-release-signed.apk"
