@@ -3,33 +3,56 @@ name: OpenSSF Scorecard
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   schedule:
     - cron: "30 1 * * 6"
   workflow_dispatch:
 
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   analysis:
     name: Supply-chain security posture
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
-      security-events: write
-      id-token: write
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Run OpenSSF Scorecard
-        uses: ossf/scorecard-action@fa7117db83c52d787ae5a89f350999701505d78e # v2.5.0
+      - name: Run pinned OpenSSF Scorecard CLI container
+        shell: bash
+        env:
+          GITHUB_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -e GITHUB_AUTH_TOKEN="$GITHUB_AUTH_TOKEN" \
+            ghcr.io/ossf/scorecard:v5.5.0 \
+            --repo=github.com/ErTapanJatakia/JestBox \
+            --format=json \
+            --show-details > scorecard.json
+          jq -e '.score != null and (.checks | type == "array")' scorecard.json >/dev/null
+      - name: Publish Scorecard summary
+        shell: bash
+        run: |
+          {
+            echo "## OpenSSF Scorecard"
+            echo
+            echo "Overall score: $(jq -r '.score' scorecard.json)/10"
+            echo
+            echo "| Check | Score | Reason |"
+            echo "|---|---:|---|"
+            jq -r '.checks[] | "| " + .name + " | " + (.score | tostring) + "/10 | " + ((.reason // "No reason supplied") | gsub("\\|"; "\\\\|")) + " |"' scorecard.json
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload Scorecard JSON report
+        uses: actions/upload-artifact@v4
         with:
-          results_file: results.sarif
-          results_format: sarif
-          publish_results: true
-      - name: Upload Scorecard findings to GitHub code scanning
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
-        with:
-          sarif_file: results.sarif
-          category: ossf-scorecard
+          name: jestbox-openssf-scorecard-report
+          path: scorecard.json
+          if-no-files-found: error
+          retention-days: 30
