@@ -39,8 +39,7 @@ The initial workflows are configured to collect a baseline without automatically
 
 ## Known coverage limitations
 
-- The repository currently has no committed `package-lock.json`. Exact direct dependency versions are declared in `package.json`, but transitive npm dependency coverage is incomplete until a reproducible lockfile is generated, reviewed, and committed.
-- OSV-Scanner coverage depends on package metadata it can discover. A manifest-only scan is not equivalent to a complete lockfile-based transitive dependency assessment.
+- The repository currently has no committed `package-lock.json`. The OSV-Scanner and Trivy workflows generate a temporary lockfile in the ephemeral runner using `npm install --package-lock-only --ignore-scripts --no-audit --no-fund`, so transitive packages can be scanned without executing package lifecycle scripts. This is useful baseline coverage but is not a committed, reproducible dependency lock; committing a reviewed lockfile remains recommended.
 - MobSF performs static APK analysis only in this workflow. Dynamic analysis requires a separately provisioned Android emulator/device and is not claimed here.
 - Trivy and DevSkim may produce false positives; findings require human validation.
 - GitHub repository security settings (Dependency Graph, Dependabot alerts, secret scanning, and CodeQL default setup) must be verified separately in repository settings. Existing CodeQL default-setup runs were detected; the additional advanced-setup workflow was removed because GitHub rejects simultaneous default and advanced CodeQL configurations.
