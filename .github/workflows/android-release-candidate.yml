@@ -231,14 +231,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          MOBSF_API_KEY="$(openssl rand -hex 32)"
+          echo "::add-mask::$MOBSF_API_KEY"
+          echo "MOBSF_API_KEY=$MOBSF_API_KEY" >> "$GITHUB_ENV"
           docker run -d --name jestbox-mobsf-static --network host \
+            -e MOBSF_API_KEY="$MOBSF_API_KEY" \
             -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
             -e MOBSF_VT_ENABLED=0 \
             opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954
           for _ in {1..90}; do
-            if curl --silent --fail --connect-timeout 5 --max-time 15 http://127.0.0.1:8000/ >/dev/null \
-              && docker exec jestbox-mobsf-static test -s /home/mobsf/.MobSF/secret; then
-              echo "::add-mask::$(docker exec jestbox-mobsf-static cat /home/mobsf/.MobSF/secret)"
+            if curl --silent --fail --connect-timeout 5 --max-time 15 http://127.0.0.1:8000/ >/dev/null; then
               exit 0
             fi
             sleep 5
@@ -252,14 +254,16 @@ jobs:
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/release/jestbox-release-signed.apk"
+          : "${MOBSF_API_KEY:?Ephemeral MobSF API key was not initialized}"
+          ACTUAL_SHA256="$(sha256sum "$APK" | awk '{print $1}')"
           curl --silent --show-error --fail --connect-timeout 10 --max-time 120 \
-            -H "Authorization: $(docker exec jestbox-mobsf-static cat /home/mobsf/.MobSF/secret)" \
+            -H "Authorization: $MOBSF_API_KEY" \
             -F "file=@$APK" \
             http://127.0.0.1:8000/api/v1/upload > mobsf-upload.json
           HASH="$(jq -er '.hash' mobsf-upload.json)"
           FILE_NAME="$(jq -er '.file_name' mobsf-upload.json)"
           curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
-            -H "Authorization: $(docker exec jestbox-mobsf-static cat /home/mobsf/.MobSF/secret)" \
+            -H "Authorization: $MOBSF_API_KEY" \
             --data-urlencode "hash=$HASH" \
             --data-urlencode "file_name=$FILE_NAME" \
             --data-urlencode "scan_type=apk" \
@@ -267,7 +271,7 @@ jobs:
           report_ready=false
           for _ in {1..60}; do
             if curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
-              -H "Authorization: $(docker exec jestbox-mobsf-static cat /home/mobsf/.MobSF/secret)" \
+              -H "Authorization: $MOBSF_API_KEY" \
               --data-urlencode "hash=$HASH" \
               http://127.0.0.1:8000/api/v1/report_json -o mobsf-report.json; then
               if jq -e 'type == "object" and (has("error") | not) and has("security_score")' mobsf-report.json >/dev/null; then
