@@ -122,12 +122,17 @@ test("hi-IN jokes pass a full-collection lexical near-duplicate screen", () => {
   }
 });
 
-test("new category IDs do not appear in other locales", () => {
+test("new category IDs remain exclusive to their respective locales", () => {
   for (const [locale, records] of Object.entries(jokes)) {
-    if (locale === "en-IN") continue;
     for (const [assigned] of records) {
       const ids = Array.isArray(assigned) ? assigned : [assigned];
-      assert.ok(ids.every(id => !(addedCategories.includes(id)) && (locale === "hi-IN" || !hiInCategories.includes(id))), locale);
+      if (locale === "en-IN") {
+        assert.ok(ids.every(id => !hiInCategories.includes(id)), "hi-IN category leaked into en-IN");
+      } else if (locale === "hi-IN") {
+        assert.ok(ids.every(id => !addedCategories.includes(id)), "en-IN category leaked into hi-IN");
+      } else {
+        assert.ok(ids.every(id => !addedCategories.includes(id) && !hiInCategories.includes(id)), locale);
+      }
     }
   }
 });
