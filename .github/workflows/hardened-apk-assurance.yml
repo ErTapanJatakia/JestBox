@@ -1,0 +1,263 @@
+name: JestBox hardened APK security assurance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/hardened-apk-assurance.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "capacitor.config.json"
+      - "scripts/**"
+      - "index.html"
+      - "script.js"
+      - "jokes.js"
+      - "share-bridge.entry.js"
+      - "assets/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jestbox-hardened-apk-assurance
+  cancel-in-progress: false
+
+jobs:
+  build-and-assess:
+    name: Build, hash-check, OpenTIP lookup and emulator runtime assessment
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out trusted source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install Android SDK and API 30 emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +o pipefail
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          set -o pipefail
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" "emulator" "platforms;android-36" "build-tools;36.0.0" \
+            "system-images;android-30;google_apis;x86_64"
+
+      - name: Install locked dependencies and run regression tests
+        run: |
+          npm ci --no-audit --no-fund
+          node --check script.js
+          node --check jokes.js
+          node --check share-bridge.entry.js
+          node --check scripts/prepare-web.mjs
+          node --check scripts/prepare-android-branding.mjs
+          node --check scripts/prepare-android-security.mjs
+          node --test
+
+      - name: Build hardened Android release APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          node -e '
+            const c = require("./capacitor.config.json");
+            if (c.appId !== "com.jestbox.app") throw new Error("Unexpected application ID: " + c.appId);
+          '
+          npm run prepare:web
+          npx cap add android
+          node scripts/prepare-android-branding.mjs
+          node scripts/prepare-android-security.mjs
+          npx cap sync android
+          cd android
+          for attempt in 1 2 3; do
+            if ./gradlew --no-daemon --max-workers=2 assembleRelease 2>&1 | tee "$RUNNER_TEMP/gradle-release.log"; then
+              break
+            else
+              status=$?
+            fi
+            if grep -q "Received status code 429" "$RUNNER_TEMP/gradle-release.log" && [[ "$attempt" -lt 3 ]]; then
+              echo "Maven Central returned HTTP 429; bounded retry after backoff."
+              sleep "$((attempt * 20))"
+            else
+              exit "$status"
+            fi
+          done
+          cd ..
+          test -s android/app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Decrypt existing production signing identity and sign candidate
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_ENCRYPTED_BASE64: ${{ secrets.ANDROID_KEYSTORE_ENCRYPTED_BASE64 }}
+          ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_BACKUP_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in ANDROID_KEYSTORE_ENCRYPTED_BASE64 ANDROID_KEYSTORE_BACKUP_PASSWORD ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_PASSWORD; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Required existing production signing secret is unavailable: $name"
+              exit 1
+            fi
+          done
+          APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          ENCRYPTED="$RUNNER_TEMP/jestbox-release.jks.gpg"
+          KEYSTORE="$RUNNER_TEMP/jestbox-release.jks"
+          ALIGNED="$RUNNER_TEMP/jestbox-release-aligned.apk"
+          SIGNED="android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk"
+          printf '%s' "$ANDROID_KEYSTORE_ENCRYPTED_BASE64" | base64 --decode > "$ENCRYPTED"
+          chmod 600 "$ENCRYPTED"
+          printf '%s' "$ANDROID_KEYSTORE_BACKUP_PASSWORD" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --output "$KEYSTORE" --decrypt "$ENCRYPTED"
+          chmod 600 "$KEYSTORE"
+          keytool -list -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias jestbox-release >/dev/null
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -p -f 4 "$APK" "$ALIGNED"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" sign \
+            --ks "$KEYSTORE" --ks-key-alias jestbox-release \
+            --ks-pass env:ANDROID_KEYSTORE_PASSWORD --key-pass env:ANDROID_KEY_PASSWORD \
+            --out "$SIGNED" "$ALIGNED"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$SIGNED" | tee signed-certificate.txt
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -v 4 "$SIGNED"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest application-id "$SIGNED" | grep -Fx "com.jestbox.app"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest debuggable "$SIGNED" | grep -Fx "false"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest min-sdk "$SIGNED" | grep -Fx "29"
+          sha256sum "$SIGNED" | tee hardened-apk.sha256
+          rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"
+
+      - name: Query Kaspersky OpenTIP by SHA-256 only (never upload APK)
+        shell: bash
+        env:
+          OPENTIP_API_KEY: ${{ secrets.OPENTIP_API_KEY }}
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk"
+          HASH="$(sha256sum "$APK" | awk '{print $1}')"
+          if [[ -z "$OPENTIP_API_KEY" ]]; then
+            echo "OpenTIP lookup skipped: OPENTIP_API_KEY is not configured."
+            printf '%s\n' "OpenTIP lookup skipped: API key unavailable." > opentip-status.txt
+            exit 0
+          fi
+          code="$(curl --silent --show-error --connect-timeout 10 --max-time 60 \
+            -H "X-API-KEY: $OPENTIP_API_KEY" \
+            --get --data-urlencode "request=$HASH" \
+            -o opentip-hash-lookup.json -w '%{http_code}' \
+            https://opentip.kaspersky.com/api/v1/search/hash)"
+          unset OPENTIP_API_KEY
+          if [[ "$code" != "200" ]]; then
+            echo "::error::OpenTIP hash lookup returned HTTP $code."
+            exit 1
+          fi
+          jq -e 'type == "object"' opentip-hash-lookup.json >/dev/null
+          {
+            echo "OpenTIP hash-only lookup completed."
+            echo "SHA-256: $HASH"
+            echo "HTTP status: $code"
+            echo "No APK or file content was submitted."
+          } | tee opentip-status.txt
+
+      - name: Create and boot isolated Android API 30 emulator
+        shell: bash
+        env:
+          ANDROID_AVD_HOME: ${{ runner.temp }}/.android/avd
+        run: |
+          set -euo pipefail
+          export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+          mkdir -p "$ANDROID_AVD_HOME"
+          echo "no" | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd \
+            --force --name jestbox_api30 --package "system-images;android-30;google_apis;x86_64" --device pixel_2
+          if [[ ! -e /dev/kvm ]]; then
+            echo "::error::KVM is unavailable; dynamic runtime assessment cannot run on this runner."
+            exit 1
+          fi
+          sudo chown "$USER":kvm /dev/kvm
+          sudo chmod 660 /dev/kvm
+          "$ANDROID_HOME/emulator/emulator" -avd jestbox_api30 -port 5554 -no-window -no-audio \
+            -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics -wipe-data -accel on \
+            > "$RUNNER_TEMP/emulator.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/emulator.pid"
+          timeout 120s adb -s emulator-5554 wait-for-device
+          booted=false
+          for _ in {1..90}; do
+            if [[ "$(timeout 15s adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; then
+              booted=true
+              break
+            fi
+            sleep 5
+          done
+          [[ "$booted" == "true" ]] || { cat "$RUNNER_TEMP/emulator.log"; exit 1; }
+          adb -s emulator-5554 shell settings put global window_animation_scale 0
+          adb -s emulator-5554 shell settings put global transition_animation_scale 0
+          adb -s emulator-5554 shell settings put global animator_duration_scale 0
+
+      - name: Install and exercise signed APK on emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$ANDROID_HOME/platform-tools:$PATH"
+          APK="android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk"
+          adb -s emulator-5554 install "$APK"
+          adb -s emulator-5554 shell monkey -p com.jestbox.app 1
+          sleep 45
+          adb -s emulator-5554 shell pidof com.jestbox.app | tee app-process.txt
+          adb -s emulator-5554 shell dumpsys package com.jestbox.app > package-runtime.txt
+          adb -s emulator-5554 logcat -d -v time > android-logcat.txt
+          if grep -E 'FATAL EXCEPTION|Process: com\.jestbox\.app' android-logcat.txt; then
+            echo "::error::Fatal application exception observed during emulator smoke test."
+            exit 1
+          fi
+          adb -s emulator-5554 shell am force-stop com.jestbox.app
+          adb -s emulator-5554 shell monkey -p com.jestbox.app 1
+          sleep 10
+          adb -s emulator-5554 shell pidof com.jestbox.app | tee relaunch-process.txt
+          {
+            echo "# JestBox hardened APK runtime assessment"
+            echo
+            echo "- Commit: $GITHUB_SHA"
+            echo "- Package: com.jestbox.app"
+            echo "- Target device: Android API 30 Google APIs x86_64 emulator"
+            echo "- APK: production-signed hardened assessment candidate"
+            echo "- Install, launch, process survival and relaunch: passed"
+            echo "- Fatal exception scan: no matching fatal exception observed"
+            echo "- Observation windows: 45 seconds initial launch; 10 seconds relaunch"
+            echo "- Scope: automated emulator smoke test; not a full penetration test or physical-device certification"
+          } > runtime-assessment-summary.md
+          cat runtime-assessment-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload hardened APK and security evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-hardened-apk-assessment-candidate
+          path: |
+            android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk
+            hardened-apk.sha256
+            signed-certificate.txt
+            opentip-hash-lookup.json
+            opentip-status.txt
+            runtime-assessment-summary.md
+            app-process.txt
+            relaunch-process.txt
+            package-runtime.txt
+            android-logcat.txt
+            ${{ runner.temp }}/emulator.log
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Stop emulator and remove temporary signing material
+        if: always()
+        shell: bash
+        run: |
+          adb -s emulator-5554 emu kill >/dev/null 2>&1 || true
+          rm -f "$RUNNER_TEMP/jestbox-release.jks" "$RUNNER_TEMP/jestbox-release.jks.gpg" "$RUNNER_TEMP/jestbox-release-aligned.apk"
