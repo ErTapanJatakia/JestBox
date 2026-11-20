@@ -93,6 +93,9 @@ jobs:
       - name: Apply JestBox Android branding
         run: node scripts/prepare-android-branding.mjs
 
+      - name: Apply MobSF-driven Android security hardening
+        run: node scripts/prepare-android-security.mjs
+
       - name: Synchronize Capacitor Android project
         run: npx cap sync android
 
