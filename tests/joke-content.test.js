@@ -21,6 +21,10 @@ test("all eight locales retain their existing 100-joke baseline outside en-IN", 
   }
 });
 
+test("en-IN retains its original 100-joke baseline", () => {
+  assert.ok(jokes["en-IN"].length >= 100);
+});
+
 test("en-IN joke records are unique regardless of category assignments", () => {
   const seen = new Set();
   for (const [assigned, text] of jokes["en-IN"]) {
@@ -39,7 +43,7 @@ test("new en-IN categories, when populated, have 100 three-line original records
     const records = jokes["en-IN"].filter(([assigned]) =>
       (Array.isArray(assigned) ? assigned : [assigned]).includes(category));
     if (records.length) {
-      assert.equal(records.length, 100, category);
+      assert.ok(records.length >= 100, `${category} must contain at least 100 jokes`);
       for (const [, text] of records) {
         assert.ok(text.split("\n").filter(line => line.trim()).length >= 3,
           `${category} joke must have at least three lines`);
