@@ -13,7 +13,7 @@ const addedCategories = [
   "trickster-stories", "uncle-cheesy"
 ];
 const normalized = value => value.normalize("NFKC").toLocaleLowerCase("en-IN")
-  .replace(/[^\\p{L}\\p{N}]+/gu, " ").trim().replace(/\\s+/g, " ");
+  .replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
 
 test("all eight locales retain their existing 100-joke baseline outside en-IN", () => {
   for (const locale of Object.keys(jokes)) {
@@ -41,7 +41,7 @@ test("new en-IN categories, when populated, have 100 three-line original records
     if (records.length) {
       assert.equal(records.length, 100, category);
       for (const [, text] of records) {
-        assert.ok(text.split(/\\r?\\n/).filter(line => line.trim()).length >= 3,
+        assert.ok(text.split("\n").filter(line => line.trim()).length >= 3,
           `${category} joke must have at least three lines`);
       }
     }
