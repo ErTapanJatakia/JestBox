@@ -67,7 +67,8 @@ test("all eight interface dictionaries expose the same complete set of non-empty
  for(const locale of locales){
   assert.deepEqual(Object.keys(dictionaries[locale]).sort(),expected,locale+" UI key coverage");
   for(const [key,value] of Object.entries(dictionaries[locale]))if(typeof value==="string")assert.ok(value.trim(),locale+" empty "+key);
-  assert.equal(dictionaries[locale].cats.length,6,locale+" category labels");
+  assert.equal(dictionaries[locale].cats.length,locale==="en-IN"?16:6,locale+" category labels");
+  if(locale==="en-IN")assert.deepEqual(dictionaries[locale].cats,["All Jokes","Characters","City","Culture Contrasts","Everyday Life","Food & Drink","Marriage","Middle-class Life","Relatives","Romance","Satire","Tech & Internet","Trickster Stories","Uncle / Cheesy","Work & Study","Wordplay"],"en-IN category labels are alphabetically ordered");
  }
 });
 test("locale and country names are translated in every searchable locale selector",()=>{
