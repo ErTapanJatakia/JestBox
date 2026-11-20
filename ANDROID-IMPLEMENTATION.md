@@ -37,3 +37,19 @@ This first integration stage generates the Android project in the CI workspace. 
 ## Release work not yet performed
 
 No release keystore has been created, no signed APK/AAB has been produced, and no RuStore submission has been made. Those steps require a separate release-readiness review and explicit approval.
+
+
+## MobSF-driven Android hardening
+
+The Android generation pipeline applies `scripts/prepare-android-security.mjs` after Capacitor creates the native project and before synchronization/build. The script fails closed if the upstream generated files no longer match the reviewed defaults.
+
+- Minimum supported Android version is raised from API 24 to API 29. This avoids installing the app on Android 7–9 devices that no longer receive reasonable platform security updates. **Compatibility impact:** devices below Android 10 cannot install or upgrade to this hardened build.
+- Application backup is disabled (`android:allowBackup="false"`) to reduce ADB backup extraction exposure.
+- AndroidX ProfileInstaller's broadcast receiver is explicitly merged as non-exported, preventing other apps from invoking that receiver.
+- Cordova's wildcard network access rule is narrowed to the local Capacitor origin (`http://localhost`). JestBox's application content is bundled locally and does not require arbitrary remote origins.
+
+The build includes regression tests for these transformations and fails if the generated Capacitor defaults change unexpectedly. These are build-time source changes only; they do not alter an already-uploaded RuStore APK or the submission currently under moderation.
+
+## MobSF findings requiring contextual validation
+
+MobSF's external-storage and temporary-file warnings point into Capacitor's Share/WebChrome bridge. Those paths are part of user-initiated file sharing; the static report alone does not prove sensitive data is exposed. Hardening them by removing or breaking the share flow would be an unsafe false-positive fix. The application has no SMS permission, no tracker was detected, and the behaviour signatures are not proof of SMS inbox access. The hardcoded-data heuristic and generic Capacitor logging warning also require source-level validation before suppressing or modifying framework code.

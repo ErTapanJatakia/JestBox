@@ -36,6 +36,7 @@ jobs:
           node --check share-bridge.entry.js
           node --check scripts/prepare-web.mjs
           node --check scripts/prepare-android-branding.mjs
+          node --check scripts/prepare-android-security.mjs
       - name: Run dependency-free regression tests
         run: node --test
       - name: Set up Java
@@ -58,6 +59,8 @@ jobs:
         run: npx cap add android
       - name: Apply original JestBox launcher artwork
         run: node scripts/prepare-android-branding.mjs
+      - name: Apply MobSF-driven Android security hardening
+        run: node scripts/prepare-android-security.mjs
       - name: Synchronize native project
         run: npx cap sync android
       - name: Assemble debug APK
