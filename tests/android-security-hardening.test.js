@@ -12,7 +12,7 @@ const manifest = `<?xml version="1.0" encoding="utf-8"?>
     <activity android:name=".MainActivity" android:exported="true" />
   </application>
 </manifest>`;
-const variables = "ext {\\n    minSdkVersion = 24\\n    compileSdkVersion = 36\\n    targetSdkVersion = 36\\n}\\n";
+const variables = `ext {\n    minSdkVersion = 24\n    compileSdkVersion = 36\n    targetSdkVersion = 36\n}\n`;
 const cordova = `<?xml version="1.0" encoding="utf-8"?>
 <widget><access origin="*" /><allow-navigation href="http://localhost/*" /></widget>`;
 
