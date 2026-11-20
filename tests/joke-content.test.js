@@ -12,6 +12,12 @@ const addedCategories = [
   "middle-class-life", "relatives", "romance", "satire",
   "trickster-stories", "uncle-cheesy"
 ];
+const hiInCategories = [
+  "akbar-birbal", "jija-sali", "teacher-student", "doctor-patient",
+  "tenali-ram", "pati-patni", "pappu-chintu", "bhojpuri", "corruption",
+  "mulla-nasruddin", "politics", "rajasthani", "lawyer-client", "society",
+  "saas-bahu", "haryanvi"
+];
 const normalized = value => value.normalize("NFKC").toLocaleLowerCase("en-IN")
   .replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
 
@@ -53,12 +59,24 @@ test("new en-IN categories, when populated, have 100 three-line original records
   assert.equal(jokes["en-IN"].length, 1100, "en-IN must contain exactly 1,100 unique records");
 });
 
+test("hi-IN expansion categories, when populated, have exactly 100 four-line jokes each", () => {
+  for (const category of hiInCategories) {
+    const records = jokes["hi-IN"].filter(([assigned]) =>
+      (Array.isArray(assigned) ? assigned : [assigned]).includes(category));
+    if (records.length) {
+      assert.equal(records.length, 100, `${category} must contain exactly 100 jokes`);
+      for (const [, text] of records) assert.ok(text.split("\\n").filter(line => line.trim()).length >= 4,
+        `${category} joke must have at least four non-empty lines`);
+    }
+  }
+});
+
 test("new category IDs do not appear in other locales", () => {
   for (const [locale, records] of Object.entries(jokes)) {
     if (locale === "en-IN") continue;
     for (const [assigned] of records) {
       const ids = Array.isArray(assigned) ? assigned : [assigned];
-      assert.ok(ids.every(id => !addedCategories.includes(id)), locale);
+      assert.ok(ids.every(id => !(addedCategories.includes(id)) && (locale === "hi-IN" || !hiInCategories.includes(id))), locale);
     }
   }
 });
