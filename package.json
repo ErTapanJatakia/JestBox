@@ -7,7 +7,8 @@
     "prepare:web": "node scripts/prepare-web.mjs",
     "android:add": "npm run prepare:web && cap add android",
     "android:sync": "npm run prepare:web && cap sync android",
-    "android:debug": "npm run android:sync && cd android && ./gradlew assembleDebug"
+    "android:debug": "npm run android:sync && cd android && ./gradlew assembleDebug",
+    "test": "node --test"
   },
   "devDependencies": {
     "@capacitor/android": "8.6.2",
