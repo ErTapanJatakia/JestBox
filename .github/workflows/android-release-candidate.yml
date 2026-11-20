@@ -274,7 +274,7 @@ jobs:
               -H "Authorization: $MOBSF_API_KEY" \
               --data-urlencode "hash=$HASH" \
               http://127.0.0.1:8000/api/v1/report_json -o mobsf-report.json; then
-              if jq -e 'type == "object" and (has("error") | not) and has("security_score")' mobsf-report.json >/dev/null; then
+              if jq -e 'type == "object" and (has("error") | not) and (.appsec | type == "object" and has("security_score") and has("high") and has("warning") and has("info"))' mobsf-report.json >/dev/null; then
                 report_ready=true
                 break
               fi
@@ -293,8 +293,8 @@ jobs:
             echo "- Source commit: $(git rev-parse HEAD)"
             echo "- APK SHA-256: $ACTUAL_SHA256"
             echo "- Package: $(jq -r '.package_name // "not reported"' mobsf-report.json)"
-            echo "- MobSF security score: $(jq -r '.security_score // "not reported"' mobsf-report.json)"
-            echo "- High findings: $(jq -r '.security_analysis | [.. | objects | select(.severity? == "high")] | length' mobsf-report.json)"
+            echo "- MobSF security score (appsec.security_score): $(jq -r '.appsec.security_score // "not reported"' mobsf-report.json)"
+            echo "- High findings (appsec.high): $(jq -r '.appsec.high | length' mobsf-report.json)"
             echo
             echo "The JSON report is the authoritative machine-readable output. Findings require manual validation. This is static analysis, not dynamic testing or a penetration test."
           } > mobsf-production-summary.md
