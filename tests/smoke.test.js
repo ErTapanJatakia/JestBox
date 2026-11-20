@@ -23,12 +23,12 @@ test("hi-IN category IDs are exclusive to hi-IN and match the visible alphabetic
  const hiIds=Function("return "+js.slice(idsStart,idsEnd))();
  const expression=js.match(/const CATEGORY_IDS=([^;]+);/)?.[1];
  assert.ok(expression,"locale category selector must be defined");
- const getIds=Function("HI_IN_CATEGORY_IDS","CATS","return ("+expression+")");
- assert.deepEqual(getIds("hi-IN",hiIds,[]),["all",...hiIds]);
+ const getIds=Function("HI_IN_CATEGORY_IDS","CATS","return ("+expression+")")(hiIds,[]);
+ assert.deepEqual(getIds("hi-IN"),["all",...hiIds]);
  assert.equal(hiIds.length,21);
  const newIds=hiIds.filter(id=>!["everyday","work","tech","food","wordplay"].includes(id));
  assert.equal(newIds.length,16);
- assert.ok(!getIds("en-US",hiIds,[]).some(id=>newIds.includes(id)));
+ assert.ok(!getIds("en-US").some(id=>newIds.includes(id)));
 });
 
 test("share opens a dialog and invokes the native device share API without the old unavailable message",()=>{assert.match(html,/<dialog id="share-dialog"/);assert.match(html,/id="native-share-button"/);assert.match(js,/navigator\.share\(/);assert.match(js,/window\.JestBoxNativeShare/);assert.match(html,/share-bridge\.bundle\.js/);assert.match(read("package.json"),/"@capacitor\/share": "8\.0\.3"/);assert.doesNotMatch(js,/Sharing isn't available/);assert.match(js,/shareError/)});
