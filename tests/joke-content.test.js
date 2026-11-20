@@ -83,7 +83,7 @@ test("hi-IN expansion categories, when populated, have exactly 100 four-line jok
       (Array.isArray(assigned) ? assigned : [assigned]).includes(category));
     if (records.length) {
       assert.equal(records.length, 100, `${category} must contain exactly 100 jokes`);
-      for (const [, text] of records) assert.ok(text.split("\\n").filter(line => line.trim()).length >= 4,
+      for (const [, text] of records) assert.ok(text.split("\n").filter(line => line.trim()).length >= 4,
         `${category} joke must have at least four non-empty lines`);
     }
   }
