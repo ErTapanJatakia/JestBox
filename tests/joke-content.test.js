@@ -4,8 +4,10 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
 const source = readFileSync(new URL("../jokes.js", import.meta.url), "utf8");
+const hiInSource = readFileSync(new URL("../jokes-hi-IN.js", import.meta.url), "utf8");
 const sandbox = { window: {} };
 vm.runInNewContext(source, sandbox);
+vm.runInNewContext(hiInSource, sandbox);
 const jokes = sandbox.window.JESTBOX_JOKES;
 const addedCategories = [
   "characters", "city", "culture-contrasts", "marriage",
@@ -20,6 +22,8 @@ const hiInCategories = [
 ];
 const normalized = value => value.normalize("NFKC").toLocaleLowerCase("en-IN")
   .replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
+const normalizedHindi = value => value.normalize("NFKC").toLocaleLowerCase("hi-IN")
+  .replace(/[^\\p{L}\\p{N}]+/gu, " ").trim().replace(/\\s+/g, " ");
 
 test("all eight locales retain their existing 100-joke baseline outside en-IN", () => {
   for (const locale of Object.keys(jokes)) {
@@ -57,6 +61,19 @@ test("new en-IN categories, when populated, have 100 three-line original records
     }
   }
   assert.equal(jokes["en-IN"].length, 1100, "en-IN must contain exactly 1,100 unique records");
+});
+
+test("all hi-IN joke records remain unique after Unicode-aware normalization", () => {
+  const seen = new Set();
+  for (const [assigned, text] of jokes["hi-IN"]) {
+    const key = normalizedHindi(text);
+    assert.ok(key, "hi-IN joke text must not be empty");
+    assert.ok(!seen.has(key), `duplicate hi-IN joke: ${text}`);
+    seen.add(key);
+    const ids = Array.isArray(assigned) ? assigned : [assigned];
+    assert.ok(ids.length >= 1, "every hi-IN joke needs a category");
+    assert.equal(new Set(ids).size, ids.length, "hi-IN category IDs must not repeat");
+  }
 });
 
 test("hi-IN expansion categories, when populated, have exactly 100 four-line jokes each", () => {
