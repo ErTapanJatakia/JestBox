@@ -36,6 +36,7 @@ jobs:
           node --check share-bridge.entry.js
           node --check scripts/prepare-web.mjs
           node --check scripts/prepare-android-branding.mjs
+          node --check scripts/prepare-android-security.mjs
       - name: Run dependency-free regression tests
         run: node --test
       - name: Set up Java
