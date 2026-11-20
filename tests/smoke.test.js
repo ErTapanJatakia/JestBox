@@ -16,6 +16,21 @@ test("every joke uses the writing system of its selected language locale",()=>{f
 test("ten named themes define full-page color tokens",()=>{const start=js.indexOf("const THEMES=")+"const THEMES=".length;const end=js.indexOf("];",start)+1;const palettes=Function("return "+js.slice(start,end))();assert.equal(palettes.length,10);for(const token of ["--page","--surface","--text","--muted","--border","--accent"])assert.ok(css.includes(token))});
 test("only the Settings gear remains in the header and the theme picker lives below Accessibility",()=>{const header=html.match(/<header class="site-header">([\s\S]*?)<\/header>/)?.[1]||"";assert.match(header,/id="settings-button"/);assert.doesNotMatch(header,/theme-button|theme-dialog/);assert.match(html,/id="settings-title">Settings &amp; Superpowers/);assert.ok(html.indexOf('id="accessibility-title"')<html.indexOf('id="themes-title"'));assert.match(html,/id="theme-options"/);assert.match(html,/id="large-text"[^>]*type="range"[^>]*min="50"[^>]*max="200"[^>]*step="5"[^>]*value="85"/);for(const id of ["high-contrast","reduce-motion","underline-links","larger-targets","line-spacing","focus-outline"])assert.ok(html.includes('id="'+id+'"'))});
 test("language and category controls are searchable combobox inputs",()=>{assert.match(html,/id="locale-search" role="combobox"[^>]*aria-controls="locale-options"/);assert.match(html,/id="category-search" role="combobox"[^>]*aria-controls="category-options"/);for(const name of ["All Jokes","Everyday Life","Work & Study","Tech & Internet","Food & Drink"])assert.ok(js.includes(name));for(const country of ["United States of America","Republic of Peru","Russian Federation","Kingdom of Spain","Republic of India"])assert.ok(js.includes(country))});
+
+test("hi-IN category IDs are exclusive to hi-IN and match the visible alphabetical catalogue",()=>{
+ const idsStart=js.indexOf("const HI_IN_CATEGORY_IDS=")+"const HI_IN_CATEGORY_IDS=".length;
+ const idsEnd=js.indexOf(";",idsStart);
+ const hiIds=Function("return "+js.slice(idsStart,idsEnd))();
+ const expression=js.match(/const CATEGORY_IDS=([^;]+);/)?.[1];
+ assert.ok(expression,"locale category selector must be defined");
+ const getIds=Function("HI_IN_CATEGORY_IDS","CATS","return ("+expression+")");
+ assert.deepEqual(getIds("hi-IN",hiIds,[]),["all",...hiIds]);
+ assert.equal(hiIds.length,21);
+ const newIds=hiIds.filter(id=>!["everyday","work","tech","food","wordplay"].includes(id));
+ assert.equal(newIds.length,16);
+ assert.ok(!getIds("en-US",hiIds,[]).some(id=>newIds.includes(id)));
+});
+
 test("share opens a dialog and invokes the native device share API without the old unavailable message",()=>{assert.match(html,/<dialog id="share-dialog"/);assert.match(html,/id="native-share-button"/);assert.match(js,/navigator\.share\(/);assert.match(js,/window\.JestBoxNativeShare/);assert.match(html,/share-bridge\.bundle\.js/);assert.match(read("package.json"),/"@capacitor\/share": "8\.0\.3"/);assert.doesNotMatch(js,/Sharing isn't available/);assert.match(js,/shareError/)});
 test("launch screen is skippable and auto-dismisses after five seconds",()=>{assert.match(html,/id="launch-screen"/);assert.match(js,/timer=setTimeout\(dismiss,5000\)/);assert.match(js,/addEventListener\("click",dismiss\)/)});
 test("footer exposes privacy and an Accessibility Statement button plus the bundled WCAG mark",()=>{assert.match(html,/id="privacy-link"/);assert.match(html,/id="accessibility-link" class="footer-button"/);assert.match(html,/assets\/wcag22aa-blue\.svg/)});
