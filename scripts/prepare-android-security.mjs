@@ -37,7 +37,7 @@ if (!manifest.includes("xmlns:tools=")) {
 if (!manifest.includes('android:name="androidx.profileinstaller.ProfileInstallReceiver"')) {
   manifest = manifest.replace(
     /<\/application>/,
-    '    <receiver android:name="androidx.profileinstaller.ProfileInstallReceiver" android:exported="false" tools:node="merge" />\n</application>'
+    '    <receiver android:name="androidx.profileinstaller.ProfileInstallReceiver" android:exported="false" tools:replace="android:exported" tools:node="merge" />\n</application>'
   );
 } else {
   manifest = manifest.replace(
@@ -45,12 +45,14 @@ if (!manifest.includes('android:name="androidx.profileinstaller.ProfileInstallRe
     (_tag, attrs) => {
       let updated = attrs.replace(/android:exported=["'][^"']+["']/, "").trim();
       if (!/android:exported=/.test(updated)) updated += ' android:exported="false"';
+      if (!/tools:replace=/.test(updated)) updated += ' tools:replace="android:exported"';
       if (!/tools:node=/.test(updated)) updated += ' tools:node="merge"';
       return '<receiver' + updated + ' />';
     }
   );
 }
-if (!manifest.includes('android:name="androidx.profileinstaller.ProfileInstallReceiver" android:exported="false"')) {
+if (!manifest.includes('android:name="androidx.profileinstaller.ProfileInstallReceiver" android:exported="false"') ||
+    !manifest.includes('tools:replace="android:exported"')) {
   throw new Error("Could not enforce non-exported ProfileInstallReceiver override.");
 }
 
