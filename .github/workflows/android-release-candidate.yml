@@ -8,6 +8,15 @@ on:
         required: true
         default: main
         type: string
+      run_batch1_mobsf:
+        description: Run Batch 1 MobSF static assessment against the rebuilt, hash-pinned production APK
+        required: true
+        default: false
+        type: boolean
+      expected_apk_sha256:
+        description: Approved production APK SHA-256 digest (64 hexadecimal characters)
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -194,6 +203,116 @@ jobs:
           sha256sum "$SIGNED" | tee "$SIGNED.sha256"
           echo "Production-signed APK successfully verified." >> "$GITHUB_STEP_SUMMARY"
           rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"
+
+
+      - name: Verify exact approved production APK digest for Batch 1
+        if: inputs.run_batch1_mobsf
+        shell: bash
+        env:
+          APPROVED_APK_DIGEST: ${{ inputs.expected_apk_sha256 }}
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/release/jestbox-release-signed.apk"
+          test -s "$APK"
+          [[ "$APPROVED_APK_DIGEST" =~ ^[a-fA-F0-9]{64}$ ]] || {
+            echo "::error::Provide the approved production APK SHA-256 digest as a 64-character hexadecimal workflow input."
+            exit 1
+          }
+          test -s "$APK"
+          ACTUAL_SHA256="$(sha256sum "$APK" | awk '{print $1}')"
+          if [[ "$ACTUAL_SHA256" != "$APPROVED_APK_DIGEST" ]]; then
+            echo "::error::Rebuilt APK does not match the approved RuStore APK. No MobSF scan was performed."
+            exit 1
+          fi
+          echo "Exact approved production APK SHA-256 verified: $ACTUAL_SHA256" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Start pinned MobSF scanner for Batch 1
+        if: inputs.run_batch1_mobsf
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run -d --name jestbox-mobsf-static --network host \
+            -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
+            -e MOBSF_VT_ENABLED=0 \
+            opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954
+          for _ in {1..90}; do
+            if curl --silent --fail --connect-timeout 5 --max-time 15 http://127.0.0.1:8000/ >/dev/null \
+              && docker exec jestbox-mobsf-static test -s /home/mobsf/.MobSF/secret; then
+              echo "::add-mask::$(docker exec jestbox-mobsf-static cat /home/mobsf/.MobSF/secret)"
+              exit 0
+            fi
+            sleep 5
+          done
+          docker logs jestbox-mobsf-static
+          exit 1
+
+      - name: Run MobSF static analysis on the exact approved APK
+        if: inputs.run_batch1_mobsf
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/release/jestbox-release-signed.apk"
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 120 \
+            -H "Authorization: $(docker exec jestbox-mobsf-static cat /home/mobsf/.MobSF/secret)" \
+            -F "file=@$APK" \
+            http://127.0.0.1:8000/api/v1/upload > mobsf-upload.json
+          HASH="$(jq -er '.hash' mobsf-upload.json)"
+          FILE_NAME="$(jq -er '.file_name' mobsf-upload.json)"
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
+            -H "Authorization: $(docker exec jestbox-mobsf-static cat /home/mobsf/.MobSF/secret)" \
+            --data-urlencode "hash=$HASH" \
+            --data-urlencode "file_name=$FILE_NAME" \
+            --data-urlencode "scan_type=apk" \
+            http://127.0.0.1:8000/api/v1/scan > mobsf-scan-response.json
+          report_ready=false
+          for _ in {1..60}; do
+            if curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
+              -H "Authorization: $(docker exec jestbox-mobsf-static cat /home/mobsf/.MobSF/secret)" \
+              --data-urlencode "hash=$HASH" \
+              http://127.0.0.1:8000/api/v1/report_json -o mobsf-report.json; then
+              if jq -e 'type == "object" and (has("error") | not) and has("security_score")' mobsf-report.json >/dev/null; then
+                report_ready=true
+                break
+              fi
+            fi
+            sleep 5
+          done
+          [[ "$report_ready" == "true" ]] || {
+            docker logs jestbox-mobsf-static
+            echo "::error::MobSF did not produce a complete static JSON report."
+            exit 1
+          }
+          {
+            echo "# JestBox Batch 1 — production APK static assessment"
+            echo
+            echo "- Source release workflow: this run"
+            echo "- Source commit: $(git rev-parse HEAD)"
+            echo "- APK SHA-256: $ACTUAL_SHA256"
+            echo "- Package: $(jq -r '.package_name // "not reported"' mobsf-report.json)"
+            echo "- MobSF security score: $(jq -r '.security_score // "not reported"' mobsf-report.json)"
+            echo "- High findings: $(jq -r '.security_analysis | [.. | objects | select(.severity? == "high")] | length' mobsf-report.json)"
+            echo
+            echo "The JSON report is the authoritative machine-readable output. Findings require manual validation. This is static analysis, not dynamic testing or a penetration test."
+          } > mobsf-production-summary.md
+          cat mobsf-production-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Batch 1 MobSF evidence
+        if: always() && inputs.run_batch1_mobsf && hashFiles('mobsf-report.json') != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-batch1-production-static-evidence
+          path: |
+            mobsf-upload.json
+            mobsf-scan-response.json
+            mobsf-report.json
+            mobsf-production-summary.md
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Stop Batch 1 MobSF container
+        if: always() && inputs.run_batch1_mobsf
+        shell: bash
+        run: docker rm -f jestbox-mobsf-static || true
 
       - name: Upload unsigned release candidate
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
