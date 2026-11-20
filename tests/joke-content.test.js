@@ -87,6 +87,13 @@ test("hi-IN expansion categories, when populated, have exactly 100 four-line jok
   }
 });
 
+test("all 1,600 new hi-IN jokes use distinct opening lines", () => {
+  const openings = jokes["hi-IN"].slice(100).map(([, text]) => text.split("\\n")[0]
+    .normalize("NFKC").toLocaleLowerCase("hi-IN").replace(/\\s+/g, " ").trim());
+  assert.equal(openings.length, 1600);
+  assert.equal(new Set(openings).size, 1600, "new hi-IN jokes must not recycle opening lines");
+});
+
 test("hi-IN contains exactly 1,600 additional jokes across 16 new categories", () => {
   assert.equal(jokes["hi-IN"].length, 1700);
   assert.equal(hiInCategories.length, 16);
