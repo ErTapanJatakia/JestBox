@@ -29,7 +29,7 @@ test("all non-expansion locales retain their established baselines", () => {
   for (const locale of Object.keys(jokes)) {
     if (locale !== "en-IN" && locale !== "hi-IN") assert.equal(jokes[locale].length, 100, locale);
   }
-  assert.equal(jokes["hi-IN"].length, 1500, "hi-IN must contain its 100-joke baseline plus seven 200-joke batches");
+  assert.equal(jokes["hi-IN"].length, 1700, "hi-IN must contain its 100-joke baseline plus eight 200-joke batches");
 });
 
 test("en-IN retains its original 100-joke baseline", () => {
