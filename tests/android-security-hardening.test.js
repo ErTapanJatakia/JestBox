@@ -37,13 +37,13 @@ test("Android hardening closes the MobSF manifest and hybrid-origin gaps", async
       readFile(join(root, "android/app/src/main/res/xml/config.xml"), "utf8")
     ]);
     assert.match(m, /android:allowBackup="false"/);
-    assert.match(m, /xmlns:tools="http:\\/\\/schemas\\.android\\.com\\/tools"/);
-    assert.match(m, /android:name="androidx\\.profileinstaller\\.ProfileInstallReceiver" android:exported="false" tools:node="merge"/);
+    assert.ok(m.includes('xmlns:tools="http://schemas.android.com/tools"'));
+    assert.ok(m.includes('android:name="androidx.profileinstaller.ProfileInstallReceiver" android:exported="false" tools:node="merge"'));
     assert.match(v, /minSdkVersion = 29/);
     assert.doesNotMatch(v, /minSdkVersion = 24/);
-    assert.match(c, /<access origin="http:\\/\\/localhost" \\/>/);
-    assert.doesNotMatch(c, /<access origin="\\*" \\/>/);
-    assert.match(c, /<allow-navigation href="http:\\/\\/localhost\\/\\*" \\/>/);
+    assert.ok(c.includes('<access origin="http://localhost" />'));
+    assert.ok(!c.includes('<access origin="*" />'));
+    assert.ok(c.includes('<allow-navigation href="http://localhost/*" />'));
   } finally {
     await rm(root, { recursive: true, force: true });
   }
