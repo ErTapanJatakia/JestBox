@@ -69,6 +69,7 @@ jobs:
           node --check share-bridge.entry.js
           node --check scripts/prepare-web.mjs
           node --check scripts/prepare-android-branding.mjs
+          node --check scripts/prepare-android-security.mjs
           node --test
 
       - name: Verify canonical Android application ID
