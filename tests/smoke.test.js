@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
 const read=(name)=>fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
-const html=read("index.html"),js=read("script.js"),css=read("styles.css"),jokesSource=read("jokes.js");
+const html=read("index.html"),js=read("script.js"),css=read("styles.css"),jokesSource=read("jokes.js"),hiInSource=read("jokes-hi-IN.js");
 const dataContext={window:{}};vm.runInNewContext(jokesSource,dataContext);vm.runInNewContext(hiInSource,dataContext);const jokes=dataContext.window.JESTBOX_JOKES;
 const locales=["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN","ur-IN","ur-PK"];
 const categories=["everyday","work","tech","food","wordplay"];
