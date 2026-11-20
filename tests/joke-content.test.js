@@ -25,10 +25,11 @@ const normalized = value => value.normalize("NFKC").toLocaleLowerCase("en-IN")
 const normalizedHindi = value => value.normalize("NFKC").toLocaleLowerCase("hi-IN")
   .replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/\s+/g, " ");
 
-test("all eight locales retain their existing 100-joke baseline outside en-IN", () => {
+test("all non-expansion locales retain their established baselines", () => {
   for (const locale of Object.keys(jokes)) {
-    if (locale !== "en-IN") assert.equal(jokes[locale].length, 100, locale);
+    if (locale !== "en-IN" && locale !== "hi-IN") assert.equal(jokes[locale].length, 100, locale);
   }
+  assert.ok(jokes["hi-IN"].length >= 100, "hi-IN must retain its original collection");
 });
 
 test("en-IN retains its original 100-joke baseline", () => {
