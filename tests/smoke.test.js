@@ -4,7 +4,7 @@ import fs from "node:fs";
 import vm from "node:vm";
 const read=(name)=>fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html=read("index.html"),js=read("script.js"),css=read("styles.css"),jokesSource=read("jokes.js");
-const dataContext={window:{}};vm.runInNewContext(jokesSource,dataContext);const jokes=dataContext.window.JESTBOX_JOKES;
+const dataContext={window:{}};vm.runInNewContext(jokesSource,dataContext);vm.runInNewContext(hiInSource,dataContext);const jokes=dataContext.window.JESTBOX_JOKES;
 const locales=["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN","ur-IN","ur-PK"];
 const categories=["everyday","work","tech","food","wordplay"];
 
@@ -68,7 +68,8 @@ test("all eight interface dictionaries expose the same complete set of non-empty
  for(const locale of locales){
   assert.deepEqual(Object.keys(dictionaries[locale]).sort(),expected,locale+" UI key coverage");
   for(const [key,value] of Object.entries(dictionaries[locale]))if(typeof value==="string")assert.ok(value.trim(),locale+" empty "+key);
-  assert.equal(dictionaries[locale].cats.length,locale==="en-IN"?16:6,locale+" category labels");
+  assert.equal(dictionaries[locale].cats.length,locale==="en-IN"?16:locale==="hi-IN"?22:6,locale+" category labels");
+  if(locale==="hi-IN")assert.deepEqual(dictionaries[locale].cats,["सभी चुटकुले","अकबर-बीरबल","काम और पढ़ाई","खाना-पीना","जीजा-साली","टीचर-स्टूडेंट","डॉक्टर-मरीज","तकनीक और इंटरनेट","तेनालीराम","पति-पत्नी","पप्पू-चिंटू","भोजपुरी","भ्रष्टाचार","मुल्ला नसरुद्दीन","राजनीति","राजस्थानी","रोज़मर्रा की ज़िंदगी","वकील-मुवक्किल","शब्दों की शरारत","समाज","सास-बहू","हरियाणवी"],"hi-IN category labels are alphabetically ordered");
   if(locale==="en-IN")assert.deepEqual(dictionaries[locale].cats,["All Jokes","Characters","City","Culture Contrasts","Everyday Life","Food & Drink","Marriage","Middle-class Life","Relatives","Romance","Satire","Tech & Internet","Trickster Stories","Uncle / Cheesy","Work & Study","Wordplay"],"en-IN category labels are alphabetically ordered");
  }
 });
