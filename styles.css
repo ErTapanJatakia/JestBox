@@ -55,3 +55,6 @@ body.enhanced-focus :focus-visible{outline:4px solid var(--accent)!important;out
 
 /* Urdu locales use a complete right-to-left reading flow without reversing icons or numeric controls. */
 html[dir="rtl"]{direction:rtl}html[dir="rtl"] body{text-align:right}html[dir="rtl"] .site-header,html[dir="rtl"] .locale-picker,html[dir="rtl"] .joke-toolbar,html[dir="rtl"] .dialog-heading{direction:rtl}html[dir="rtl"] .joke-mark{left:auto;right:.1rem}html[dir="rtl"] .combo-options{direction:rtl;text-align:right}html[dir="rtl"] .combo-option{justify-items:stretch;text-align:right}html[dir="rtl"] .search-control input,html[dir="rtl"] .category-control input,html[dir="rtl"] #share-preview{direction:rtl;text-align:right}html[dir="rtl"] .joke-content h2{text-align:center}html[dir="rtl"] .site-footer{text-align:center}html[dir="rtl"] .skip-link{left:auto;right:.5rem}html[dir="rtl"] .theme-choice{text-align:right}html[dir="rtl"] .setting-row,html[dir="rtl"] .setting-scale{direction:rtl}
+
+/* Preserve authored multi-line joke formatting. */
+.joke-content h2{white-space:pre-line}
