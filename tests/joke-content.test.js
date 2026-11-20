@@ -81,10 +81,43 @@ test("hi-IN expansion categories, when populated, have exactly 100 four-line jok
   for (const category of hiInCategories) {
     const records = jokes["hi-IN"].filter(([assigned]) =>
       (Array.isArray(assigned) ? assigned : [assigned]).includes(category));
-    if (records.length) {
-      assert.equal(records.length, 100, `${category} must contain exactly 100 jokes`);
-      for (const [, text] of records) assert.ok(text.split("\n").filter(line => line.trim()).length >= 4,
-        `${category} joke must have at least four non-empty lines`);
+    assert.equal(records.length, 100, `${category} must contain exactly 100 jokes`);
+    for (const [, text] of records) assert.ok(text.split("\n").filter(line => line.trim()).length >= 4,
+      `${category} joke must have at least four non-empty lines`);
+  }
+});
+
+test("hi-IN contains exactly 1,600 additional jokes across 16 new categories", () => {
+  assert.equal(jokes["hi-IN"].length, 1700);
+  assert.equal(hiInCategories.length, 16);
+  for (const category of hiInCategories) {
+    assert.equal(jokes["hi-IN"].filter(([assigned]) =>
+      (Array.isArray(assigned) ? assigned : [assigned]).includes(category)).length, 100);
+  }
+});
+
+test("hi-IN jokes pass a full-collection lexical near-duplicate screen", () => {
+  const stop = new Set(["ने","है","हैं","था","थी","थे","और","का","की","के","को","से","में","पर","तो","भी","ही","यह","वह","एक","अब","कि","कर","करें","कहा","बोला","बोली","बोले","पूछा","जवाब","दिया","दिए","सब","किस","क्या","क्यूँ","क्यों","मैं","हम","आप","उस","उन","इस","इसे","इसी","जैसे","जब","तब","लिए","साथ","पहले","फिर"]);
+  const shingles = text => {
+    const words = text.normalize("NFKC").toLocaleLowerCase("hi-IN")
+      .replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/)
+      .filter(word => word && !stop.has(word));
+    const result = new Set();
+    for (let i = 0; i < words.length - 1; i++) result.add(words[i] + " " + words[i + 1]);
+    return result;
+  };
+  const records = jokes["hi-IN"].map(([category, text]) => ({ category, text, grams: shingles(text) }));
+  for (let i = 0; i < records.length; i++) {
+    for (let j = i + 1; j < records.length; j++) {
+      const a = records[i].grams, b = records[j].grams;
+      if (!a.size || !b.size) continue;
+      const smaller = a.size < b.size ? a : b;
+      const larger = a.size < b.size ? b : a;
+      let intersection = 0;
+      for (const gram of smaller) if (larger.has(gram)) intersection++;
+      const similarity = intersection / (a.size + b.size - intersection);
+      assert.ok(similarity < 0.72,
+        "Potential hi-IN near-duplicate (" + similarity.toFixed(3) + "): " + records[i].text + " / " + records[j].text);
     }
   }
 });
