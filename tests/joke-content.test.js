@@ -116,7 +116,7 @@ test("hi-IN jokes pass a full-collection lexical near-duplicate screen", () => {
       let intersection = 0;
       for (const gram of smaller) if (larger.has(gram)) intersection++;
       const similarity = intersection / (a.size + b.size - intersection);
-      assert.ok(similarity < 0.72,
+      assert.ok(similarity < 0.68,
         "Potential hi-IN near-duplicate (" + similarity.toFixed(3) + "): " + records[i].text + " / " + records[j].text);
     }
   }
