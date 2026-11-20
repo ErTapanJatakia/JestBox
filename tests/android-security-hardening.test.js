@@ -38,7 +38,7 @@ test("Android hardening closes the MobSF manifest and hybrid-origin gaps", async
     ]);
     assert.match(m, /android:allowBackup="false"/);
     assert.ok(m.includes('xmlns:tools="http://schemas.android.com/tools"'));
-    assert.ok(m.includes('android:name="androidx.profileinstaller.ProfileInstallReceiver" android:exported="false" tools:node="merge"'));
+    assert.ok(m.includes('android:name="androidx.profileinstaller.ProfileInstallReceiver" android:exported="false" tools:replace="android:exported" tools:node="merge"'));
     assert.match(v, /minSdkVersion = 29/);
     assert.doesNotMatch(v, /minSdkVersion = 24/);
     assert.ok(c.includes('<access origin="http://localhost" />'));
