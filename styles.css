@@ -116,3 +116,9 @@ html[dir="rtl"]{direction:rtl}html[dir="rtl"] body{text-align:right}html[dir="rt
   .joke-content { min-height: 155px; }
   .site-footer { padding-block: .35rem; }
 }
+
+
+/* Keep the category search field within the tablet touch-target baseline. */
+@media (min-width: 700px) and (max-width: 1100px), (min-width: 1101px) and (max-width: 1400px) and (orientation: landscape) {
+  #category-search { min-height: 48px; }
+}
