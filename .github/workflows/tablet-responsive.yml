@@ -26,10 +26,10 @@ jobs:
           cache: npm
       - name: Install locked application dependencies
         run: npm ci --no-audit --no-fund
-      - name: Install pinned Playwright browser tooling
-        run: |
-          npm install --no-save --package-lock=false --no-audit --no-fund playwright@1.56.1
-          npx playwright install --with-deps chromium
+      - name: Install lockfile-pinned tablet browser tooling
+        run: npm ci --prefix .github/tooling/tablet --no-audit --no-fund
+      - name: Install Chromium for tablet browser tooling
+        run: ./.github/tooling/tablet/node_modules/.bin/playwright install --with-deps chromium
       - name: Prepare the actual JestBox web application
         run: npm run prepare:web
       - name: Validate tablet layouts and capture screenshots
