@@ -118,7 +118,7 @@ try {
     ]
   };
 
-  async function startVisualPage(viewport, captureLaunch = false) {
+  async function startVisualPage(viewport, captureLaunch = false, initialLocale = null) {
     const page = await browser.newPage({
       viewport: { width: viewport.width, height: viewport.height },
       deviceScaleFactor: 1.5,
@@ -129,9 +129,17 @@ try {
     page.on("pageerror", error => errors.push(error.stack || error.message));
     await page.goto("http://127.0.0.1:4173/", { waitUntil: "domcontentloaded" });
     await page.locator("#launch-screen").waitFor({ state: "visible" });
+    if (initialLocale) {
+      await page.locator("#locale-search").evaluate((input, code) => {
+        input.value = code;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+      }, initialLocale);
+      await page.waitForFunction(expected => document.documentElement.lang === expected, initialLocale);
+    }
     if (captureLaunch) {
       await page.screenshot({
-        path: "tablet-screenshots/launch-en-US-" + viewport.name + ".png",
+        path: "tablet-screenshots/launch-" + (initialLocale || "en-US") + "-" + viewport.name + ".png",
         fullPage: true
       });
     }
@@ -166,8 +174,7 @@ try {
 
   // Russian: every available category at six tablet dimensions (36 captures).
   for (const viewport of visualViewports.russian) {
-    const { page, errors } = await startVisualPage(viewport);
-    await chooseLocale(page, "ru-RU");
+    const { page, errors } = await startVisualPage(viewport, false, "ru-RU");
     await page.locator("#category-search").fill("");
     const categories = await page.locator("#category-options button").allTextContents();
     assert.equal(categories.length, 6, "ru-RU should expose All Jokes plus five joke categories");
@@ -182,8 +189,7 @@ try {
   // English India and US: four representative categories at portrait and landscape sizes (16 captures).
   for (const localeCode of ["en-IN", "en-US"]) {
     for (const viewport of visualViewports.english) {
-      const { page, errors } = await startVisualPage(viewport);
-      await chooseLocale(page, localeCode);
+      const { page, errors } = await startVisualPage(viewport, false, localeCode);
       await page.locator("#category-search").fill("");
       const categories = await page.locator("#category-options button").allTextContents();
       assert.ok(categories.length >= 6, localeCode + ": expected the standard category set");
@@ -199,17 +205,21 @@ try {
   // One representative localized joke view for each remaining supported language.
   for (const localeCode of ["es-PE", "es-ES", "hi-IN", "ur-IN", "ur-PK"]) {
     const viewport = { name: "834x1194", width: 834, height: 1194 };
-    const { page, errors } = await startVisualPage(viewport);
-    await chooseLocale(page, localeCode);
+    const { page, errors } = await startVisualPage(viewport, false, localeCode);
     await captureVisual(page, localeCode + "-" + viewport.name + "-all-jokes", errors);
+    await page.close();
+  }
+
+  // Capture the localized Russian launch screen before its timed dismissal (six dimensions).
+  for (const viewport of visualViewports.russian) {
+    const { page } = await startVisualPage(viewport, true, "ru-RU");
     await page.close();
   }
 
   // Russian interface states: category picker, accessibility settings and share preview.
   {
     const viewport = { name: "1024x768", width: 1024, height: 768 };
-    const { page, errors } = await startVisualPage(viewport);
-    await chooseLocale(page, "ru-RU");
+    const { page, errors } = await startVisualPage(viewport, false, "ru-RU");
     await page.locator("#category-search").fill("");
     await page.screenshot({ path: "tablet-screenshots/ru-RU-1024x768-category-picker-open.png", fullPage: true });
     await page.locator("#category-search").press("Escape");
