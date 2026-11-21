@@ -52,6 +52,7 @@ try {
     page.on("pageerror", error => pageErrors.push(error.message));
     await page.goto("http://127.0.0.1:4173/", { waitUntil: "networkidle" });
     await page.locator("#launch-screen").click();
+    await page.locator("#launch-screen").waitFor({ state: "hidden", timeout: 2000 });
     await page.locator("#joke-heading").waitFor({ state: "visible" });
 
     const layout = await page.evaluate(() => {
