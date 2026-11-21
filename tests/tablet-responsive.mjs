@@ -126,7 +126,7 @@ try {
       hasTouch: true
     });
     const errors = [];
-    page.on("pageerror", error => errors.push(error.message));
+    page.on("pageerror", error => errors.push(error.stack || error.message));
     await page.goto("http://127.0.0.1:4173/", { waitUntil: "domcontentloaded" });
     await page.locator("#launch-screen").waitFor({ state: "visible" });
     if (captureLaunch) {
