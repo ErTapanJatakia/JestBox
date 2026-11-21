@@ -2,7 +2,16 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { mkdir, readFile, stat } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
-import { chromium } from "playwright";
+import { chromium } from "../.github/tooling/tablet/node_modules/playwright/index.mjs";
+
+const workflow = await readFile(".github/workflows/tablet-responsive.yml", "utf8");
+const toolingManifest = JSON.parse(await readFile(".github/tooling/tablet/package.json", "utf8"));
+const toolingLock = JSON.parse(await readFile(".github/tooling/tablet/package-lock.json", "utf8"));
+assert.equal(toolingManifest.devDependencies.playwright, "1.56.1", "tablet Playwright version must remain pinned");
+assert.equal(toolingLock.packages["node_modules/playwright"].version, "1.56.1", "tablet Playwright lockfile version");
+assert.equal(toolingLock.packages["node_modules/playwright-core"].version, "1.56.1", "tablet Playwright Core lockfile version");
+assert.match(workflow, /npm ci --prefix \.github\/tooling\/tablet/, "tablet workflow must install from its committed lockfile");
+assert.doesNotMatch(workflow, /npm install --no-save|--package-lock=false/, "tablet workflow must not bypass dependency locking");
 
 const root = resolve("www");
 const mime = {
