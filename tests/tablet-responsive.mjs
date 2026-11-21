@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { readFile, stat } from "node:fs/promises";
+import { mkdir, readFile, stat } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 import { chromium } from "playwright";
 
@@ -28,6 +28,7 @@ const server = createServer(async (request, response) => {
   }
 });
 
+await mkdir("tablet-screenshots", { recursive: true });
 await new Promise((resolveListen) => server.listen(4173, "127.0.0.1", resolveListen));
 let browser;
 try {
