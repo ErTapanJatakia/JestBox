@@ -172,6 +172,23 @@ try {
     console.log("PASS visual " + name + " (" + state.lang + ")");
   }
 
+  // Regression: changing language after the launch screen has been dismissed must remain error-free.
+  {
+    const viewport = { name: "1024x768", width: 1024, height: 768 };
+    const { page, errors } = await startVisualPage(viewport, false, "ru-RU");
+    await chooseLocale(page, "en-IN");
+    assert.equal(await page.locator("html").getAttribute("lang"), "en-IN");
+    assert.equal(await page.locator("html").getAttribute("dir"), "ltr");
+    assert.ok((await page.locator("#joke-heading").textContent()).trim().length > 0);
+    await chooseLocale(page, "ur-IN");
+    assert.equal(await page.locator("html").getAttribute("lang"), "ur-IN");
+    assert.equal(await page.locator("html").getAttribute("dir"), "rtl");
+    assert.ok((await page.locator("#joke-heading").textContent()).trim().length > 0);
+    assert.deepEqual(errors, [], "post-launch locale switching: browser runtime errors");
+    await page.close();
+    console.log("PASS regression post-launch locale switching (ru-RU → en-IN → ur-IN)");
+  }
+
   // Russian: every available category at six tablet dimensions (36 captures).
   for (const viewport of visualViewports.russian) {
     const { page, errors } = await startVisualPage(viewport, false, "ru-RU");
