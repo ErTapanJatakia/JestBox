@@ -1,0 +1,9 @@
+{
+  "name": "jestbox-tablet-tooling",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Isolated, lockfile-pinned browser tooling for JestBox tablet validation",
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}
