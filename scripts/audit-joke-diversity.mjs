@@ -10,7 +10,7 @@ const normalize = value => value.normalize("NFKC")
   .toLocaleLowerCase("en-IN")
   .replace(/[^a-z0-9]+/g, " ")
   .trim()
-  .replace(/\\s+/g, " ");
+  .replace(/\s+/g, " ");
 
 const threshold = 0.8;
 let failures = 0;
@@ -28,7 +28,7 @@ for (const [locale, records] of Object.entries(collections)) {
 
   for (const [category, jokes] of categories) {
     const lineStats = [0, 1, 2].map(index => {
-      const lines = jokes.map(joke => normalize(joke.split("\\n")[index] ?? ""));
+      const lines = jokes.map(joke => normalize(joke.split("\n")[index] ?? ""));
       return new Set(lines.filter(Boolean)).size;
     });
     const ratios = lineStats.map(count => jokes.length ? count / jokes.length : 1);
