@@ -168,11 +168,11 @@ try {
   for (const viewport of visualViewports.russian) {
     const { page, errors } = await startVisualPage(viewport);
     await chooseLocale(page, "ru-RU");
-    await page.locator("#category-search").click();
+    await page.locator("#category-search").fill("");
     const categories = await page.locator("#category-options button").allTextContents();
     assert.equal(categories.length, 6, "ru-RU should expose All Jokes plus five joke categories");
     for (const [index, category] of categories.entries()) {
-      await page.locator("#category-search").click();
+      await page.locator("#category-search").fill("");
       await page.getByRole("option", { name: category, exact: true }).click();
       await captureVisual(page, "ru-RU-" + viewport.name + "-category-" + String(index + 1).padStart(2, "0"), errors);
     }
@@ -184,11 +184,11 @@ try {
     for (const viewport of visualViewports.english) {
       const { page, errors } = await startVisualPage(viewport);
       await chooseLocale(page, localeCode);
-      await page.locator("#category-search").click();
+      await page.locator("#category-search").fill("");
       const categories = await page.locator("#category-options button").allTextContents();
       assert.ok(categories.length >= 6, localeCode + ": expected the standard category set");
       for (const [index, category] of categories.slice(0, 4).entries()) {
-        await page.locator("#category-search").click();
+        await page.locator("#category-search").fill("");
         await page.getByRole("option", { name: category, exact: true }).click();
         await captureVisual(page, localeCode + "-" + viewport.name + "-category-" + String(index + 1).padStart(2, "0"), errors);
       }
@@ -210,7 +210,7 @@ try {
     const viewport = { name: "1024x768", width: 1024, height: 768 };
     const { page, errors } = await startVisualPage(viewport);
     await chooseLocale(page, "ru-RU");
-    await page.locator("#category-search").click();
+    await page.locator("#category-search").fill("");
     await page.screenshot({ path: "tablet-screenshots/ru-RU-1024x768-category-picker-open.png", fullPage: true });
     await page.locator("#category-search").press("Escape");
     await page.locator("#settings-button").click();
