@@ -40,6 +40,7 @@ class PackagedApkManifestVerifierTests(unittest.TestCase):
         self.assertEqual(result["targetSdkVersion"], 36)
         self.assertEqual(result["allowBackup"], "false")
         self.assertEqual(result["sensitivePermissionReview"], "none detected")
+        self.assertIn("android.permission.INTERNET", result["declaredPermissions"])
         self.assertEqual(result["launcher"]["name"], ".MainActivity")
 
     def test_rejects_backup_enabled(self):
@@ -61,6 +62,10 @@ class PackagedApkManifestVerifierTests(unittest.TestCase):
     def test_rejects_unexpected_sensitive_permissions(self):
         with self.assertRaisesRegex(VerificationError, "READ_SMS"):
             verify_manifest(manifest(extra_permissions='<uses-permission android:name="android.permission.READ_SMS" />'))
+
+    def test_rejects_sensitive_sdk_scoped_permission(self):
+        with self.assertRaisesRegex(VerificationError, "READ_SMS"):
+            verify_manifest(manifest(extra_permissions='<uses-permission-sdk-23 android:name="android.permission.READ_SMS" />'))
 
     def test_rejects_unexpected_exported_receiver(self):
         components = """
