@@ -1,0 +1,179 @@
+name: njsscan Node.js security analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "37 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: njsscan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: Scan JavaScript and Node.js security patterns
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned njsscan release
+        run: python -m pip install --disable-pip-version-check njsscan==1.0.2
+
+      - name: Run njsscan and preserve its exit status
+        id: njsscan
+        shell: bash
+        run: |
+          set -uo pipefail
+          set +e
+          njsscan . --json --output njsscan-results.json >njsscan.stdout.log 2>njsscan.stderr.log
+          json_exit_code=$?
+          njsscan . --sarif --output njsscan-results.sarif >>njsscan.stdout.log 2>>njsscan.stderr.log
+          sarif_exit_code=$?
+          set -e
+          for report in njsscan-results.json njsscan-results.sarif; do
+            if [ ! -s "$report" ]; then
+              echo "njsscan did not produce a non-empty $report (exit code: JSON=$json_exit_code SARIF=$sarif_exit_code)." >&2
+              exit 2
+            fi
+          done
+          {
+            echo "JSON exit code: $json_exit_code"
+            echo "SARIF exit code: $sarif_exit_code"
+            echo
+            echo "### njsscan stdout"
+            cat njsscan.stdout.log
+            echo
+            echo "### njsscan stderr"
+            cat njsscan.stderr.log
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "json_exit_code=$json_exit_code" >> "$GITHUB_OUTPUT"
+          echo "sarif_exit_code=$sarif_exit_code" >> "$GITHUB_OUTPUT"
+          echo "njsscan produced JSON and SARIF reports (exit codes: JSON=$json_exit_code SARIF=$sarif_exit_code)."
+
+      - name: Upload njsscan findings to code scanning
+        if: always() && hashFiles('njsscan-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        with:
+          sarif_file: njsscan-results.sarif
+          category: njsscan
+          wait-for-processing: true
+
+      - name: Generate njsscan summary
+        if: always() && hashFiles('njsscan-results.sarif') != ''
+        run: bash .github/scripts/render-sarif-summary.sh njsscan njsscan-results.sarif
+
+      - name: Archive njsscan report
+        if: always() && hashFiles('njsscan-results.sarif') != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-njsscan-report
+          path: |
+            njsscan-results.sarif
+            njsscan-results.json
+            njsscan.stdout.log
+            njsscan.stderr.log
+            njsscan-security-summary.md
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce njsscan completion and ERROR findings
+        if: always()
+        env:
+          JSON_EXIT_CODE: ${{ steps.njsscan.outputs.json_exit_code }}
+          SARIF_EXIT_CODE: ${{ steps.njsscan.outputs.sarif_exit_code }}
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+
+          failures = []
+          json_code = os.environ.get("JSON_EXIT_CODE", "")
+          sarif_code = os.environ.get("SARIF_EXIT_CODE", "")
+          if json_code not in {"0", "1"}:
+              failures.append(f"JSON scan did not complete (exit code: {json_code or 'missing'})")
+          if sarif_code != "0":
+              failures.append(f"SARIF scan did not complete successfully (exit code: {sarif_code or 'missing'})")
+
+          try:
+              report = json.loads(Path("njsscan-results.json").read_text())
+          except Exception as exc:
+              report = {}
+              failures.append(f"JSON report is missing or invalid: {exc}")
+
+          scan_errors = report.get("errors", [])
+          if scan_errors:
+              for item in scan_errors:
+                  failures.append(
+                      f"Scanner execution error: {item.get('type', 'unknown')} "
+                      f"on {item.get('path', 'unknown path')} "
+                      f"({item.get('rule_id', 'unknown rule')}): {item.get('message', '')}"
+                  )
+
+          findings = []
+          for section in ("nodejs", "templates"):
+              for rule_id, rule in report.get(section, {}).items():
+                  severity = str(rule.get("metadata", {}).get("severity", "UNKNOWN")).upper()
+                  for item in rule.get("files", []):
+                      findings.append((severity, rule_id, item.get("file_path", "unknown")))
+
+          try:
+              sarif = json.loads(Path("njsscan-results.sarif").read_text())
+              runs = sarif.get("runs", [])
+              if not runs or any(
+                  invocation.get("executionSuccessful") is not True
+                  for run in runs for invocation in run.get("invocations", [])
+              ):
+                  failures.append("SARIF invocation is missing or marked unsuccessful")
+              for run in runs:
+                  for invocation in run.get("invocations", []):
+                      for notification in (
+                          invocation.get("toolExecutionNotifications", [])
+                          + invocation.get("toolConfigurationNotifications", [])
+                      ):
+                          if notification.get("level") == "error":
+                              failures.append(
+                                  "SARIF execution notification: "
+                                  + notification.get("message", {}).get("text", "unspecified error")
+                              )
+              sarif_count = sum(len(run.get("results", [])) for run in runs)
+              if sarif_count != len(findings):
+                  failures.append(
+                      f"SARIF/JSON finding count mismatch: SARIF={sarif_count}, JSON={len(findings)}"
+                  )
+          except Exception as exc:
+              failures.append(f"SARIF report is missing or invalid: {exc}")
+
+          error_findings = [item for item in findings if item[0] == "ERROR"]
+          if json_code == "1" and not scan_errors and not error_findings:
+              failures.append("JSON exit code 1 is unexplained by scanner errors or ERROR findings")
+          print(f"njsscan findings: {len(findings)} total; {len(error_findings)} ERROR")
+          print(f"njsscan scanner execution errors: {len(scan_errors)}")
+          if error_findings:
+              for severity, rule_id, path in error_findings:
+                  failures.append(f"ERROR finding: {rule_id} in {path}")
+          if failures:
+              print("njsscan gate failed:")
+              for failure in failures:
+                  print(f"- {failure}")
+              sys.exit(1)
+          print("njsscan completed successfully; JSON and SARIF reports are consistent.")
+          PY

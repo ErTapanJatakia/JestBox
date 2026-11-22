@@ -2,9 +2,24 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
+import { webcrypto } from "node:crypto";
 const read=(name)=>fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html=read("index.html"),js=read("script.js"),css=read("styles.css"),jokesSource=read("jokes.js");
 const dataContext={window:{}};vm.runInNewContext(jokesSource,dataContext);const jokes=dataContext.window.JESTBOX_JOKES;
+test("njsscan excludes only the literal joke-data bundle, which is parsed as JSON and rendered as text",()=>{
+ const source=read("jokes.js");
+ const prefix="window.JESTBOX_JOKES=";
+ assert.ok(source.startsWith(prefix),"joke bundle must remain a single global data assignment");
+ const payload=source.slice(prefix.length).trim();
+ assert.ok(payload.endsWith(";"),"joke bundle must end as a single data assignment");
+ const parsed=JSON.parse(payload.slice(0,-1));
+ assert.deepEqual(Object.keys(parsed).sort(),[...locales].sort());
+ assert.ok(js.includes('$("#joke-heading").textContent=current[1]'),"joke text must be rendered as text, not HTML");
+ const config=read(".njsscan");
+ const ignored=config.split("ignore-filenames:")[1]?.split("\n  ignore-paths:")[0]?.trim();
+ assert.equal(ignored,"- jokes.js","jokes.js must be the only ignored filename");
+ assert.equal(config.includes("ignore-rules:"),false,"no njsscan rules may be disabled");
+});
 const locales=["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN","ur-IN","ur-PK"];
 const categories=["everyday","work","tech","food","wordplay"];
 
@@ -111,4 +126,17 @@ test("Urdu locales are independent, searchable, fully localized, and rendered ri
  }
  const build=read("scripts/prepare-web.mjs");
  assert.match(build,/locale\.startsWith\("ur-"\) \? "rtl" : "ltr"/);
+});
+
+
+test("random joke selection uses unbiased Web Crypto rather than Math.random",()=>{
+ const helper=read("random-index.js");
+ const randomIndex=vm.runInNewContext(helper+"; JestBoxRandomIndex",{crypto:webcrypto,Uint32Array,Number,Math,RangeError});
+ for(let i=0;i<2000;i++){const value=randomIndex(17);assert.ok(Number.isInteger(value)&&value>=0&&value<17)}
+ assert.equal(randomIndex(1),0);
+ assert.throws(()=>randomIndex(0),RangeError);
+ assert.throws(()=>randomIndex(0x100000001),RangeError);
+ assert.match(html,/random-index\.js/);
+ assert.match(js,/const secureRandomIndex=globalThis\.JestBoxRandomIndex/);
+ assert.match(js,/secureRandomIndex\(a\.length\)/);
 });

@@ -1,0 +1,17 @@
+---
+- nodejs-extensions:
+  - .js
+  template-extensions:
+  - .new
+  - .hbs
+  - ''
+  ignore-filenames:
+  - jokes.js
+  ignore-paths:
+  - __MACOSX
+  - node_modules
+  ignore-extensions:
+  - .jsx
+  severity-filter:
+  - WARNING
+  - ERROR

@@ -28,7 +28,84 @@ Good-faith research that follows this policy and applicable law is welcome. Avoi
 
 ## Security Assessment Programme
 
-**Last updated:** 19 November 2026  
+### Latest Security Assurance Report — 22 November 2026
+
+**Assessment status:** all 24 GitHub commit checks completed successfully on the application-code PR head recorded below. This report is added in a subsequent documentation-only update; PR #77 remains open and has not been merged into `main`. The report therefore records PR-branch verification, not a production release or deployment.
+
+- **Repository:** [ErTapanJatakia/JestBox](https://github.com/ErTapanJatakia/JestBox)
+- **Pull request:** [#77 — njsscan Node.js security analysis](https://github.com/ErTapanJatakia/JestBox/pull/77)
+- **Assessed PR head:** `b1a092632a71760f2de06af4de174b968d8ebd07`
+- **Base `main` commit:** `989fa1f893d6d87028eba6ae83cd28dadeb65d62`
+- **GitHub PR merge-ref commit used by the scanner reports:** `7f4e568a4343f1b7164831849667e0d4fcbafa25`
+- **Commit check result:** 24/24 checks successful — [check-run summary](https://github.com/ErTapanJatakia/JestBox/commit/b1a092632a71760f2de06af4de174b968d8ebd07/checks)
+
+| Control / workflow | Latest result | Evidence |
+|---|---|---|
+| JestBox regression validation | **43/43 tests passed** | [Run #44985369263](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369263) |
+| GitHub CodeQL — JavaScript/TypeScript and GitHub Actions | Both default-setup analyses passed | [Run #44985366944](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985366944) |
+| njsscan 1.0.2 | **0 findings; 0 scanner errors; complete JSON and SARIF; SARIF upload successful** | [Run #44985369183](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369183) · [Report artifact 14739790820](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369183/artifacts/14739790820) |
+| Android debug and unsigned release builds | Both APKs assembled; debug signature/alignment/checksum verification passed | [Run #44985369124](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369124) · [APK artifact 14740020521](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369124/artifacts/14740020521) |
+| Tablet browser validation | Passed; tablet viewport screenshots generated | [Run #44985369154](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369154) |
+| OWASP ZAP baseline DAST | Scan completed; 0 High, 2 Medium, 6 Low and 2 Informational alerts (triage below) | [Run #44985369066](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369066) · [Report artifact 14739561122](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369066/artifacts/14739561122) |
+| Microsoft DevSkim | Passed | [Run #44985369088](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369088) |
+| Trivy | Passed | [Run #44985369185](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369185) |
+| OSV-Scanner | Passed | [Run #44985369085](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369085) |
+| Gitleaks | Passed | [Run #44985369072](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369072) |
+| Dependency Review | Passed | [Run #44985369114](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369114) |
+| OpenSSF Scorecard | Passed | [Run #44985369107](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369107) |
+| zizmor | Passed | [Run #44985369265](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369265) |
+| actionlint | Passed | [Run #44985369048](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369048) |
+| Syft SBOM generation | Passed | [Run #44985369135](https://github.com/ErTapanJatakia/JestBox/actions/runs/44985369135) |
+
+#### njsscan timeout investigation and scope
+
+The initial njsscan JSON report recorded a timeout in rule `regex_dos` against the 307 KB `jokes.js` bundle; this was an incomplete scan, not a clean result. The cause was traced to the file combining static joke data with batch-append JavaScript. The data was consolidated into a single JSON-compatible literal assignment. The `.njsscan` configuration now excludes only this static data filename; no njsscan rule is disabled. A regression test parses the bundle as JSON, checks that it remains a data-only assignment, verifies joke rendering uses `textContent`, and asserts that `jokes.js` is the sole filename exclusion. All executable JavaScript remains in njsscan scope. The subsequent JSON and SARIF reports contain no scanner errors or findings, and the completeness gate passed.
+
+#### Investigation and closure of earlier failed checks
+
+The following failures were investigated rather than suppressed:
+
+- **CodeQL advanced-setup attempt (PR #76):** the advanced workflow could not run alongside the repository's already-enabled CodeQL default setup. PR #76 was closed without merging; the existing default setup was retained. Its JavaScript/TypeScript and GitHub Actions analyses both passed in the latest assessment.
+- **Initial njsscan pattern finding:** the first report flagged `Math.random()` in non-security-sensitive random joke selection (CWE-327). The selection was replaced with a Web Crypto `crypto.getRandomValues()` rejection-sampling helper, and regression tests were added. No rule suppression was used.
+- **JestBox regression suite:** the first 42-test run had two failures. The Android staging fixture did not copy the newly required `random-index.js` helper, and the random-selection test asserted an outdated conditional expression. The fixture and assertion were corrected; the latest suite passes 43/43 tests.
+- **Android and ZAP first attempts:** both stopped in their shared preflight regression suite because of those same test failures; the Android Gradle build and ZAP scan had not yet started. After the fix, the latest Android debug and unsigned release builds completed successfully, and the ZAP baseline scan completed successfully.
+- **njsscan incomplete scan:** the subsequent JSON diagnostic identified a `regex_dos` timeout against the mixed code/data `jokes.js` bundle. The data-only conversion, narrow filename exclusion, regression guard and fail-closed JSON/SARIF validation are documented above. The final scan completed with zero scanner errors and zero findings.
+
+No existing working scanner was removed, no njsscan rule was disabled, and no regression or CI gate was deleted or weakened.
+
+#### OWASP ZAP alert triage
+
+The PR workflow ran the passive baseline scan against the disposable local target `http://127.0.0.1:8080`, served by Python `SimpleHTTP/0.6 Python/3.14.4`. It completed successfully, but it did **not** produce a finding-free report:
+
+- **2 Medium:** Content Security Policy header not set; anti-clickjacking header missing.
+- **6 Low:** COEP, COOP, CORP, Permissions Policy and X-Content-Type-Options headers missing; server-version information exposed by the local Python test server.
+- **2 Informational:** a benign descriptive comment in `random-index.js`; static content reported as storable/cacheable.
+
+The server-version finding is specific to the disposable Python test server. The missing-header findings describe that local test-server response and do not establish whether a production hosting edge supplies equivalent headers. Production hosting, authenticated flows, backend APIs and Android runtime behavior were not tested by this ZAP run. The header controls remain a deployment-edge verification item; they are not recorded as dismissed or remediated. The informational comment does not disclose credentials or secrets, and the cacheability alert concerns static content rather than user-specific data. This was a passive baseline scan, not a human-led penetration test or PR active scan.
+
+#### Android artifact verification
+
+The downloaded build artifact was inspected after the successful workflow:
+
+| APK | Size | SHA-256 |
+|---|---:|---|
+| `debug/app-debug.apk` | 12,208,577 bytes | `7cd179efbe2aa8748b3ec265933e06625e3abe8c6b81f474a4f59d2f1cb1384b` |
+| `release/app-release-unsigned.apk` | 10,365,939 bytes | `947d621df69a117ef535a156b4dd9f8a7a40c549739ce4b1eaffc271252c0848` |
+
+Both APKs contain `assets/public/random-index.js`, `assets/public/jokes.js`, and `assets/public/legal/third-party-notices.html`. The release APK is unsigned; no production signing or release was performed.
+
+#### Scanner coverage decisions
+
+- Existing working scanners and CI gates were retained; no test or security gate was weakened or deleted.
+- CodeQL remains on GitHub's existing default setup for JavaScript/TypeScript and GitHub Actions; no duplicate advanced CodeQL workflow was added.
+- MobSF remains deferred for this workstream as previously agreed.
+- Bearer was evaluated and remains a candidate for a controlled trial; it has not yet been integrated.
+- OSSAR was evaluated and not adopted for this JavaScript-focused repository because its current beta/Windows-runner constraints add complexity with overlapping coverage.
+
+**Interpretation:** successful checks mean the corresponding automation completed and its configured gate passed. They do not mean the application is vulnerability-free. The ZAP alerts above remain visible as deployment-context findings, and the report does not claim production-host security verification.
+
+
+**Last updated:** 22 November 2026  
 **Repository:** [ErTapanJatakia/JestBox](https://github.com/ErTapanJatakia/JestBox)  
 **Main commit before this documentation consolidation:** `6e5368da55499ec86b69e3c919004a5e7e1dd21a`  
 **Security-workflow baseline commit covered by the 19 November assessment snapshot:** `d4b6e13dfb5e0f56a078eb29ef8d36a85a95dba1`  
