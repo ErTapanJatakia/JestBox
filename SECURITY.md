@@ -28,6 +28,14 @@ Good-faith research that follows this policy and applicable law is welcome. Avoi
 
 ## Security Assessment Programme
 
+### Packaged Android manifest verification — PR in progress
+
+A separate fail-closed verifier is being added to inspect the **final signed assessment APK** using Android SDK `apkanalyzer`, rather than relying only on the generated source manifest. The change is additive and does not alter application runtime behaviour, signing identity, release distribution, or existing scanner gates.
+
+The proposed verifier checks the packaged application ID, minimum and target SDK levels, explicit backup disablement, non-debuggable/non-test-only state, cleartext-traffic policy, declared sensitive permissions, and exported component inventory. It requires the ProfileInstaller receiver to remain non-exported and permits only the single expected exported launcher component. A packaged custom network-security configuration is treated as requiring manual review rather than being assumed safe. Python standard-library regression tests exercise positive and negative manifest cases.
+
+**Status:** implementation is on a pull-request branch and is not yet verified by GitHub Actions. Do not treat this control as passed until the PR checks and the generated APK report succeed. A successful result will demonstrate that the inspected assessment APK manifest meets these specific invariants; it will not constitute a complete Android penetration test, TLS interception assessment, or store certification.
+
 ### Main-branch post-merge verification — 22 November 2026
 
 **Result:** all 15 main-branch workflow runs and all 16 commit checks completed successfully on main. This assessment covers commit `519ecd7ec69ee59987e02e74d3669c73d5e27044`; it is automated post-merge verification, not a production release certification.
@@ -443,7 +451,7 @@ For a cancelled or failed workflow, link the run and describe what actually exec
 | P1 | Verify/enable main branch protection and required status checks | Ruleset/branch-protection configuration verified; keep merge automation compatible |
 | P1 | Verify Dependabot security alerts, secret scanning, push protection and Dependency Graph | Settings confirmed in GitHub repository security settings |
 | P1 | Decide Android minimum supported API | Product decision recorded for MobSF minSdk=24 observation; do not silently drop older-device support |
-| P2 | Review allowBackup, ProfileInstallReceiver permission and generated Cordova/Capacitor static-analysis heuristics | Findings confirmed, mitigated or documented as accepted/deferred with rationale |
+| P2 | Verify the hardened settings in the final packaged APK and review any generated Cordova/Capacitor static-analysis heuristics | Packaged-manifest evidence passes; remaining framework heuristics are validated or documented with rationale |
 | P2 | Improve rooted MobSF coverage if TLS/system-level testing is required | A supported writable-system API 30 emulator completes rooted mode; otherwise retain Gadget-mode limitation |
 | P2 | Preserve time-limited report artifacts | Evidence downloaded or retained before artifact expiry |
 | P3 | Human-led penetration test and production-host assessment | Separately authorised assessment with defined scope |
