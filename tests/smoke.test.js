@@ -122,6 +122,6 @@ test("random joke selection uses unbiased Web Crypto rather than Math.random",()
  assert.equal(randomIndex(1),0);
  assert.throws(()=>randomIndex(0),RangeError);
  assert.throws(()=>randomIndex(0x100000001),RangeError);
- assert.match(html,/random-index\\.js/);
- assert.match(js,/mode==="random"\\?secureRandomIndex\\(a\\.length\\)/);
+ assert.match(html,/random-index\.js/);
+ assert.match(js,/mode==="random"\?secureRandomIndex\(a\.length\)/);
 });
