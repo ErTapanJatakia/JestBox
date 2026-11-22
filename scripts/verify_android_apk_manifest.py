@@ -151,10 +151,13 @@ def verify_manifest(xml_text: str) -> dict:
             + ", ".join(f"{kind}:{name}" for kind, name, _ in unexpected_exports)
         )
 
+    permission_tags = {"uses-permission", "uses-permission-sdk-23", "uses-permission-sdk-m"}
     permissions = sorted(
-        (element.get("name") or "")
-        for element in root.findall("uses-permission")
-        if element.get("name")
+        permission
+        for element in root.iter()
+        if element.tag in permission_tags
+        for permission in [android_attr(element, "name")]
+        if permission
     )
     sensitive = sorted(set(permissions) & SENSITIVE_PERMISSIONS)
     if sensitive:
