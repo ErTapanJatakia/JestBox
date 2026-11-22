@@ -572,3 +572,41 @@ This is an automated build/emulator assessment, not a human-led penetration test
 2. Continue triage of the existing ZAP, MobSF and Bearer findings using their underlying reports; green workflow status alone does not close findings.
 3. Keep production-edge header verification, human-led penetration testing and production release controls separate from this local-build assessment.
 4. Run the documentation commit's CI and preserve its result. No deployment, signing for distribution, store submission or APK release is authorised by this assessment.
+
+### Detailed ZAP and Bearer report review — 23 November 2026
+
+This review inspected the raw reports from the post-merge commit `94022328d8530ec5d5829f9af648a7a910428957`, rather than relying only on workflow conclusions.
+
+#### OWASP ZAP
+
+- **Run:** [#45063593443](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593443)
+- **Artifact:** [14770741996 — baseline, active JSON and HTML reports](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593443/artifacts/14770741996)
+- **Target:** disposable local static build at `http://127.0.0.1:8080), served by Python `SimpleHTTP/0.6 Python/3.14.4`.
+- **Baseline:** 0 High, 2 Medium, 6 Low, 2 Informational.
+- **Bounded active scan:** 0 High, 2 Medium, 6 Low, 3 Informational.
+
+The two Medium categories are missing Content-Security-Policy and anti-clickjacking response headers. The six Low categories are missing COEP, COOP, CORP, Permissions-Policy and X-Content-Type-Options headers, plus the Python test server's version disclosure. The active scan's additional Informational result is User-Agent Fuzzer response variation. Other Informational results are a benign source comment and cacheability of static content.
+
+**Disposition:** these are real observations of the disposable local test server and static build, not false-positive claims about a production host. The Python Server version disclosure is specifically attributable to the test harness. Response-header controls belong at the actual hosting/edge configuration and must be validated against the intended production origin before any deployment. No production domain was scanned, and no production hosting change is proposed or claimed. The comment and cacheability observations do not establish sensitive-data disclosure; the application is an offline-first static client and the scan did not identify a High-risk alert.
+
+#### Bearer CLI SAST evaluation
+
+- **Run:** [#45063593353](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593353)
+- **Artifact:** [14770537471 — SARIF and scan log](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593353/artifacts/14770537471)
+- **Tool:** Bearer CLI v2.1.3; 175 rules evaluated.
+- **Raw SARIF results:** 3 findings (two `javascript_lang_dangerous_insert_html` results and one `javascript_lang_logger_leak` result). This count is the SARIF result count for this run and should not be confused with the earlier PR #80 evaluation's five findings.
+
+| SARIF result | Location | Review |
+|---|---|---|
+| `javascript_lang_dangerous_insert_html` | `scripts/legal-markdown-renderer.mjs:124` | The flagged operation appends a DOM element built with `document.createElement`; the content label is assigned with `textContent`. No HTML string is parsed or injected. |
+| `javascript_lang_dangerous_insert_html` | `scripts/legal-markdown-renderer.mjs:167` | The flagged operation appends a DOM element created from a fixed allowlisted tag (`h1`–`h6`, `p`, `hr`, `ol`, `ul`, `li`). Inline text is emitted as text nodes; links use parsed URL allowlisting and DOM `setAttribute`; no `innerHTML`, `outerHTML` or `insertAdjacentHTML` sink is used. |
+| `javascript_lang_logger_leak` | `scripts/audit-joke-diversity.mjs:50` | The JSON report contains locale/category identifiers, aggregate joke counts, distinct-line counts and uniqueness ratios. It does not log joke text, user input, personal data, credentials or secrets. |
+
+**Disposition:** based on the current source and data flow, the two DOM-construction observations are contextual false positives for the specific dangerous-HTML rule: the renderer constructs nodes using safe DOM APIs, uses text nodes/textContent for text, and restricts link protocols to HTTP(S), mailto and tel. The logger observation is a contextual false positive for sensitive-data leakage because the emitted fields are aggregate QA metrics and contain no joke bodies or user data. These are documented triage decisions, not scanner suppressions. The Bearer workflow remains a non-blocking evaluation; its findings are not silently discarded and its output remains available as a retained artifact.
+
+#### Follow-up boundaries
+
+1. Keep production HTTP security-header verification as a pre-deployment task; do not retrofit local Python test-server headers and then present that as production assurance.
+2. Retain the renderer's safe DOM construction, URL protocol allowlist and tests. Any future change to render untrusted/user-submitted Markdown requires a fresh threat review and appropriate sanitization policy.
+3. Preserve the diversity audit's aggregate-only output. Do not add joke text or user-specific content to CI logs.
+4. The five Trivy licence alert states remain unverified in GitHub Security UI; their compliance evidence is documented above, but no close/dismiss action is claimed.
