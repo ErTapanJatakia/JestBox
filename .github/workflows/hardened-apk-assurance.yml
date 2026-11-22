@@ -150,8 +150,8 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest debuggable "$SIGNED" | grep -Fx "false"
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest min-sdk "$SIGNED" | grep -Fx "29"
           python3 scripts/verify_android_apk_manifest.py \
-            --apk "$SIGNED" \\
-            --apkanalyzer "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" \\
+            --apk "$SIGNED" \
+            --apkanalyzer "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" \
             --output android-apk-manifest-assessment.json
           sha256sum "$SIGNED" | tee hardened-apk.sha256
           rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"
