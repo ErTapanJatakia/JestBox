@@ -85,7 +85,19 @@ A non-blocking evaluation workflow was added in [PR #80](https://github.com/ErTa
 | `javascript_lang_logger_leak` | `scripts/audit-joke-diversity.mjs:50` | Logs locale/category counts, line-distinctness counts and ratios; it does not log joke text, personal data or secrets. | Candidate contextual false positive; retain evidence and recheck after review. |
 | `javascript_lang_logger_leak` | `scripts/prepare-web.mjs:87` | Logs only the fixed count of generated locale-specific legal pages. | Candidate contextual false positive; retain evidence and recheck after review. |
 
-No finding has been blanket-dismissed or suppressed. The two logger observations appear non-sensitive based on the logged fields, but their final disposition remains subject to review. The two findings in the APK verifier will be hardened. The legal-page renderer will be reviewed to remove unrestricted raw-HTML passthrough and ensure generated link attributes cannot be injected.
+No finding has been blanket-dismissed or suppressed. The two logger observations appear non-sensitive based on the logged fields, but their final disposition remains subject to review. The two findings in the APK verifier and the legal-page renderer are being addressed in [PR #81](https://github.com/ErTapanJatakia/JestBox/pull/81).
+
+#### Follow-up remediation and re-scan — PR #81
+
+A second Bearer run on the remediation branch evaluated the same 175 rules and reported **4 findings**, down from 5:
+
+- **Path traversal:** no longer reported. The APK verifier now resolves the APK path, follows symlinks before validation, and rejects any resolved path outside the repository workspace. The report output path is a fixed workspace filename rather than a caller-supplied path.
+- **OS command injection:** still reported at `scripts/verify_android_apk_manifest.py`. Manual review shows the executable is the fixed `apkanalyzer` name resolved from PATH; arguments are passed as a list with explicit `shell=False`, and the APK path is workspace-confined. This is a candidate false positive, but remains open pending final disposition.
+- **Manual HTML sanitization:** still reported at `scripts/prepare-web.mjs`. The renderer now escapes quotes as well as HTML delimiters, allows only the exact repository WCAG badge HTML, escapes all other raw HTML, and adds `rel="noopener noreferrer"` to generated links. A regression test covers script markup, quote-based attribute injection, unsafe URL schemes, normal HTTPS links, and the permitted badge. The rule remains open for contextual review; it is not suppressed.
+- **Logger observations:** both remain. The audit script emits locale/category and uniqueness metrics; the web preparation script emits only the fixed count of generated legal pages. Neither emits secrets, personal data, or joke content. They remain candidates for contextual false-positive disposition, not silently dismissed.
+
+Evidence: [Bearer run #44992014592](https://github.com/ErTapanJatakia/JestBox/actions/runs/44992014592) · [artifact 14742267318](https://github.com/ErTapanJatakia/JestBox/actions/runs/44992014592/artifacts/14742267318).
+
 
 The evaluation will compare language coverage, findings quality, rule overlap with CodeQL/njsscan/DevSkim, false-positive rate, execution time, and operational reliability. **Bearer is not yet an adopted required scanner**; adoption requires the follow-up remediation/re-scan and an evidence-based decision.
 
