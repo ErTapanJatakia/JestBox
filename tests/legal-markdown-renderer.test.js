@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { renderMarkdown } from "../scripts/legal-markdown-renderer.mjs";
 
 test("renders the approved linked WCAG reference image without raw HTML input", () => {
@@ -34,4 +35,15 @@ test("retains headings, emphasis, lists and plain text", () => {
   assert.match(output, /<strong>bold<\/strong>/);
   assert.match(output, /<em>italic<\/em>/);
   assert.match(output, /<ul><li>First<\/li><li>Second<\/li><\/ul>/);
+});
+
+test("all eight localized accessibility statements use the approved safe image syntax", async () => {
+  const locales = ["", ".en-IN", ".es-PE", ".es-ES", ".ru-RU", ".hi-IN", ".ur-IN", ".ur-PK"];
+  for (const locale of locales) {
+    const markdown = await readFile(new URL("../ACCESSIBILITY-STATEMENT" + locale + ".md", import.meta.url), "utf8");
+    assert.equal((markdown.match(/\[!\[[^\]]*\]\(assets\/wcag22aa-blue\.svg\)\]\(https:\/\/www\.w3\.org\/WAI\/WCAG22\/quickref\/\)/g) ?? []).length, 2, locale || "en-US");
+    const output = renderMarkdown(markdown);
+    assert.equal((output.match(/class="reference-mark"/g) ?? []).length, 2, locale || "en-US");
+    assert.doesNotMatch(output, /<p align=/, locale || "en-US");
+  }
 });
