@@ -61,6 +61,34 @@ The verifier fails closed if a custom `networkSecurityConfig` is introduced, unt
 
 **Coverage boundary:** this is packaged-manifest verification plus an automated API 30 emulator smoke test. It is not a human-led penetration test, rooted-device/TLS interception assessment, physical-device certification, app-store acceptance, or public release. The signed APK is an assessment candidate only; no store submission or distribution was performed.
 
+### Bearer CLI controlled SAST evaluation — 22 November 2026
+
+A non-blocking evaluation workflow was added in [PR #80](https://github.com/ErTapanJatakia/JestBox/pull/80) for **Bearer CLI v2.1.3**. The official CLI supports JavaScript and TypeScript and provides SAST rules covering OWASP Top 10/CWE Top 25 security risks. The open-source CLI is distributed under Elastic License 2.0 (ELv2); its terms permit internal use but are not an OSI-approved permissive licence.
+
+- **Tool release:** [Bearer CLI v2.1.3](https://github.com/Bearer/bearer/releases/tag/v2.1.3)
+- **Documentation:** [Bearer CLI](https://docs.bearer.com/) · [scan command reference](https://docs.bearer.com/reference/commands/)
+- **Pinned Linux AMD64 archive SHA-256:** `974d4ad7bb71bc578675684d444e345e8fbad91c85557aac035406ef5cc04c68`
+- **Execution:** [workflow run #44991208476](https://github.com/ErTapanJatakia/JestBox/actions/runs/44991208476) · [artifact 14742136388](https://github.com/ErTapanJatakia/JestBox/actions/runs/44991208476/artifacts/14742136388)
+- **Result:** 175 rules evaluated; 5 SARIF findings; SARIF schema and report structure validated.
+- **Scope:** SAST only. Bearer's optional secrets scanner is excluded because Gitleaks already covers secret-pattern detection.
+- **Reporting:** SARIF retained as a workflow artifact for manual triage; it is not uploaded into GitHub Code Scanning during the evaluation.
+- **CI policy:** non-blocking (`--exit-code=0`); no existing scanner, required check, or CI gate is changed or weakened.
+- **Credentials/network:** no Bearer Cloud API key is used; domain resolution and version-check network calls are disabled during the scan.
+
+#### Initial finding triage
+
+| Finding | Location | Assessment | Disposition |
+|---|---|---|---|
+| `python_lang_os_command_injection` | `scripts/verify_android_apk_manifest.py:203` | Uses an argv list with no shell expansion; the scanner does not model the fixed trusted CI invocation. | Open for hardening: use a fixed executable name, explicit `shell=False`, and retain command-argument validation. |
+| `python_lang_path_traversal` | `scripts/verify_android_apk_manifest.py:214` | Output path is a CLI argument; current workflow passes a fixed workspace-relative path. | Open for hardening: constrain APK and report paths to the repository workspace and test traversal rejection. |
+| `javascript_lang_manual_html_sanitization` | `scripts/prepare-web.mjs:25` | Markdown sources are repository-owned legal/accessibility documents, not user submissions. The renderer currently passes raw HTML lines through and performs manual escaping; this deserves a narrower HTML policy and attribute-safe link handling. | Open for remediation/review; do not dismiss as a false positive yet. |
+| `javascript_lang_logger_leak` | `scripts/audit-joke-diversity.mjs:50` | Logs locale/category counts, line-distinctness counts and ratios; it does not log joke text, personal data or secrets. | Candidate contextual false positive; retain evidence and recheck after review. |
+| `javascript_lang_logger_leak` | `scripts/prepare-web.mjs:87` | Logs only the fixed count of generated locale-specific legal pages. | Candidate contextual false positive; retain evidence and recheck after review. |
+
+No finding has been blanket-dismissed or suppressed. The two logger observations appear non-sensitive based on the logged fields, but their final disposition remains subject to review. The two findings in the APK verifier will be hardened. The legal-page renderer will be reviewed to remove unrestricted raw-HTML passthrough and ensure generated link attributes cannot be injected.
+
+The evaluation will compare language coverage, findings quality, rule overlap with CodeQL/njsscan/DevSkim, false-positive rate, execution time, and operational reliability. **Bearer is not yet an adopted required scanner**; adoption requires the follow-up remediation/re-scan and an evidence-based decision.
+
 ### Main-branch post-merge verification — 22 November 2026
 
 **Result:** all 15 main-branch workflow runs and all 16 commit checks completed successfully on main. This assessment covers commit `519ecd7ec69ee59987e02e74d3669c73d5e27044`; it is automated post-merge verification, not a production release certification.
