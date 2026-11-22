@@ -9,6 +9,7 @@ on:
       - "package-lock.json"
       - "capacitor.config.json"
       - "scripts/**"
+      - "tests/**"
       - "index.html"
       - "script.js"
       - "jokes.js"
