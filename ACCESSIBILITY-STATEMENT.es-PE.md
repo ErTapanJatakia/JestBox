@@ -3,7 +3,7 @@
 **Última revisión:** 19 de noviembre de 2026  
 **Producto:** JestBox
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="Guía WCAG 2.2"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Gráfico de referencia de conformidad WCAG 2.2 nivel AA"></a></p>
+[![Gráfico de referencia de conformidad WCAG 2.2 nivel AA](assets/wcag22aa-blue.svg)](https://www.w3.org/WAI/WCAG22/quickref/)
 
 ## Nuestro compromiso
 
@@ -36,7 +36,7 @@ Indica la pantalla o el control afectado, los pasos para reproducir el problema,
 - **Teléfono:** [+91 9664332984](tel:+919664332984)
 - **Sitio web:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="Guía WCAG 2.2"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Gráfico de referencia de conformidad WCAG 2.2 nivel AA"></a></p>
+[![Gráfico de referencia de conformidad WCAG 2.2 nivel AA](assets/wcag22aa-blue.svg)](https://www.w3.org/WAI/WCAG22/quickref/)
 
 ## Referencia
 
