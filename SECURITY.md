@@ -1,4 +1,4 @@
-# Security Policy
+# JestBox Security Policy and Security Assessment Programme
 
 ## Reporting
 Report suspected vulnerabilities privately. Do not publish exploit details in public issues or pull requests.
