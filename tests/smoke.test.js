@@ -6,6 +6,19 @@ import { webcrypto } from "node:crypto";
 const read=(name)=>fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html=read("index.html"),js=read("script.js"),css=read("styles.css"),jokesSource=read("jokes.js");
 const dataContext={window:{}};vm.runInNewContext(jokesSource,dataContext);const jokes=dataContext.window.JESTBOX_JOKES;
+test("njsscan excludes only the literal joke-data bundle, which is parsed as JSON and rendered as text",()=>{
+ const source=read("jokes.js");
+ const prefix="window.JESTBOX_JOKES=";
+ assert.ok(source.startsWith(prefix),"joke bundle must remain a single global data assignment");
+ const payload=source.slice(prefix.length).trim().replace(/;\\s*$/,"");
+ const parsed=JSON.parse(payload);
+ assert.deepEqual(Object.keys(parsed).sort(),[...locales].sort());
+ assert.match(js,/\\$\\("#joke-heading"\\)\\.textContent=current\\[1\\]/);
+ const config=read(".njsscan");
+ assert.match(config,/ignore-filenames:\\s*\\n\\s*- jokes\\.js/);
+ assert.doesNotMatch(config,/ignore-rules:/);
+ assert.doesNotMatch(config,/ignore-filenames:[\\s\\S]*?-[^\\n]+(?=\\n)/g,/);
+});
 const locales=["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN","ur-IN","ur-PK"];
 const categories=["everyday","work","tech","food","wordplay"];
 
