@@ -40,6 +40,9 @@ test("Android staging script copies only the local web app and bundled assets", 
     const stagedRenderer = await readFile(join(fixture, "www/legal/legal-markdown-renderer.mjs"), "utf8");
     const sourceRenderer = await readFile("scripts/legal-markdown-renderer.mjs", "utf8");
     assert.equal(stagedRenderer, sourceRenderer, "safe DOM renderer must be bundled with legal pages");
+    const stagedBootstrap = await readFile(join(fixture, "www/legal/legal-page-bootstrap.mjs"), "utf8");
+    const sourceBootstrap = await readFile("scripts/legal-page-bootstrap.mjs", "utf8");
+    assert.equal(stagedBootstrap, sourceBootstrap, "legal-page bootstrap must be bundled with legal pages");
     const sourceAsset = await readFile("assets/wcag22aa-blue.svg", "utf8");
     const stagedAsset = await readFile(join(fixture, "www/assets/wcag22aa-blue.svg"), "utf8");
     assert.equal(stagedAsset, sourceAsset, "bundled accessibility asset must be copied unchanged");
