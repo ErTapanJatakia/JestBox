@@ -1,0 +1,84 @@
+name: njsscan Node.js security analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "37 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: njsscan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: Scan JavaScript and Node.js security patterns
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned njsscan release
+        run: python -m pip install --disable-pip-version-check njsscan==1.0.2
+
+      - name: Run njsscan and preserve its exit status
+        id: njsscan
+        shell: bash
+        run: |
+          set -uo pipefail
+          set +e
+          njsscan . --sarif --output njsscan-results.sarif
+          scan_exit_code=$?
+          set -e
+          if [ ! -s njsscan-results.sarif ]; then
+            echo "njsscan did not produce a non-empty SARIF report (exit code: ${scan_exit_code})." >&2
+            exit 2
+          fi
+          echo "exit_code=${scan_exit_code}" >> "$GITHUB_OUTPUT"
+          echo "njsscan completed and produced SARIF (exit code: ${scan_exit_code})."
+
+      - name: Upload njsscan findings to code scanning
+        if: always() && hashFiles('njsscan-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        with:
+          sarif_file: njsscan-results.sarif
+          category: njsscan
+          wait-for-processing: true
+
+      - name: Generate njsscan summary
+        if: always() && hashFiles('njsscan-results.sarif') != ''
+        run: bash .github/scripts/render-sarif-summary.sh njsscan njsscan-results.sarif
+
+      - name: Archive njsscan report
+        if: always() && hashFiles('njsscan-results.sarif') != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-njsscan-report
+          path: |
+            njsscan-results.sarif
+            njsscan-security-summary.md
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Fail on njsscan errors or high-severity findings
+        if: always() && steps.njsscan.outputs.exit_code == '1'
+        run: |
+          echo "njsscan reported ERROR findings or source parse/read errors. Review the uploaded SARIF report before remediation."
+          exit 1
