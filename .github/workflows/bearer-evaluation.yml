@@ -1,0 +1,105 @@
+name: Bearer controlled SAST evaluation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/bearer-evaluation.yml"
+      - "*.js"
+      - "*.ts"
+      - "scripts/**"
+      - "tests/**"
+      - "assets/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/bearer-evaluation.yml"
+      - "*.js"
+      - "*.ts"
+      - "scripts/**"
+      - "tests/**"
+      - "assets/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jestbox-bearer-evaluation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bearer-sast:
+    name: Run non-blocking Bearer SAST evaluation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out trusted source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install checksum-verified Bearer CLI v2.1.3
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="v2.1.3"
+          SHA256="974d4ad7bb71bc578675684d444e345e8fbad91c85557aac035406ef5cc04c68"
+          ARCHIVE="$RUNNER_TEMP/bearer_2.1.3_linux_amd64.tar.gz"
+          INSTALL_DIR="$RUNNER_TEMP/bearer"
+          mkdir -p "$INSTALL_DIR"
+          curl --fail --location --retry 3 --retry-all-errors "https://github.com/Bearer/bearer/releases/download/$VERSION/bearer_2.1.3_linux_amd64.tar.gz" --output "$ARCHIVE"
+          printf '%s  %s\n' "$SHA256" "$ARCHIVE" | sha256sum --check --strict
+          tar --no-same-owner -xzf "$ARCHIVE" -C "$INSTALL_DIR"
+          test -x "$INSTALL_DIR/bearer"
+          "$INSTALL_DIR/bearer" version | tee bearer-version.txt
+          echo "Bearer CLI $VERSION installed after SHA-256 verification." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run Bearer SAST without changing existing CI gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/bearer/bearer" scan . --scanner=sast --report=security --format=sarif --output=bearer.sarif --exit-code=0 --disable-version-check --disable-domain-resolution --no-color 2>&1 | tee bearer-scan.log
+
+      - name: Validate SARIF and summarize findings
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          report_path = Path("bearer.sarif")
+          if not report_path.is_file() or report_path.stat().st_size == 0:
+              raise SystemExit("Bearer did not produce a non-empty SARIF report.")
+          report = json.loads(report_path.read_text(encoding="utf-8"))
+          if report.get("version") != "2.1.0" or not isinstance(report.get("runs"), list) or not report["runs"]:
+              raise SystemExit("Bearer SARIF is incomplete or not SARIF 2.1.0.")
+          run = report["runs"][0]
+          driver = run.get("tool", {}).get("driver", {})
+          results = run.get("results")
+          rules = driver.get("rules")
+          if not isinstance(driver.get("name"), str) or not isinstance(results, list) or not isinstance(rules, list):
+              raise SystemExit("Bearer SARIF is missing required tool, rules, or results fields.")
+          summary = {"tool": driver["name"], "rules": len(rules), "findings": len(results)}
+          print(json.dumps(summary, indent=2))
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as output:
+              output.write("## Bearer SAST evaluation\n\n")
+              output.write(f"- Tool: {summary['tool']}\n")
+              output.write(f"- Rules reported: {summary['rules']}\n")
+              output.write(f"- Findings: {summary['findings']}\n")
+              output.write("- CI policy: non-blocking evaluation; existing scanner gates are unchanged\n")
+          PY
+
+      - name: Upload Bearer evaluation evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-bearer-sast-evaluation
+          path: |
+            bearer.sarif
+            bearer-version.txt
+            bearer-scan.log
+          if-no-files-found: warn
+          retention-days: 14
