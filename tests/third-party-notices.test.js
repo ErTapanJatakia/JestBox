@@ -17,6 +17,7 @@ test("Android web preparation copies the third-party notices into the packaged l
 test("in-app notices preserve the required runtime licence texts and attribution", () => {
   const page = read("THIRD_PARTY_NOTICES.html");
   for (const marker of [
+    "Capacitor Android 8.6.2 — MIT",
     "Capacitor Core 8.6.2 — MIT",
     "Copyright (c) 2017-present Drifty Co.",
     "Capacitor Share 8.0.3 — MIT",
