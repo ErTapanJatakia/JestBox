@@ -30,7 +30,7 @@ Good-faith research that follows this policy and applicable law is welcome. Avoi
 
 ### Latest Security Assurance Report — 22 November 2026
 
-**Assessment status:** all 24 GitHub commit checks completed successfully on the latest PR head. PR #77 remains open and has not been merged into `main`; this report therefore records PR-branch verification, not a production release or deployment.
+**Assessment status:** all 24 GitHub commit checks completed successfully on the application-code PR head recorded below. This report is added in a subsequent documentation-only update; PR #77 remains open and has not been merged into `main`. The report therefore records PR-branch verification, not a production release or deployment.
 
 - **Repository:** [ErTapanJatakia/JestBox](https://github.com/ErTapanJatakia/JestBox)
 - **Pull request:** [#77 — njsscan Node.js security analysis](https://github.com/ErTapanJatakia/JestBox/pull/77)
