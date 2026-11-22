@@ -673,3 +673,47 @@ All 18 commit checks on the merge commit completed successfully, with zero failu
 | MobSF | Deferred by agreement due to tool reliability issues | Do not block other assurance work on MobSF |
 | Production deployment / APK distribution / store submission | Not authorised; not performed | Requires separate explicit authorisation |
 
+
+
+### DevSkim namespace fixture remediation and latest main-branch assurance — 23 November 2026
+
+**Result: PR #86 merged; all 27/27 PR checks and all 18/18 main-branch commit checks passed.** Merge commit: `8786bc4736da8269d6ad191533be364d99a61627`.
+
+- **PR:** [#86 — Reuse the canonical Android XML namespace in security fixtures](https://github.com/ErTapanJatakia/JestBox/pull/86) · [27/27 PR checks](https://github.com/ErTapanJatakia/JestBox/pull/86/checks)
+- **Main commit:** [`8786bc4736da8269d6ad191533be364d99a61627`](https://github.com/ErTapanJatakia/JestBox/commit/8786bc4736da8269d6ad191533be364d99a61627) · [18/18 checks successful, 0 failed, 0 pending](https://github.com/ErTapanJatakia/JestBox/commit/8786bc4736da8269d6ad191533be364d99a61627/checks)
+- **Android debug build:** [run #45072074677](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074677) — successful.
+- **Hardened APK assessment:** [run #45072074597](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074597) — successful.
+- **DevSkim:** [run #45072074598](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074598) · [SARIF artifact 14774055406](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074598/artifacts/14774055406) — **0 Errors, 0 Warnings, 25 Notes**.
+- **Trivy:** [run #45072074554](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074554) — successful; five licence-inventory notes remain informational.
+- **ZAP:** [run #45072074710](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074710) — successful against disposable local scan target only.
+- **OSV-Scanner:** [run #45072074595](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074595) — successful.
+- **njsscan:** [run #45072074800](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074800) — successful.
+- **Gitleaks:** [run #45072074803](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074803) — successful.
+- **zizmor:** [run #45072074590](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074590) — successful.
+- **actionlint:** [run #45072074661](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074661) — successful.
+- **Syft SBOM:** [run #45072074653](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074653) — successful.
+- **Tablet browser validation:** [run #45072074571](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074571) — successful.
+
+#### Remediation detail
+
+The residual DevSkim `DS137138` warning at `tests/android-security-hardening.test.js:10` was caused by a second test-fixture spelling of Android's XML namespace identifier. PR #86 centralised the identifier in `tests/helpers/android-xml-namespace.mjs` and reused the exported constant in the fixture. The exact namespace value remains unchanged; a narrow, line-scoped `DS137138` suppression documents that this literal is an XML namespace identifier, not a network endpoint. Fresh main-branch SARIF reports zero warnings. No scanner rules, tests, assertions, or CI gates were removed or weakened.
+
+#### Trivy licence alert lifecycle clarification
+
+The five licence inventory alerts — #1 (`@capacitor/core`), #2 (`@capacitor/share`), #3 (`tslib`), #120 (`playwright`) and #121 (`playwright-core`) — were **dismissed earlier, as confirmed by the maintainer**. Their technical classification remains informational licence inventory, not vulnerability findings. The repository records the relevant attributions and licence texts; app dependency notices are included in the inspected APKs, while Playwright packages are isolated tablet CI tooling and were not found in inspected APK contents. This report records dismissal status based on maintainer confirmation, not independent live API verification of each GitHub alert state. Dismissal does not remove dependencies or extinguish applicable licence obligations.
+
+#### Updated assurance tracker
+
+| Workstream | Status | Evidence / boundary |
+|---|---|---|
+| PR #86 DevSkim fixture warning | Remediated and merged | Fresh main SARIF: 0 Errors, 0 Warnings, 25 Notes |
+| PR #86 validation | Complete | 27/27 PR checks; 18/18 main commit checks |
+| Android debug build and hardened APK assessment | Automated workflows passed | CI assessment only; not public release or distribution |
+| Trivy licence alerts #1, #2, #3, #120, #121 | Dismissed per maintainer confirmation; compliance evidence documented | Not vulnerabilities; licence obligations remain |
+| ZAP | Workflow passed; findings remain scoped to disposable local target | No production origin exists or was scanned |
+| MobSF | Deferred by agreement | Tool reliability issues; not represented as passed |
+| Human-led penetration test / rooted-device and TLS interception review | Not completed | Separate manual assessment |
+| Production-edge HTTP security headers | Pre-deployment requirement | JestBox has not been deployed as a website |
+| APK distribution / app-store submission | Not authorised; not performed | Requires separate explicit authorisation |
+
+**Assessment boundary:** this checkpoint confirms automated repository, scanner, build and emulator workflows. It is not a certification, independent audit, guarantee of vulnerability-free software, human-led penetration test, production-host assessment or release approval. JestBox remains an Android APK project and has not been deployed as a website.
