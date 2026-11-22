@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -54,6 +55,21 @@ def parse_sdk(value: str | None, label: str) -> int:
         return int(value)
     except ValueError as exc:
         raise VerificationError(f"{label} is not a numeric API level: {value!r}") from exc
+
+
+def resolve_workspace_path(value: str, label: str, workspace: Path, *, strict: bool = False) -> Path:
+    candidate = Path(value)
+    if not candidate.is_absolute():
+        candidate = workspace / candidate
+    try:
+        resolved = candidate.resolve(strict=strict)
+    except OSError as exc:
+        raise VerificationError(f"{label} path cannot be resolved safely: {exc}") from exc
+    try:
+        resolved.relative_to(workspace)
+    except ValueError as exc:
+        raise VerificationError(f"{label} path must remain inside the repository workspace.") from exc
+    return resolved
 
 
 def verify_manifest(xml_text: str) -> dict:
@@ -185,36 +201,37 @@ def verify_manifest(xml_text: str) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--apk", required=True, help="Built APK to inspect")
-    parser.add_argument("--apkanalyzer", required=True, help="Path to Android apkanalyzer executable")
-    parser.add_argument("--output", help="Optional JSON evidence report path")
+    parser.add_argument("--apk", required=True, help="Built APK inside the repository workspace")
     args = parser.parse_args()
 
-    apk = Path(args.apk)
-    analyzer = Path(args.apkanalyzer)
-    if not apk.is_file() or apk.stat().st_size == 0:
-        print(f"ERROR: APK does not exist or is empty: {apk}", file=sys.stderr)
-        return 2
-    if not analyzer.is_file():
-        print(f"ERROR: apkanalyzer executable does not exist: {analyzer}", file=sys.stderr)
-        return 2
-
+    workspace = Path.cwd().resolve()
     try:
+        apk = resolve_workspace_path(args.apk, "APK", workspace, strict=True)
+        if not apk.is_file() or apk.stat().st_size == 0:
+            raise VerificationError(f"APK does not exist or is empty: {apk}")
+
+        analyzer = shutil.which("apkanalyzer")
+        if analyzer is None:
+            print("ERROR: apkanalyzer is not available on PATH.", file=sys.stderr)
+            return 2
+
         completed = subprocess.run(
-            [str(analyzer), "manifest", "print", str(apk)],
+            ["apkanalyzer", "manifest", "print", str(apk)],
             check=True,
             capture_output=True,
             text=True,
             timeout=60,
+            shell=False,
+            cwd=str(workspace),
         )
         report = verify_manifest(completed.stdout)
         report["apk"] = apk.name
         report["apkBytes"] = apk.stat().st_size
-        if args.output:
-            Path(args.output).write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        output_path = workspace / "android-apk-manifest-assessment.json"
+        output_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print(json.dumps(report, indent=2))
         return 0
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
         detail = getattr(exc, "stderr", None) or str(exc)
         print(f"ERROR: apkanalyzer failed; refusing to certify APK manifest. {detail}", file=sys.stderr)
         return 2
