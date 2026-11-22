@@ -581,7 +581,7 @@ This review inspected the raw reports from the post-merge commit `94022328d8530e
 
 - **Run:** [#45063593443](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593443)
 - **Artifact:** [14770741996 — baseline, active JSON and HTML reports](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593443/artifacts/14770741996)
-- **Target:** disposable local static build at `http://127.0.0.1:8080), served by Python `SimpleHTTP/0.6 Python/3.14.4`.
+- **Target:** disposable local static build at `http://127.0.0.1:8080`, served by Python `SimpleHTTP/0.6 Python/3.14.4`.
 - **Baseline:** 0 High, 2 Medium, 6 Low, 2 Informational.
 - **Bounded active scan:** 0 High, 2 Medium, 6 Low, 3 Informational.
 
@@ -610,3 +610,12 @@ The two Medium categories are missing Content-Security-Policy and anti-clickjack
 2. Retain the renderer's safe DOM construction, URL protocol allowlist and tests. Any future change to render untrusted/user-submitted Markdown requires a fresh threat review and appropriate sanitization policy.
 3. Preserve the diversity audit's aggregate-only output. Do not add joke text or user-specific content to CI logs.
 4. The five Trivy licence alert states remain unverified in GitHub Security UI; their compliance evidence is documented above, but no close/dismiss action is claimed.
+
+#### Documentation CI verification — 23 November 2026
+
+The detailed ZAP and Bearer triage update was committed as `5e6574fa8baf701301a376d31ddde074b6755714`. Its complete main-branch validation subsequently finished with **16/16 commit checks successful, 0 failed**. This included CodeQL for JavaScript/TypeScript, Python and GitHub Actions; OSV/Trivy scans; CycloneDX/SPDX inventory generation; workflow lint and security audits; tablet browser validation; ZAP DAST; njsscan; repository-history secret scanning; smoke tests; and Android debug validation.
+
+- **Commit:** [`5e6574fa8baf701301a376d31ddde074b6755714`](https://github.com/ErTapanJatakia/JestBox/commit/5e6574fa8baf701301a376d31ddde074b6755714)
+- **Commit checks:** [16/16 successful](https://github.com/ErTapanJatakia/JestBox/commit/5e6574fa8baf701301a376d31ddde074b6755714/checks)
+
+This confirms the documentation change passed the repository's existing checks. It does not close the five GitHub licence alerts, validate production-host headers, or substitute for the deferred MobSF and human-led assessments.
