@@ -1,7 +1,6 @@
 import { access, cp, mkdir, rm, readFile, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { constants } from "node:fs";
-import { renderMarkdown } from "./legal-markdown-renderer.mjs";
 
 
 const requiredFiles = ["index.html", "script.js", "jokes.js", "random-index.js", "share-bridge.bundle.js", "styles.css"];
@@ -10,6 +9,8 @@ for (const file of requiredFiles) await access(file, constants.R_OK);
 await rm("www", { recursive: true, force: true });
 await mkdir("www/assets", { recursive: true });
 await mkdir("www/legal", { recursive: true });
+await cp("scripts/legal-markdown-renderer.mjs", "www/legal/legal-markdown-renderer.mjs");
+await cp("scripts/legal-page-bootstrap.mjs", "www/legal/legal-page-bootstrap.mjs");
 await cp("THIRD_PARTY_NOTICES.html", "www/legal/third-party-notices.html");
 for (const file of requiredFiles) await cp(file, `www/${file}`);
 await cp("assets", "www/assets", { recursive: true });
@@ -41,7 +42,7 @@ for (const locale of locales) {
   ]) {
     const source = `${prefix}${suffix}.md`;
     const markdown = await readFile(source, "utf8");
-    const body = renderMarkdown(markdown);
+    const encodedMarkdown = Buffer.from(markdown, "utf8").toString("base64");
     const localizedTitle = localizedTitles[locale][kind];
     const page = `<!doctype html>
 <html lang="${locale}" dir="${locale.startsWith("ur-") ? "rtl" : "ltr"}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -56,8 +57,8 @@ li{margin:.35rem 0}code{overflow-wrap:anywhere}
 .home{display:inline-block;margin:1rem 0;padding:.6rem 1rem;border:1px solid currentColor;border-radius:.6rem;text-decoration:none}
 @media(prefers-color-scheme:light){body{background:#f4f0e7;color:#20252b}main{background:#fffdf7;border-color:#6d7884}a{color:#075d68}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
-</style></head><body><main><a class="home" href="../index.html">← JestBox</a><article>${body}</article><a class="home" href="../index.html">← JestBox</a></main></body></html>`;
+</style></head><body><main><a class="home" href="../index.html">← JestBox</a><article id="legal-content" data-markdown="${encodedMarkdown}"></article><script type="module" src="./legal-page-bootstrap.mjs"></script><a class="home" href="../index.html">← JestBox</a></main></body></html>`;
     await writeFile(`www/legal/${kind}-${locale}.html`, page);
   }
 }
-console.log(`Prepared local app assets and ${locales.length * 2} locale-specific legal pages in www/.`);
+console.log("Prepared local app assets and localized legal pages.");
