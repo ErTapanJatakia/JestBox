@@ -143,6 +143,17 @@ jobs:
                   for run in runs for invocation in run.get("invocations", [])
               ):
                   failures.append("SARIF invocation is missing or marked unsuccessful")
+              for run in runs:
+                  for invocation in run.get("invocations", []):
+                      for notification in (
+                          invocation.get("toolExecutionNotifications", [])
+                          + invocation.get("toolConfigurationNotifications", [])
+                      ):
+                          if notification.get("level") == "error":
+                              failures.append(
+                                  "SARIF execution notification: "
+                                  + notification.get("message", {}).get("text", "unspecified error")
+                              )
               sarif_count = sum(len(run.get("results", [])) for run in runs)
               if sarif_count != len(findings):
                   failures.append(
@@ -152,6 +163,8 @@ jobs:
               failures.append(f"SARIF report is missing or invalid: {exc}")
 
           error_findings = [item for item in findings if item[0] == "ERROR"]
+          if json_code == "1" and not scan_errors and not error_findings:
+              failures.append("JSON exit code 1 is unexplained by scanner errors or ERROR findings")
           print(f"njsscan findings: {len(findings)} total; {len(error_findings)} ERROR")
           print(f"njsscan scanner execution errors: {len(scan_errors)}")
           if error_findings:

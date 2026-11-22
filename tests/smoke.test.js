@@ -16,7 +16,8 @@ test("njsscan excludes only the literal joke-data bundle, which is parsed as JSO
  assert.deepEqual(Object.keys(parsed).sort(),[...locales].sort());
  assert.ok(js.includes('$("#joke-heading").textContent=current[1]'),"joke text must be rendered as text, not HTML");
  const config=read(".njsscan");
- assert.ok(config.includes("ignore-filenames:\n  - jokes.js"),"only the static data bundle may be excluded");
+ const ignored=config.split("ignore-filenames:")[1]?.split("\n  ignore-paths:")[0]?.trim();
+ assert.equal(ignored,"- jokes.js","jokes.js must be the only ignored filename");
  assert.equal(config.includes("ignore-rules:"),false,"no njsscan rules may be disabled");
 });
 const locales=["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN","ur-IN","ur-PK"];
