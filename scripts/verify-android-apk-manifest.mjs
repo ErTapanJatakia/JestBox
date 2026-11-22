@@ -15,8 +15,7 @@ if (reportIndex >= 0 && !reportPath) {
 const xml = await readFile(manifestPath, "utf8");
 const failures = [];
 const attr = (source, name) => {
-  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = source.match(new RegExp("(?:^|\\s)" + escaped + "\\s*=\\s*\\\"([^\\\"]*)\\\""));
+  const match = source.match(new RegExp("(?:^|\\s)" + name + "\\s*=\\s*\"([^\"]*)\""));
   return match?.[1] ?? null;
 };
 const openTag = (name) => {
@@ -44,7 +43,7 @@ if (allowBackup !== "false") failures.push("APK application must explicitly set 
 if (debuggable === "true") failures.push("APK application is debuggable=true.");
 if (cleartext === "true") failures.push("APK application explicitly permits cleartext traffic.");
 
-const componentPattern = /<(activity|activity-alias|service|receiver|provider)\\b([^>]*?)(\\/?)>/g;
+const componentPattern = /<(activity|activity-alias|service|receiver|provider)\b([^>]*?)(\/?)>/g;
 const components = [];
 for (const match of xml.matchAll(componentPattern)) {
   const [, tag, attributes, selfClosing] = match;
@@ -53,9 +52,9 @@ for (const match of xml.matchAll(componentPattern)) {
   const start = match.index + match[0].length;
   const closeIndex = selfClosing ? start : xml.indexOf("</" + tag + ">", start);
   const body = closeIndex < 0 ? "" : xml.slice(start, closeIndex);
-  const hasIntentFilter = /<intent-filter\\b/.test(body);
-  const isLauncher = /android:name=["']android\\.intent\\.action\\.MAIN["']/.test(body) &&
-    /android:name=["']android\\.intent\\.category\\.LAUNCHER["']/.test(body);
+  const hasIntentFilter = /<intent-filter\b/.test(body);
+  const isLauncher = /android:name=["']android\.intent\.action\.MAIN["']/.test(body) &&
+    /android:name=["']android\.intent\.category\.LAUNCHER["']/.test(body);
 
   components.push({ tag, name, exported, hasIntentFilter, launcher: isLauncher });
   if (hasIntentFilter && exported === null) {
@@ -75,9 +74,9 @@ if (!components.some((item) => item.launcher && item.exported === "true")) {
   failures.push("No explicitly exported MAIN/LAUNCHER activity was found.");
 }
 
-const permissionPattern = /<(uses-permission|uses-permission-sdk-23|uses-permission-sdk-m)\\b([^>]*)\\/?>/g;
+const permissionPattern = /<(uses-permission|uses-permission-sdk-23|uses-permission-sdk-m)\b([^>]*)\/?>/g;
 const permissions = [...xml.matchAll(permissionPattern)].map((match) => attr(match[2], "android:name")).filter(Boolean);
-const prohibitedPermission = /^(?:android\\.permission\\.(?:READ|WRITE)_EXTERNAL_STORAGE|android\\.permission\\.MANAGE_EXTERNAL_STORAGE|android\\.permission\\.(?:READ|SEND|RECEIVE)_SMS|android\\.permission\\.(?:READ|WRITE)_CONTACTS|android\\.permission\\.(?:READ|WRITE)_CALENDAR|android\\.permission\\.(?:ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|ACCESS_BACKGROUND_LOCATION|CAMERA|RECORD_AUDIO|CALL_PHONE|READ_CALL_LOG|WRITE_CALL_LOG|BODY_SENSORS|ACTIVITY_RECOGNITION|READ_MEDIA_(?:IMAGES|VIDEO|AUDIO)|READ_MEDIA_VISUAL_USER_SELECTED))$/;
+const prohibitedPermission = /^(?:android\.permission\.(?:READ|WRITE)_EXTERNAL_STORAGE|android\.permission\.MANAGE_EXTERNAL_STORAGE|android\.permission\.(?:READ|SEND|RECEIVE)_SMS|android\.permission\.(?:READ|WRITE)_CONTACTS|android\.permission\.(?:READ|WRITE)_CALENDAR|android\.permission\.(?:ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|ACCESS_BACKGROUND_LOCATION|CAMERA|RECORD_AUDIO|CALL_PHONE|READ_CALL_LOG|WRITE_CALL_LOG|BODY_SENSORS|ACTIVITY_RECOGNITION|READ_MEDIA_(?:IMAGES|VIDEO|AUDIO)|READ_MEDIA_VISUAL_USER_SELECTED))$/;
 for (const permission of permissions) {
   if (prohibitedPermission.test(permission)) failures.push("Unexpected sensitive permission declared: " + permission);
 }
@@ -96,7 +95,7 @@ const report = {
   failures
 };
 
-if (reportPath) await writeFile(reportPath, JSON.stringify(report, null, 2) + "\\n");
+if (reportPath) await writeFile(reportPath, JSON.stringify(report, null, 2) + "\n");
 console.log(JSON.stringify(report, null, 2));
 if (failures.length) {
   console.error("APK manifest verification failed closed.");
