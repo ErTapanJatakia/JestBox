@@ -117,7 +117,7 @@ test("Urdu locales are independent, searchable, fully localized, and rendered ri
 
 test("random joke selection uses unbiased Web Crypto rather than Math.random",()=>{
  const start=js.indexOf("function secureRandomIndex(max){");
- const end=js.indexOf("\\n}",start)+2;
+ const end=js.indexOf("\n}",start)+2;
  const helper=start>=0&&end>1?js.slice(start,end):null;
  assert.ok(helper,"secureRandomIndex helper must exist");
  const randomIndex=vm.runInNewContext(helper+"; secureRandomIndex",{crypto:webcrypto,Uint32Array,Number,Math,RangeError});
