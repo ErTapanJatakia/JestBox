@@ -170,6 +170,7 @@ The security automation was introduced and hardened in a series of changes:
 - [PR #22](https://github.com/ErTapanJatakia/JestBox/pull/22): added Android SDK platform-tools/emulator paths to the dynamic workflow so `adb` and `emulator` resolve correctly.
 - [PR #24](https://github.com/ErTapanJatakia/JestBox/pull/24): consolidated the security policy, assessment history and testing procedures into this SECURITY.md.
 - [PR #26](https://github.com/ErTapanJatakia/JestBox/pull/26): committed package-lock.json, moved CI installs to npm ci, added unsigned release-APK static assessment, stabilised MobSF dynamic ADB handling, and incorporated Dependabot updates for checkout, upload-artifact, deploy-pages and setup-dotnet.
+- [PR #71](https://github.com/ErTapanJatakia/JestBox/pull/71): isolated tablet-only Playwright tooling under `.github/tooling/tablet/`, pinned Playwright and Playwright Core 1.56.1 in a dedicated npm lockfile, changed the tablet workflow to `npm ci`, and added regression assertions preventing unlocked installation. Trivy reported Apache-2.0 license notices for `playwright` and `playwright-core`; these are permissive-license inventory notices, not vulnerability findings. The dependency is CI-only and is not added to the application runtime dependency set.
 
 These changes concern security automation and workflow reliability. They did not authorise production signing, store submission, or production deployment.
 
