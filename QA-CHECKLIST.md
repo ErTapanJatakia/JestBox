@@ -63,5 +63,5 @@
 - [ ] Verify Security Policy, Code of Conduct, Contributing Guidelines, and product documentation are current.
 - [ ] Run source checks and review CI results for the exact final commit.
 - [ ] Complete Android debug build and inspect APK contents/manifest/signature.
-- [ ] Complete physical-device testing on supported Android versions and screen sizes.
+- [x] Complete physical-device acceptance for the Urdu locales (`ur-IN` and `ur-PK`) — maintainer-confirmed pass on 2026-11-19; device/OS matrix is not recorded here.
 - [ ] Do not sign a production release, create an AAB/release APK, or submit to RuStore until separately authorized.

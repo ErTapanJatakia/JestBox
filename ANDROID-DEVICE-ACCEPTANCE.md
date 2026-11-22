@@ -61,7 +61,13 @@ The app ID is currently \`com.ertapanjatakia.jestbox\`. A debug build may not in
 - [ ] Increase Android system font/display size and check that controls remain usable.
 - [ ] Test high-contrast and reduced-motion settings.
 
-## 5. Report results
+## 5. Recorded Urdu device-acceptance result
+
+**Date:** 2026-11-19  
+**Result:** The maintainer confirmed that physical-device testing passed for both Urdu locales: `ur-IN` (Indian Urdu) and `ur-PK` (Pakistani Urdu). No defects were reported.  
+**Evidence boundary:** Device models, Android versions, screenshots, and specific assistive-technology test details were not supplied, so this record does not claim a particular device matrix or TalkBack-specific pass.
+
+## 6. Report results
 
 Send the following information after testing:
 
