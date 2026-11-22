@@ -619,3 +619,57 @@ The detailed ZAP and Bearer triage update was committed as `5e6574fa8baf701301a3
 - **Commit checks:** [16/16 successful](https://github.com/ErTapanJatakia/JestBox/commit/5e6574fa8baf701301a376d31ddde074b6755714/checks)
 
 This confirms the documentation change passed the repository's existing checks. It does not close the five GitHub licence alerts, validate production-host headers, or substitute for the deferred MobSF and human-led assessments.
+
+
+### DevSkim alert triage and post-merge assurance — 23 November 2026
+
+**Result: PR #84 merged; all 27/27 PR checks and all 18/18 main-branch commit checks passed.** The merge commit is `ed665bba1a68cc885f11c0540fa95ec3123fc1ce`. This is automated source/build assurance for the Android APK project; JestBox has not been deployed as a website, and no APK distribution or store submission was performed.
+
+- **PR:** [#84 — Triage three DevSkim findings with narrow source-level fixes](https://github.com/ErTapanJatakia/JestBox/pull/84)
+- **Merge commit:** [`ed665bba1a68cc885f11c0540fa95ec3123fc1ce`](https://github.com/ErTapanJatakia/JestBox/commit/ed665bba1a68cc885f11c0540fa95ec3123fc1ce)
+- **PR checks:** [27/27 successful](https://github.com/ErTapanJatakia/JestBox/pull/84/checks)
+- **Main commit checks:** [18/18 successful](https://github.com/ErTapanJatakia/JestBox/commit/ed665bba1a68cc885f11c0540fa95ec3123fc1ce/checks)
+- **Main-branch DevSkim:** [run #45068479634](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479634) · [SARIF artifact 14771604206](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479634/artifacts/14771604206)
+- **Other main-branch security runs:** [CodeQL / checks](https://github.com/ErTapanJatakia/JestBox/commit/ed665bba1a68cc885f11c0540fa95ec3123fc1ce/checks) · [ZAP #45068479520](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479520) · [Trivy #45068479363](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479363) · [OSV #45068479528](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479528) · [Gitleaks #45068479391](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479391) · [njsscan #45068479369](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479369) · [Bearer #45068479402](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479402) · [Android debug #45068479368](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479368) · [Hardened APK assessment #45068479491](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479491) · [Tablet browser #45068479418](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479418) · [Syft SBOM #45068479541](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479541) · [zizmor #45068479514](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479514) · [actionlint #45068479500](https://github.com/ErTapanJatakia/JestBox/actions/runs/45068479500).
+
+#### Disposition of the three reported Code Scanning findings
+
+| Alert | Reported location | Technical assessment | Source remediation |
+|---|---|---|---|
+| #127 | `.github/workflows/bearer-evaluation.yml:47` — token/key heuristic | The value is the public SHA-256 integrity digest for the pinned Bearer CLI v2.1.3 archive. It is not a credential, access token or authentication key. | Kept the digest and strict `sha256sum --check --strict` verification. Added an explanatory comment and a line-scoped DevSkim `DS173237` suppression for this exact checksum line. |
+| #126 | `scripts/verify_android_apk_manifest.py:14` — HTTP URL heuristic | The value is Android's required XML namespace identifier (`http://schemas.android.com/apk/res/android`), not an HTTP endpoint or network request. | Kept the namespace byte-for-byte unchanged. Added rationale and a line-scoped `DS137138` suppression. |
+| #125 | `tests/test_android_apk_manifest_verifier.py:13` — HTTP URL heuristic | Duplicate fixture spelling of the same Android XML namespace identifier. | Removed the duplicate literal; the test now reuses the verifier's canonical namespace constant. |
+
+Suppressions follow the documented [DevSkim suppression syntax](https://github.com/microsoft/DevSkim/wiki/Suppressions) and are restricted to the exact source lines and rule IDs. No real secrets, scanner rules, TLS protections, test assertions, or CI gates were removed or weakened. The checksum remains verified; the Android namespace remains unchanged at runtime.
+
+The PR-branch SARIF no longer reported any finding at the three supplied source locations. The fresh main-branch SARIF confirms those locations are absent after merge. This is scanner evidence, not proof that the GitHub Code Scanning alert records have transitioned to Closed: the available GitHub connector does not expose individual alert lifecycle state. Verify the live state in the [Code Scanning alerts page](https://github.com/ErTapanJatakia/JestBox/security/code-scanning); no manual dismissal or closure is claimed here.
+
+#### Fresh main-branch DevSkim result and residual warning
+
+The completed main-branch DevSkim SARIF contains **0 Error, 1 Warning and 25 Note results (26 total)**. The remaining warning is a separate finding:
+
+- **Rule:** `DS137138`
+- **Location:** `tests/android-security-hardening.test.js:10`
+- **Context:** a test fixture contains the same Android XML namespace identifier in an embedded manifest string. It is a namespace identifier, not a network endpoint. This warning was not one of the three alert locations supplied for PR #84 and remains separately tracked for narrow remediation.
+- **Other output:** 25 Note-level results are retained as scanner observations; they are not silently converted into a clean-scan claim.
+
+Do not describe the complete DevSkim scan as warning-free. The next source-level task is to handle this additional fixture occurrence with a minimal, well-documented approach, preserving the exact XML namespace and all test coverage, then rerun DevSkim and the relevant regression/CI checks.
+
+#### Main-branch check result
+
+All 18 commit checks on the merge commit completed successfully, with zero failures and zero pending checks. The run set included CodeQL (JavaScript/TypeScript, Python and GitHub Actions), ZAP DAST, hardened signed APK build/signature/emulator assessment, Android debug and unsigned release build, tablet browser validation, DevSkim, njsscan, Bearer, Trivy, OSV-Scanner, Gitleaks, Syft SBOM, OpenSSF Scorecard, zizmor and actionlint, plus repository validation and push workflow checks. Individual scanner success indicates the tool completed; it does not by itself disposition every finding.
+
+**Build boundary:** the hardened signed APK is an assessment candidate only. The automated API 30 emulator assessment is not a human-led penetration test, physical-device certification, production deployment, or store release. JestBox remains an Android APK project; no website deployment is asserted.
+
+#### Security assurance tracker — current checkpoint
+
+| Workstream | Status | Evidence / next action |
+|---|---|---|
+| Three supplied DevSkim findings | Source remediations merged; fresh SARIF clear at supplied locations | PR #84 and main SARIF above; confirm live GitHub alert lifecycle in Security UI |
+| Additional DevSkim namespace warning | Open for separate narrow remediation | `tests/android-security-hardening.test.js:10` |
+| Main-branch CI after PR #84 | Complete — 18/18 passed | Merge commit check summary above |
+| Trivy licence alerts #1, #2, #3, #120, #121 | Compliance evidence documented; GitHub alert states not verified | Confirm each alert status individually; do not dismiss valid licence inventory notices |
+| ZAP findings | Scan completed; contextual findings remain documented | Local disposable target only; production-edge headers remain a pre-deployment check |
+| MobSF | Deferred by agreement due to tool reliability issues | Do not block other assurance work on MobSF |
+| Production deployment / APK distribution / store submission | Not authorised; not performed | Requires separate explicit authorisation |
+
