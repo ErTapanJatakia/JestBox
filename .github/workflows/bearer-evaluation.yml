@@ -44,7 +44,8 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="v2.1.3"
-          SHA256="974d4ad7bb71bc578675684d444e345e8fbad91c85557aac035406ef5cc04c68"
+          # Public artifact-integrity digest, not an authentication secret.
+          SHA256="974d4ad7bb71bc578675684d444e345e8fbad91c85557aac035406ef5cc04c68" # DevSkim: ignore DS173237
           ARCHIVE="$RUNNER_TEMP/bearer_2.1.3_linux_amd64.tar.gz"
           INSTALL_DIR="$RUNNER_TEMP/bearer"
           mkdir -p "$INSTALL_DIR"
