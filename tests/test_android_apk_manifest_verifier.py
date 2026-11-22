@@ -154,7 +154,7 @@ class PackagedApkManifestVerifierTests(unittest.TestCase):
             binary_dir = root / "bin"
             binary_dir.mkdir()
             analyzer = binary_dir / "apkanalyzer"
-            analyzer.write_text("#!/usr/bin/env python3\\nprint(" + repr(manifest()) + ")\\n", encoding="utf-8")
+            analyzer.write_text("#!/usr/bin/env python3\nprint(" + repr(manifest()) + ")\n", encoding="utf-8")
             analyzer.chmod(0o755)
             apk = root / "android" / "app" / "build" / "outputs" / "apk" / "release" / "app-release-unsigned.apk"
             apk.parent.mkdir(parents=True)
