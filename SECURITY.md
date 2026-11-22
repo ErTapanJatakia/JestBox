@@ -61,6 +61,18 @@ Good-faith research that follows this policy and applicable law is welcome. Avoi
 
 The initial njsscan JSON report recorded a timeout in rule `regex_dos` against the 307 KB `jokes.js` bundle; this was an incomplete scan, not a clean result. The cause was traced to the file combining static joke data with batch-append JavaScript. The data was consolidated into a single JSON-compatible literal assignment. The `.njsscan` configuration now excludes only this static data filename; no njsscan rule is disabled. A regression test parses the bundle as JSON, checks that it remains a data-only assignment, verifies joke rendering uses `textContent`, and asserts that `jokes.js` is the sole filename exclusion. All executable JavaScript remains in njsscan scope. The subsequent JSON and SARIF reports contain no scanner errors or findings, and the completeness gate passed.
 
+#### Investigation and closure of earlier failed checks
+
+The following failures were investigated rather than suppressed:
+
+- **CodeQL advanced-setup attempt (PR #76):** the advanced workflow could not run alongside the repository's already-enabled CodeQL default setup. PR #76 was closed without merging; the existing default setup was retained. Its JavaScript/TypeScript and GitHub Actions analyses both passed in the latest assessment.
+- **Initial njsscan pattern finding:** the first report flagged `Math.random()` in non-security-sensitive random joke selection (CWE-327). The selection was replaced with a Web Crypto `crypto.getRandomValues()` rejection-sampling helper, and regression tests were added. No rule suppression was used.
+- **JestBox regression suite:** the first 42-test run had two failures. The Android staging fixture did not copy the newly required `random-index.js` helper, and the random-selection test asserted an outdated conditional expression. The fixture and assertion were corrected; the latest suite passes 43/43 tests.
+- **Android and ZAP first attempts:** both stopped in their shared preflight regression suite because of those same test failures; the Android Gradle build and ZAP scan had not yet started. After the fix, the latest Android debug and unsigned release builds completed successfully, and the ZAP baseline scan completed successfully.
+- **njsscan incomplete scan:** the subsequent JSON diagnostic identified a `regex_dos` timeout against the mixed code/data `jokes.js` bundle. The data-only conversion, narrow filename exclusion, regression guard and fail-closed JSON/SARIF validation are documented above. The final scan completed with zero scanner errors and zero findings.
+
+No existing working scanner was removed, no njsscan rule was disabled, and no regression or CI gate was deleted or weakened.
+
 #### OWASP ZAP alert triage
 
 The PR workflow ran the passive baseline scan against the disposable local target `http://127.0.0.1:8080`, served by Python `SimpleHTTP/0.6 Python/3.14.4`. It completed successfully, but it did **not** produce a finding-free report:
