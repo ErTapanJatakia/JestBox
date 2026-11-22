@@ -21,12 +21,26 @@ try {
   console.warn("esbuild is not installed; retaining the browser-safe share bridge stub.");
 }
 
+const HTML_ENTITIES = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;"
+};
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, character => HTML_ENTITIES[character]);
+}
+
 function inlineMarkdown(value) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^ )]+|mailto:[^ )]+|tel:[^ )]+)\)/g, '<a href="$2">$1</a>')
+  return escapeHtml(value)
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^ )]+|mailto:[^ )]+|tel:[^ )]+)\)/g,
+      (_match, label, href) => '<a href="' + href + '" rel="noopener noreferrer">' + label + '</a>')
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>");
 }
+
 function renderMarkdown(markdown) {
   const lines = markdown.replaceAll("assets/wcag22aa-blue.svg", "../assets/wcag22aa-blue.svg").split(/\r?\n/);
   const out = []; let paragraph = []; let list = null;
@@ -34,7 +48,19 @@ function renderMarkdown(markdown) {
   const flushL = () => { if (list) { out.push("</" + list + ">"); list = null; } };
   for (const line of lines) {
     if (!line.trim()) { flushP(); flushL(); continue; }
-    if (/^<[^>]+>/.test(line.trim())) { flushP(); flushL(); out.push(line); continue; }
+    if (/^<[^>]+>/.test(line.trim())) {
+      flushP();
+      flushL();
+      const badge = line.trim().match(/^<p align="center"><a href="https:\/\/www\.w3\.org\/WAI\/WCAG22\/quickref\/" title="([^"]*)"><img src="\.\.\/assets\/wcag22aa-blue\.svg" width="88" height="31" alt="([^"]*)"><\/a><\/p>$/);
+      if (badge) {
+        out.push('<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="' +
+          escapeHtml(badge[1]) + '" rel="noopener noreferrer"><img src="../assets/wcag22aa-blue.svg" width="88" height="31" alt="' +
+          escapeHtml(badge[2]) + '"></a></p>');
+      } else {
+        out.push(escapeHtml(line.trim()));
+      }
+      continue;
+    }
     const h = line.match(/^(#{1,6})\s+(.+)$/);
     if (h) { flushP(); flushL(); const n = h[1].length; out.push("<h" + n + ">" + inlineMarkdown(h[2]) + "</h" + n + ">"); continue; }
     if (/^\s*---+\s*$/.test(line)) { flushP(); flushL(); out.push("<hr>"); continue; }
