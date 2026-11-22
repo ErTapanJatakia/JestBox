@@ -9,6 +9,7 @@ for (const file of requiredFiles) await access(file, constants.R_OK);
 await rm("www", { recursive: true, force: true });
 await mkdir("www/assets", { recursive: true });
 await mkdir("www/legal", { recursive: true });
+await cp("THIRD_PARTY_NOTICES.html", "www/legal/third-party-notices.html");
 for (const file of requiredFiles) await cp(file, `www/${file}`);
 await cp("assets", "www/assets", { recursive: true });
 
