@@ -26,7 +26,7 @@ test("legal-page generation escapes untrusted markup and restricts raw HTML", as
         ? [
             "# Privacy",
             "<script>alert(1)</script>",
-            '[click](https://example.test/"onmouseover="alert(1))',
+            '[click](https://example.test/"onmouseover="alert)',
             "[javascript](javascript:alert(1))"
           ].join("\n")
         : "# Privacy";
