@@ -147,6 +147,29 @@ class PackagedApkManifestVerifierTests(unittest.TestCase):
             report = json.loads((root / "assessment-report;touch PWNED.json").read_text(encoding="utf-8"))
             self.assertEqual(report["result"], "passed")
             self.assertFalse((root / "PWNED.json").exists())
+    def test_cli_selects_only_allowlisted_release_unsigned_artifact(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as workspace:
+            root = Path(workspace)
+            binary_dir = root / "bin"
+            binary_dir.mkdir()
+            analyzer = binary_dir / "apkanalyzer"
+            analyzer.write_text("#!/usr/bin/env python3\\nprint(" + repr(manifest()) + ")\\n", encoding="utf-8")
+            analyzer.chmod(0o755)
+            apk = root / "android" / "app" / "build" / "outputs" / "apk" / "release" / "app-release-unsigned.apk"
+            apk.parent.mkdir(parents=True)
+            apk.write_bytes(b"unsigned-release-apk")
+            environment = os.environ.copy()
+            environment["PATH"] = str(binary_dir) + os.pathsep + environment.get("PATH", "")
+            command = [sys.executable, str(repository_root / "scripts" / "verify_android_apk_manifest.py"), "--artifact", "release-unsigned", "--output", "unsigned-assessment.json"]
+            completed = subprocess.run(command, cwd=root, env=environment, capture_output=True, text=True, check=False)
+            self.assertEqual(completed.returncode, 0, completed.stderr or completed.stdout)
+            report = json.loads((root / "unsigned-assessment.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["result"], "passed")
+            self.assertEqual(report["apk"], "app-release-unsigned.apk")
+            rejected = subprocess.run(command[:command.index("--artifact")] + ["--artifact", "../outside.apk"], cwd=root, env=environment, capture_output=True, text=True, check=False)
+            self.assertNotEqual(rejected.returncode, 0)
+
     def test_requires_profileinstaller_hardening_and_one_launcher(self):
         without_receiver = manifest().replace(
             '<receiver android:name="androidx.profileinstaller.ProfileInstallReceiver"\n        android:exported="false" />',
