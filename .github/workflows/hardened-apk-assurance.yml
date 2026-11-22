@@ -66,6 +66,7 @@ jobs:
           node --check scripts/prepare-web.mjs
           node --check scripts/prepare-android-branding.mjs
           node --check scripts/prepare-android-security.mjs
+          node --check scripts/verify-android-apk-manifest.mjs
           node --test
 
       - name: Build hardened Android release APK
@@ -133,6 +134,8 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest application-id "$SIGNED" | grep -Fx "com.jestbox.app"
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest debuggable "$SIGNED" | grep -Fx "false"
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest min-sdk "$SIGNED" | grep -Fx "29"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest print "$SIGNED" > merged-apk-manifest.xml
+          node scripts/verify-android-apk-manifest.mjs merged-apk-manifest.xml --report apk-manifest-security-report.json
           sha256sum "$SIGNED" | tee hardened-apk.sha256
           rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"
 
@@ -213,6 +216,8 @@ jobs:
             android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk
             hardened-apk.sha256
             signed-certificate.txt
+            merged-apk-manifest.xml
+            apk-manifest-security-report.json
             runtime-assessment-summary.md
             app-process.txt
             relaunch-process.txt
