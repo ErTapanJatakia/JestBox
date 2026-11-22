@@ -137,15 +137,16 @@ class PackagedApkManifestVerifierTests(unittest.TestCase):
             analyzer = binary_dir / "apkanalyzer"
             analyzer.write_text("#!/usr/bin/env python3\nprint(" + repr(manifest()) + ")\n", encoding="utf-8")
             analyzer.chmod(0o755)
-            apk = root / "candidate;touch PWNED.apk"
+            apk = root / "android" / "app" / "build" / "outputs" / "apk" / "release" / "jestbox-hardened-assessment-signed.apk"
+            apk.parent.mkdir(parents=True)
             apk.write_bytes(b"assessment-apk")
             environment = os.environ.copy()
             environment["PATH"] = str(binary_dir) + os.pathsep + environment.get("PATH", "")
-            completed = subprocess.run([sys.executable, str(repository_root / "scripts" / "verify_android_apk_manifest.py"), "--apk", apk.name, "--output", "assessment-report.json"], cwd=root, env=environment, capture_output=True, text=True, check=False)
+            completed = subprocess.run([sys.executable, str(repository_root / "scripts" / "verify_android_apk_manifest.py"), "--output", "assessment-report;touch PWNED.json"], cwd=root, env=environment, capture_output=True, text=True, check=False)
             self.assertEqual(completed.returncode, 0, completed.stderr or completed.stdout)
-            report = json.loads((root / "assessment-report.json").read_text(encoding="utf-8"))
+            report = json.loads((root / "assessment-report;touch PWNED.json").read_text(encoding="utf-8"))
             self.assertEqual(report["result"], "passed")
-            self.assertFalse((root / "PWNED.apk").exists())
+            self.assertFalse((root / "PWNED.json").exists())
     def test_requires_profileinstaller_hardening_and_one_launcher(self):
         without_receiver = manifest().replace(
             '<receiver android:name="androidx.profileinstaller.ProfileInstallReceiver"\n        android:exported="false" />',
