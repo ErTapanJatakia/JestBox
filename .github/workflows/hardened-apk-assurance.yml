@@ -79,6 +79,8 @@ jobs:
           node --check jokes.js
           node --check share-bridge.entry.js
           node --check scripts/prepare-web.mjs
+          node --check scripts/legal-markdown-renderer.mjs
+          node --check scripts/legal-page-bootstrap.mjs
           node --check scripts/prepare-android-branding.mjs
           node --check scripts/prepare-android-security.mjs
           python3 -m unittest discover -s tests -p 'test_android_apk_manifest_verifier.py' -v
@@ -149,9 +151,8 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest application-id "$SIGNED" | grep -Fx "com.jestbox.app"
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest debuggable "$SIGNED" | grep -Fx "false"
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest min-sdk "$SIGNED" | grep -Fx "29"
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
           python3 scripts/verify_android_apk_manifest.py \
-            --apk "$SIGNED" \
-            --apkanalyzer "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" \
             --output android-apk-manifest-assessment.json
           sha256sum "$SIGNED" | tee hardened-apk.sha256
           rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"

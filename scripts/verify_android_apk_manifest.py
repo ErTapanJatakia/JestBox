@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -13,6 +14,10 @@ from pathlib import Path
 ANDROID = "{http://schemas.android.com/apk/res/android}"
 EXPECTED_APPLICATION_ID = "com.jestbox.app"
 EXPECTED_MIN_SDK = 29
+EXPECTED_APK_RELATIVE_PATHS = {
+    "assessment-signed": Path("android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk"),
+    "release-unsigned": Path("android/app/build/outputs/apk/release/app-release-unsigned.apk"),
+}
 MIN_SAFE_TARGET_SDK = 28
 
 SENSITIVE_PERMISSIONS = {
@@ -183,35 +188,70 @@ def verify_manifest(xml_text: str) -> dict:
     }
 
 
+def resolve_workspace_path(
+    value: str,
+    label: str,
+    *,
+    must_exist: bool,
+    workspace: Path | None = None,
+) -> Path:
+    """Resolve a file path and reject traversal or symlink escapes from the workspace."""
+    root = (workspace or Path.cwd()).resolve()
+    candidate = Path(value)
+    if not candidate.is_absolute():
+        candidate = root / candidate
+    try:
+        resolved = candidate.resolve(strict=must_exist)
+    except (OSError, RuntimeError) as exc:
+        raise VerificationError(f"{label} path cannot be resolved: {value!r}") from exc
+    if not resolved.is_relative_to(root):
+        raise VerificationError(f"{label} path must remain inside the repository workspace.")
+    if must_exist and not resolved.is_file():
+        raise VerificationError(f"{label} does not exist or is not a regular file: {value!r}")
+    if not must_exist and not resolved.parent.is_dir():
+        raise VerificationError(f"{label} parent directory does not exist: {resolved.parent}")
+    return resolved
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--apk", required=True, help="Built APK to inspect")
-    parser.add_argument("--apkanalyzer", required=True, help="Path to Android apkanalyzer executable")
-    parser.add_argument("--output", help="Optional JSON evidence report path")
+    parser.add_argument("--artifact", choices=tuple(EXPECTED_APK_RELATIVE_PATHS), default="assessment-signed", help="Select one of the two fixed, approved build artifacts")
+    parser.add_argument("--output", help="Optional JSON evidence report path inside the repository workspace")
     args = parser.parse_args()
 
-    apk = Path(args.apk)
-    analyzer = Path(args.apkanalyzer)
-    if not apk.is_file() or apk.stat().st_size == 0:
-        print(f"ERROR: APK does not exist or is empty: {apk}", file=sys.stderr)
+    try:
+        apk = resolve_workspace_path(str(EXPECTED_APK_RELATIVE_PATHS[args.artifact]), "APK", must_exist=True)
+        output = (
+            resolve_workspace_path(args.output, "Output report", must_exist=False)
+            if args.output
+            else None
+        )
+        if output == apk:
+            raise VerificationError("Output report path must not overwrite the APK.")
+    except VerificationError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
         return 2
-    if not analyzer.is_file():
-        print(f"ERROR: apkanalyzer executable does not exist: {analyzer}", file=sys.stderr)
+
+    analyzer = shutil.which("apkanalyzer")
+    if analyzer is None:
+        print("ERROR: fixed Android SDK executable 'apkanalyzer' was not found on PATH.", file=sys.stderr)
         return 2
 
     try:
         completed = subprocess.run(
-            [str(analyzer), "manifest", "print", str(apk)],
+            ["apkanalyzer", "manifest", "print", str(apk)],
+            executable=analyzer,
             check=True,
             capture_output=True,
             text=True,
             timeout=60,
+            shell=False,
         )
         report = verify_manifest(completed.stdout)
         report["apk"] = apk.name
         report["apkBytes"] = apk.stat().st_size
-        if args.output:
-            Path(args.output).write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        if output:
+            output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print(json.dumps(report, indent=2))
         return 0
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:

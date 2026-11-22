@@ -1,9 +1,13 @@
+import json
+import os
+import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from verify_android_apk_manifest import VerificationError, verify_manifest
+from verify_android_apk_manifest import VerificationError, resolve_workspace_path, verify_manifest
 
 
 ANDROID = "http://schemas.android.com/apk/res/android"
@@ -103,6 +107,68 @@ class PackagedApkManifestVerifierTests(unittest.TestCase):
             verify_manifest(manifest().replace('android:minSdkVersion="29"', 'android:minSdkVersion="24"'))
         with self.assertRaisesRegex(VerificationError, "targetSdkVersion"):
             verify_manifest(manifest().replace('android:targetSdkVersion="36"', 'android:targetSdkVersion="27"'))
+
+    def test_rejects_apk_path_outside_workspace(self):
+        with tempfile.TemporaryDirectory() as workspace, tempfile.TemporaryDirectory() as outside:
+            outside_apk = Path(outside) / "outside.apk"
+            outside_apk.write_bytes(b"not-an-apk")
+            with self.assertRaisesRegex(VerificationError, "inside the repository workspace"):
+                resolve_workspace_path(str(outside_apk), "APK", must_exist=True, workspace=Path(workspace))
+
+    def test_rejects_output_path_traversal(self):
+        with tempfile.TemporaryDirectory() as workspace:
+            with self.assertRaisesRegex(VerificationError, "inside the repository workspace"):
+                resolve_workspace_path("../outside-report.json", "Output report", must_exist=False, workspace=Path(workspace))
+
+    def test_rejects_symlink_escape_from_workspace(self):
+        with tempfile.TemporaryDirectory() as workspace, tempfile.TemporaryDirectory() as outside:
+            root = Path(workspace)
+            (Path(outside) / "outside.apk").write_bytes(b"not-an-apk")
+            (root / "escape").symlink_to(outside, target_is_directory=True)
+            with self.assertRaisesRegex(VerificationError, "inside the repository workspace"):
+                resolve_workspace_path("escape/outside.apk", "APK", must_exist=True, workspace=root)
+
+    def test_cli_uses_fixed_apkanalyzer_without_shell_and_writes_report(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as workspace:
+            root = Path(workspace)
+            binary_dir = root / "bin"
+            binary_dir.mkdir()
+            analyzer = binary_dir / "apkanalyzer"
+            analyzer.write_text("#!/usr/bin/env python3\nprint(" + repr(manifest()) + ")\n", encoding="utf-8")
+            analyzer.chmod(0o755)
+            apk = root / "android" / "app" / "build" / "outputs" / "apk" / "release" / "jestbox-hardened-assessment-signed.apk"
+            apk.parent.mkdir(parents=True)
+            apk.write_bytes(b"assessment-apk")
+            environment = os.environ.copy()
+            environment["PATH"] = str(binary_dir) + os.pathsep + environment.get("PATH", "")
+            completed = subprocess.run([sys.executable, str(repository_root / "scripts" / "verify_android_apk_manifest.py"), "--output", "assessment-report;touch PWNED.json"], cwd=root, env=environment, capture_output=True, text=True, check=False)
+            self.assertEqual(completed.returncode, 0, completed.stderr or completed.stdout)
+            report = json.loads((root / "assessment-report;touch PWNED.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["result"], "passed")
+            self.assertFalse((root / "PWNED.json").exists())
+    def test_cli_selects_only_allowlisted_release_unsigned_artifact(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as workspace:
+            root = Path(workspace)
+            binary_dir = root / "bin"
+            binary_dir.mkdir()
+            analyzer = binary_dir / "apkanalyzer"
+            analyzer.write_text("#!/usr/bin/env python3\nprint(" + repr(manifest()) + ")\n", encoding="utf-8")
+            analyzer.chmod(0o755)
+            apk = root / "android" / "app" / "build" / "outputs" / "apk" / "release" / "app-release-unsigned.apk"
+            apk.parent.mkdir(parents=True)
+            apk.write_bytes(b"unsigned-release-apk")
+            environment = os.environ.copy()
+            environment["PATH"] = str(binary_dir) + os.pathsep + environment.get("PATH", "")
+            command = [sys.executable, str(repository_root / "scripts" / "verify_android_apk_manifest.py"), "--artifact", "release-unsigned", "--output", "unsigned-assessment.json"]
+            completed = subprocess.run(command, cwd=root, env=environment, capture_output=True, text=True, check=False)
+            self.assertEqual(completed.returncode, 0, completed.stderr or completed.stdout)
+            report = json.loads((root / "unsigned-assessment.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["result"], "passed")
+            self.assertEqual(report["apk"], "app-release-unsigned.apk")
+            rejected = subprocess.run(command[:command.index("--artifact")] + ["--artifact", "../outside.apk"], cwd=root, env=environment, capture_output=True, text=True, check=False)
+            self.assertNotEqual(rejected.returncode, 0)
 
     def test_requires_profileinstaller_hardening_and_one_launcher(self):
         without_receiver = manifest().replace(

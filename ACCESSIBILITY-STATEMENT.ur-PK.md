@@ -3,7 +3,7 @@
 **آخری جائزہ:** 19 نومبر 2026  
 **پروڈکٹ:** JestBox
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 رہنمائی"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 سطح اے اے حوالہ نشان"></a></p>
+[![WCAG 2.2 سطح اے اے حوالہ نشان](assets/wcag22aa-blue.svg)](https://www.w3.org/WAI/WCAG22/quickref/)
 
 ## ہمارا عزم
 
@@ -36,7 +36,7 @@ JestBox کا مقصد مختلف رسائی کی ضروریات رکھنے وا�
 - **فون:** [+91 9664332984](tel:+919664332984)
 - **ویب سائٹ:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 رہنمائی"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 سطح اے اے حوالہ نشان"></a></p>
+[![WCAG 2.2 سطح اے اے حوالہ نشان](assets/wcag22aa-blue.svg)](https://www.w3.org/WAI/WCAG22/quickref/)
 
 ## حوالہ
 
