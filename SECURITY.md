@@ -28,6 +28,39 @@ Good-faith research that follows this policy and applicable law is welcome. Avoi
 
 ## Security Assessment Programme
 
+### Packaged Android manifest verification — 22 November 2026
+
+**Result: passed for both the unsigned release APK and the signed assessment candidate.** A fail-closed verifier inspected each built APK's merged manifest through Android SDK `apkanalyzer`; it did not rely solely on the generated source manifest. The change is additive and does not alter application runtime behaviour or the production signing identity.
+
+- **PR:** [#79 — Verify security controls in the final Android APK](https://github.com/ErTapanJatakia/JestBox/pull/79)
+- **Source commit assessed:** `fb109daea05d5c2838da89c843c7dd4a52209c22`
+- **Regression tests:** 11/11 Python standard-library manifest tests passed, including deliberately unsafe manifests and SDK-scoped sensitive permissions.
+- **Unsigned release APK:** [Android PR build run #44990288140](https://github.com/ErTapanJatakia/JestBox/actions/runs/44990288140) · [artifact 14741626492](https://github.com/ErTapanJatakia/JestBox/actions/runs/44990288140/artifacts/14741626492) · SHA-256 `947d621df69a117ef535a156b4dd9f8a7a40c549739ce4b1eaffc271252c0848`.
+- **Signed assessment candidate:** [hardened APK assurance run #44990288148](https://github.com/ErTapanJatakia/JestBox/actions/runs/44990288148) · [artifact 14741418670](https://github.com/ErTapanJatakia/JestBox/actions/runs/44990288148/artifacts/14741418670) · SHA-256 `7e047ea552404f2e41b55b892cff2f9ff696360d76e8033fa0090184a8f3b213`.
+- **Signing:** APK Signature Scheme v3 verified; signer certificate SHA-256 `bf24d400008bf790561b6a20e4724d95cbd312e9dd6a07a38d8872fb83dcc61f`.
+- **Emulator:** Android API 30 Google APIs x86_64; install, launch, 45-second process-survival observation, force-stop, relaunch and 10-second observation passed. No matching fatal exception was observed.
+
+#### Verified packaged-manifest properties
+
+| Property | Observed result |
+|---|---|
+| Application ID | `com.jestbox.app` |
+| Minimum / target SDK | 29 / 36 |
+| `android:allowBackup` | Explicitly false |
+| Debuggable / test-only | False (platform default); `apkanalyzer` also reported debuggable=false |
+| Cleartext traffic | Not enabled; target SDK 36 default applies |
+| Custom network security config | Not declared |
+| Exported components | Only `com.jestbox.app.MainActivity`, the launcher |
+| FileProvider | Non-exported |
+| ProfileInstallReceiver | Non-exported |
+| InitializationProvider | Non-exported |
+| Declared permissions | `INTERNET` and app-specific `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` |
+| Sensitive permission review | None detected |
+
+The verifier fails closed if a custom `networkSecurityConfig` is introduced, until its rules are manually inspected. It also fails on unexpected exported components or sensitive permissions, rather than silently accepting them.
+
+**Coverage boundary:** this is packaged-manifest verification plus an automated API 30 emulator smoke test. It is not a human-led penetration test, rooted-device/TLS interception assessment, physical-device certification, app-store acceptance, or public release. The signed APK is an assessment candidate only; no store submission or distribution was performed.
+
 ### Main-branch post-merge verification — 22 November 2026
 
 **Result:** all 15 main-branch workflow runs and all 16 commit checks completed successfully on main. This assessment covers commit `519ecd7ec69ee59987e02e74d3669c73d5e27044`; it is automated post-merge verification, not a production release certification.
@@ -443,7 +476,7 @@ For a cancelled or failed workflow, link the run and describe what actually exec
 | P1 | Verify/enable main branch protection and required status checks | Ruleset/branch-protection configuration verified; keep merge automation compatible |
 | P1 | Verify Dependabot security alerts, secret scanning, push protection and Dependency Graph | Settings confirmed in GitHub repository security settings |
 | P1 | Decide Android minimum supported API | Product decision recorded for MobSF minSdk=24 observation; do not silently drop older-device support |
-| P2 | Review allowBackup, ProfileInstallReceiver permission and generated Cordova/Capacitor static-analysis heuristics | Findings confirmed, mitigated or documented as accepted/deferred with rationale |
+| P2 | Review remaining generated Cordova/Capacitor static-analysis heuristics | Contextual findings are validated or documented with rationale; packaged-manifest verification is complete (PR #79) |
 | P2 | Improve rooted MobSF coverage if TLS/system-level testing is required | A supported writable-system API 30 emulator completes rooted mode; otherwise retain Gadget-mode limitation |
 | P2 | Preserve time-limited report artifacts | Evidence downloaded or retained before artifact expiry |
 | P3 | Human-led penetration test and production-host assessment | Separately authorised assessment with defined scope |

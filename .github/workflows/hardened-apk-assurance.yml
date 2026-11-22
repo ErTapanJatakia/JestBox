@@ -9,6 +9,21 @@ on:
       - "package-lock.json"
       - "capacitor.config.json"
       - "scripts/**"
+      - "tests/**"
+      - "index.html"
+      - "script.js"
+      - "jokes.js"
+      - "share-bridge.entry.js"
+      - "assets/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/hardened-apk-assurance.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "capacitor.config.json"
+      - "scripts/**"
+      - "tests/**"
       - "index.html"
       - "script.js"
       - "jokes.js"
@@ -66,6 +81,7 @@ jobs:
           node --check scripts/prepare-web.mjs
           node --check scripts/prepare-android-branding.mjs
           node --check scripts/prepare-android-security.mjs
+          python3 -m unittest discover -s tests -p 'test_android_apk_manifest_verifier.py' -v
           node --test
 
       - name: Build hardened Android release APK
@@ -133,6 +149,10 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest application-id "$SIGNED" | grep -Fx "com.jestbox.app"
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest debuggable "$SIGNED" | grep -Fx "false"
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest min-sdk "$SIGNED" | grep -Fx "29"
+          python3 scripts/verify_android_apk_manifest.py \
+            --apk "$SIGNED" \
+            --apkanalyzer "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" \
+            --output android-apk-manifest-assessment.json
           sha256sum "$SIGNED" | tee hardened-apk.sha256
           rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"
 
@@ -212,6 +232,7 @@ jobs:
           path: |
             android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk
             hardened-apk.sha256
+            android-apk-manifest-assessment.json
             signed-certificate.txt
             runtime-assessment-summary.md
             app-process.txt

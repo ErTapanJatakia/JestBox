@@ -38,7 +38,9 @@ jobs:
           node --check scripts/prepare-android-branding.mjs
           node --check scripts/prepare-android-security.mjs
       - name: Run dependency-free regression tests
-        run: node --test
+        run: |
+          python3 -m unittest discover -s tests -p 'test_android_apk_manifest_verifier.py' -v
+          node --test
       - name: Set up Java
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
         with:
@@ -121,7 +123,8 @@ jobs:
             exit 1
           fi
           sha256sum "$APK" | tee "$APK.sha256"
-          echo "Unsigned release APK manifest debuggable flag: false" >> "$GITHUB_STEP_SUMMARY"
+          python3 scripts/verify_android_apk_manifest.py --apk "$APK" --apkanalyzer "$APKANALYZER" --output android-apk-manifest-assessment.json
+          echo "Unsigned release APK packaged-manifest verification: passed" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload debug APK and checksum
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -131,5 +134,6 @@ jobs:
             android/app/build/outputs/apk/debug/app-debug.apk.sha256
             android/app/build/outputs/apk/release/app-release-unsigned.apk
             android/app/build/outputs/apk/release/app-release-unsigned.apk.sha256
+            android-apk-manifest-assessment.json
           if-no-files-found: error
           retention-days: 14
