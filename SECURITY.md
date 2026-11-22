@@ -28,6 +28,52 @@ Good-faith research that follows this policy and applicable law is welcome. Avoi
 
 ## Security Assessment Programme
 
+### Main-branch post-merge verification — 22 November 2026
+
+**Result:** all 15 main-branch workflow runs and all 16 commit checks completed successfully on main. This assessment covers commit `519ecd7ec69ee59987e02e74d3669c73d5e27044`; it is automated post-merge verification, not a production release certification.
+
+- **Main commit:** `519ecd7ec69ee59987e02e74d3669c73d5e27044`
+- **Workflow runs:** 15/15 successful — [main-commit Actions runs](https://github.com/ErTapanJatakia/JestBox/actions?query=branch%3Amain)
+- **Commit checks:** 16/16 successful — [commit check summary](https://github.com/ErTapanJatakia/JestBox/commit/519ecd7ec69ee59987e02e74d3669c73d5e27044/checks)
+
+| Control / workflow | Main-branch result | Evidence |
+|---|---|---|
+| JestBox regression validation | Passed | [Run #44986022230](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022230) |
+| CodeQL default setup — JavaScript/TypeScript and GitHub Actions | Both analyses passed | [Run #44986021999](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986021999) |
+| njsscan 1.0.2 | **0 findings; 0 scanner errors; complete JSON/SARIF; SARIF upload successful** | [Run #44986022077](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022077) · [Report artifact 14739757153](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022077/artifacts/14739757153) |
+| OWASP ZAP | Baseline and bounded active scans completed; 0 High, 2 Medium, 6 Low and 3 Informational alerts (triage below) | [Run #44986022097](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022097) · [Report artifact 14740365696](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022097/artifacts/14740365696) |
+| Android debug and unsigned release builds | Both built; debug signature/alignment/checksum verification passed | [Run #44986022010](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022010) · [APK artifact 14740136346](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022010/artifacts/14740136346) |
+| Hardened signed APK assessment | Signed candidate verified; API 30 emulator install, launch, process survival and relaunch passed; no matching fatal exception observed | [Run #44986022081](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022081) · [Evidence artifact 14740021924](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022081/artifacts/14740021924) |
+| Tablet browser validation | Passed; viewport screenshots generated | [Run #44986022092](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022092) |
+| Microsoft DevSkim | Passed | [Run #44986022184](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022184) |
+| Trivy | Passed | [Run #44986022083](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022083) |
+| OSV-Scanner | Passed | [Run #44986022054](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022054) |
+| Gitleaks | Passed | [Run #44986022036](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022036) |
+| Dependency Review | Passed | Included in [main commit checks](https://github.com/ErTapanJatakia/JestBox/commit/519ecd7ec69ee59987e02e74d3669c73d5e27044/checks) |
+| OpenSSF Scorecard | Passed | [Run #44986022057](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022057) |
+| zizmor | Passed | [Run #44986022088](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022088) |
+| actionlint | Passed | [Run #44986022013](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022013) |
+| Syft SBOM generation | Passed | [Run #44986022096](https://github.com/ErTapanJatakia/JestBox/actions/runs/44986022096) |
+
+#### Main-branch ZAP alert triage
+
+The main-push ZAP run performed both the baseline passive scan and the bounded active scan against the disposable local target `http://127.0.0.1:8080`. The active report contained 11 alerts: 0 High, 2 Medium, 6 Low and 3 Informational. It added one Informational **User Agent Fuzzer** observation to the 10 baseline alerts; this records response differences for legacy/fuzzed user-agent strings and is not a demonstrated exploit.
+
+The Medium and Low findings remain the missing CSP and anti-clickjacking headers, missing COEP/COOP/CORP/Permissions Policy/X-Content-Type-Options headers, and the local Python test server's version header. They are test-server/deployment-edge observations, not evidence that production hosting has those same settings. The Informational findings remain the benign source comment, cacheability of static content, and user-agent response variation. No finding has been silently dismissed. Production-edge security-header verification remains open before a production deployment. The scan does not test production hosting, authenticated flows, backend APIs, or all Android runtime behavior and is not a human-led penetration test.
+
+#### Main-branch Android build evidence
+
+The downloaded main-branch Android artifact was inspected. Both APKs contain `assets/public/random-index.js`, `assets/public/jokes.js` and `assets/public/legal/third-party-notices.html`.
+
+| APK | Size | SHA-256 |
+|---|---:|---|
+| `debug/app-debug.apk` | 12,208,577 bytes | `08482e7b3e42753d807065998789920e54f5dfd47ae18dd32f36b6d1ad181def` |
+| `release/app-release-unsigned.apk` | 10,365,939 bytes | `947d621df69a117ef535a156b4dd9f8a7a40c549739ce4b1eaffc271252c0848` |
+
+The separate hardened assessment produced a production-signed **assessment candidate** with SHA-256 `7e047ea552404f2e41b55b892cff2f9ff696360d76e8033fa0090184a8f3b213`. Its signature was verified and the app survived launch and relaunch on an Android API 30 Google APIs emulator. This was an automated emulator smoke test, not physical-device certification or a public release. The unsigned release build and signed assessment candidate were not published to an app store.
+
+**MobSF note:** MobSF static/dynamic scanning remains deferred as previously agreed. The hardened APK emulator assessment above is a separate workflow and does not represent a successful MobSF scan.
+
 ### Latest Security Assurance Report — 22 November 2026
 
 **Assessment status:** all 24 GitHub commit checks completed successfully on the application-code PR head recorded below. This report is added in a subsequent documentation-only update; PR #77 remains open and has not been merged into `main`. The report therefore records PR-branch verification, not a production release or deployment.
