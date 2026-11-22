@@ -717,3 +717,39 @@ The five licence inventory alerts — #1 (`@capacitor/core`), #2 (`@capacitor/sh
 | APK distribution / app-store submission | Not authorised; not performed | Requires separate explicit authorisation |
 
 **Assessment boundary:** this checkpoint confirms automated repository, scanner, build and emulator workflows. It is not a certification, independent audit, guarantee of vulnerability-free software, human-led penetration test, production-host assessment or release approval. JestBox remains an Android APK project and has not been deployed as a website.
+
+
+### Final automated assurance evidence reconciliation — 23 November 2026
+
+This checkpoint consolidates the post-PR #86 evidence and reviews the retained raw ZAP reports rather than relying solely on the workflow's green conclusion.
+
+#### OWASP ZAP raw-report review
+
+- **Run:** [#45072074710](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074710)
+- **Artifact:** [14773468836 — baseline and bounded active JSON/HTML reports plus summary](https://github.com/ErTapanJatakia/JestBox/actions/runs/45072074710/artifacts/14773468836)
+- **Assessed commit:** `8786bc4736da8269d6ad191533be364d99a61627`
+- **Target:** isolated disposable local static build at `127.0.0.1:8080`.
+- **Baseline:** 0 High, 2 Medium, 6 Low, 2 Informational.
+- **Bounded active scan:** 0 High, 2 Medium, 6 Low, 3 Informational.
+
+The raw JSON confirms the recurring observations: CSP header absent; anti-clickjacking header absent; COEP, COOP, CORP, Permissions-Policy and X-Content-Type-Options absent; the local test server's Server header exposes version information; a source comment is flagged; static content is cacheable; and the active scan adds a User-Agent Fuzzer informational observation. The CORP and cacheability instance counts vary slightly between baseline and active reports, but no additional risk category or High finding appears.
+
+**Disposition:** these are observations of the disposable local static test target and its Python serving layer. They do not establish the response-header posture of a production origin. Since JestBox has not been deployed as a website, no production-edge host was available or scanned. Retain production HTTP security-header verification as a pre-deployment control; do not alter the local test harness merely to make its report look cleaner. ZAP's successful execution is not a clean scan and is not a human-led penetration test.
+
+#### Bearer SAST evaluation reconciliation
+
+The previously inspected Bearer CLI v2.1.3 report remains a non-blocking evaluation, not an adopted required scanner. Its three SARIF observations were reviewed at source level: two DOM construction alerts in `scripts/legal-markdown-renderer.mjs` use safe DOM node/text APIs and an explicit link-protocol allowlist rather than an HTML-string injection sink; the diversity-audit logger emits aggregate locale/category/count metrics and not joke bodies, personal data, credentials or secrets. These are documented contextual false-positive dispositions for the observed data flows, not scanner suppressions. Preserve those safe construction and aggregate-only logging properties in future changes. Bearer is not claimed as a fresh PR #86 main-branch check.
+
+#### Code Scanning alert-state evidence boundary
+
+Source remediations and scanner SARIF results are documented separately from GitHub alert lifecycle. The available GitHub connection did not provide an independently readable individual Code Scanning alert-state endpoint during this reconciliation. Accordingly, this report does not claim that every source-remediated alert has been independently verified as Closed in GitHub's UI/API. The five Trivy licence alerts #1, #2, #3, #120 and #121 remain recorded as dismissed based on the maintainer's explicit confirmation, not independent API verification. The maintainer may inspect the [repository Code Scanning alerts](https://github.com/ErTapanJatakia/JestBox/security/code-scanning) for the live lifecycle state of any other alert.
+
+#### Final automated checkpoint
+
+- PR #86: 27/27 checks passed.
+- PR #86 merge commit `8786bc4736da8269d6ad191533be364d99a61627`: 18/18 commit checks passed.
+- Documentation/evidence commit `75d9d1a8cb2942d398c8df2f6cea3c65565fe537`: 16/16 commit checks passed.
+- Fresh DevSkim SARIF: 0 Errors, 0 Warnings, 25 Notes.
+- Trivy, OSV-Scanner, ZAP, njsscan, Gitleaks, zizmor, actionlint, Syft SBOM, tablet browser validation, Android debug build and hardened APK assessment workflows completed successfully for the recorded checkpoint.
+
+**Overall conclusion:** the planned automated repository and Android build assurance for this checkpoint is complete and the evidence is recorded. This is not a claim of zero vulnerabilities or a formal security certification. MobSF remains deferred by agreement because of tool reliability issues. Human-led penetration testing, rooted-device and TLS-interception testing, and production-edge header verification remain outside the completed automated scope. JestBox has not been deployed as a website; no APK distribution or app-store submission was performed or authorised.
