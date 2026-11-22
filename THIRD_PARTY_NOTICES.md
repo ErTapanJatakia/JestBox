@@ -55,8 +55,7 @@ SOFTWARE.
 
 **Copyright notice:** Copyright 2020-present Ionic  
 **Attribution URL:** https://ionic.io  
-**Upstream licence file reviewed:** [capacitor-plugins/share/LICENSE](https://github.com/ionic-team/capacitor-plugins/blob/main/share/LICENSE)  
-**Version evidence:** The root lockfile pins 8.0.3; the npm package page identifies version 8.0.3 and MIT: [@capacitor/share on npm](https://www.npmjs.com/package/@capacitor/share/v/8.0.3).
+**Version-pinned upstream sources:** [@capacitor/share 8.0.3 package manifest](https://github.com/ionic-team/capacitor-plugins/blob/%40capacitor%2Fshare%408.0.3/share/package.json) and [8.0.3 LICENSE](https://github.com/ionic-team/capacitor-plugins/blob/%40capacitor%2Fshare%408.0.3/share/LICENSE). The manifest identifies version 8.0.3, author Ionic, and MIT; the licence text carries the Ionic copyright notice.
 
 ```text
 Copyright 2020-present Ionic
@@ -84,13 +83,13 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-**Version-specific evidence limitation:** The official upstream licence file was retrieved from the repository's current `main` branch, not from a verified immutable source tag for 8.0.3. The package version and MIT declaration are corroborated by the lockfile and npm version page, but the exact 8.0.3 tarball was not independently unpacked in this review. Re-check the package archive when preparing a release notice bundle.
+**Archive limitation:** The immutable upstream source tag and its package manifest/licence file were verified for 8.0.3. The exact npm tarball was not independently downloaded and unpacked in this review; package archive file-list verification remains a release-time check.
 
 ## 4. 0BSD — tslib 2.9.1
 
 **Copyright notice:** Copyright (c) Microsoft Corporation.  
-**Upstream package metadata:** [tslib/package.json](https://github.com/microsoft/tslib/blob/main/package.json) — reviewed manifest reports version 2.9.1 and licence 0BSD.  
-**Upstream licence text:** [tslib/LICENSE.txt](https://github.com/microsoft/tslib/blob/main/LICENSE.txt).
+**Version-pinned upstream sources:** [tslib v2.9.1 package.json](https://github.com/microsoft/tslib/blob/v2.9.1/package.json) — version 2.9.1, Microsoft Corp., licence 0BSD.  
+**Upstream licence text:** [tslib v2.9.1 LICENSE.txt](https://github.com/microsoft/tslib/blob/v2.9.1/LICENSE.txt).
 
 ```text
 Copyright (c) Microsoft Corporation.
@@ -107,13 +106,12 @@ OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ```
 
-The committed root lockfile pins 2.9.1 and declares 0BSD. The upstream manifest's version field matches 2.9.1. The upstream repository does not expose a corresponding 2.9.1 release tag in the release listing reviewed; therefore the manifest and licence file are version-matched by the repository's current package metadata, but were not independently extracted from the npm tarball during this review.
+The committed root lockfile pins 2.9.1 and declares 0BSD. The immutable upstream `v2.9.1` tag was verified, and both its package manifest and licence file were retrieved from that tag. The exact npm tarball was not independently unpacked in this review; archive file-list verification remains a release-time check.
 
 ## 5. Apache-2.0 — Playwright 1.56.1 and Playwright Core 1.56.1
 
 **Copyright / attribution:** Copyright (c) Microsoft Corporation.  
-**Versioned upstream source:** [Playwright v1.56.1 LICENSE](https://github.com/microsoft/playwright/blob/v1.56.1/LICENSE) and [NOTICE](https://github.com/microsoft/playwright/blob/v1.56.1/NOTICE).  
-**Package metadata:** The versioned upstream package manifests for both `playwright` and `playwright-core` identify version 1.56.1 and Apache-2.0.
+**Versioned upstream source:** [Playwright v1.56.1 LICENSE](https://github.com/microsoft/playwright/blob/v1.56.1/LICENSE), [NOTICE](https://github.com/microsoft/playwright/blob/v1.56.1/NOTICE), and the versioned [`playwright`](https://github.com/microsoft/playwright/blob/v1.56.1/packages/playwright/package.json) / [`playwright-core`](https://github.com/microsoft/playwright/blob/v1.56.1/packages/playwright-core/package.json) package manifests. Both manifests identify version 1.56.1 and Apache-2.0. The versioned source trees also contain `ThirdPartyNotices.txt` in each package directory: [playwright](https://github.com/microsoft/playwright/blob/v1.56.1/packages/playwright/ThirdPartyNotices.txt) and [playwright-core](https://github.com/microsoft/playwright/blob/v1.56.1/packages/playwright-core/ThirdPartyNotices.txt).
 
 ### 5.1 Upstream NOTICE
 
@@ -125,7 +123,7 @@ This software contains code derived from the Puppeteer project (https://github.c
 available under the Apache 2.0 license (https://github.com/puppeteer/puppeteer/blob/master/LICENSE).
 ```
 
-The NOTICE attributes code derived from the Puppeteer project, available under Apache-2.0. Preserve this attribution when redistributing a derivative or package distribution to which the upstream NOTICE applies.
+The root NOTICE attributes code derived from the Puppeteer project, available under Apache-2.0. The versioned package source trees additionally contain `ThirdPartyNotices.txt`; preserve applicable upstream attribution material when redistributing the packages. The full third-party notices files are large and remain linked to their upstream versioned copies rather than duplicated in this focused alert record.
 
 ### 5.2 Apache License 2.0
 
@@ -336,7 +334,7 @@ Apache License
    limitations under the License.
 ```
 
-**Package-archive limitation:** The versioned upstream source manifests, root licence, and NOTICE were checked. The npm tarballs for `playwright` and `playwright-core` were not independently unpacked in this review to confirm their exact archive file lists. Keep the upstream source evidence distinct from an archive-content verification.
+**Package-archive limitation:** The versioned upstream source manifests, root LICENSE/NOTICE, and each package directory's `ThirdPartyNotices.txt` were checked. The npm tarballs for `playwright` and `playwright-core` were not independently unpacked in this review to confirm the exact published archive file lists. Keep upstream source-tree evidence distinct from archive-content verification.
 
 ## 6. Package archive and release verification record
 
@@ -344,8 +342,8 @@ The lockfiles contain npm registry tarball URLs and integrity fields for the fiv
 
 - Licence identifiers and versions are checked against the committed lockfiles.
 - The versioned upstream source was checked for Capacitor Core and Playwright.
-- The upstream current-branch package manifest and licence text were checked for tslib; the manifest reports version 2.9.1.
-- The package version page and upstream current-branch licence file were checked for Capacitor Share; the upstream licence file is not pinned here to an immutable 8.0.3 tag.
+- The immutable upstream `v2.9.1` package manifest and licence file were checked for tslib.
+- The immutable upstream `@capacitor/share@8.0.3` package manifest and licence file were checked.
 - Package archive contents and actual release artefact inclusion remain release-time checks.
 
 ## 7. Distribution handling
@@ -367,10 +365,10 @@ This file does not change package versions, application code, tests, Trivy confi
 - [JestBox tablet tooling package lockfile](.github/tooling/tablet/package-lock.json)
 - [JestBox third-party licence inventory](THIRD_PARTY_LICENSES.md)
 - [Capacitor Core 8.6.2 licence](https://github.com/ionic-team/capacitor/blob/8.6.2/LICENSE)
-- [Capacitor Share npm package 8.0.3](https://www.npmjs.com/package/@capacitor/share/v/8.0.3)
-- [Capacitor Share upstream licence file](https://github.com/ionic-team/capacitor-plugins/blob/main/share/LICENSE)
-- [tslib upstream package manifest](https://github.com/microsoft/tslib/blob/main/package.json)
-- [tslib upstream licence file](https://github.com/microsoft/tslib/blob/main/LICENSE.txt)
+- [Capacitor Share 8.0.3 package manifest](https://github.com/ionic-team/capacitor-plugins/blob/%40capacitor%2Fshare%408.0.3/share/package.json)
+- [Capacitor Share 8.0.3 licence file](https://github.com/ionic-team/capacitor-plugins/blob/%40capacitor%2Fshare%408.0.3/share/LICENSE)
+- [tslib v2.9.1 package manifest](https://github.com/microsoft/tslib/blob/v2.9.1/package.json)
+- [tslib v2.9.1 licence file](https://github.com/microsoft/tslib/blob/v2.9.1/LICENSE.txt)
 - [Playwright v1.56.1 licence](https://github.com/microsoft/playwright/blob/v1.56.1/LICENSE)
 - [Playwright v1.56.1 NOTICE](https://github.com/microsoft/playwright/blob/v1.56.1/NOTICE)
 - [Playwright v1.56.1 package manifest](https://github.com/microsoft/playwright/blob/v1.56.1/packages/playwright/package.json)
