@@ -26,6 +26,7 @@ test("legal-page generation escapes untrusted markup and restricts raw HTML", as
         ? [
             "# Privacy",
             "<script>alert(1)</script>",
+            "[safe](https://safe.example/path)",
             '[click](https://example.test/"onmouseover="alert)',
             "[javascript](javascript:alert(1))"
           ].join("\n")
@@ -52,10 +53,11 @@ test("legal-page generation escapes untrusted markup and restricts raw HTML", as
     assert.doesNotMatch(privacyHtml, /href="javascript:/i);
 
     const anchorTags = privacyHtml.match(/<a\\b[^>]*>/gi) ?? [];
-    const injectedLink = anchorTags.find(tag => tag.includes("example.test"));
-    assert.ok(injectedLink, "expected the URL to be retained as an escaped href value");
-    assert.match(injectedLink, /&quot;/i);
-    assert.doesNotMatch(injectedLink, /\\sonmouseover\\s*=/i);
+    const safeLink = anchorTags.find(tag => tag.includes("https://safe.example/path"));
+    assert.ok(safeLink, "ordinary HTTPS Markdown links should still render");
+    assert.match(safeLink, /rel="noopener noreferrer"/i);
+    assert.match(privacyHtml, /&quot;onmouseover=&quot;alert/i);
+    assert.doesNotMatch(privacyHtml, /<a\\b[^>]*\\sonmouseover\\s*=/i);
 
     const accessibilityHtml = await readFile(join(root, "www/legal/accessibility-en-US.html"), "utf8");
     assert.match(accessibilityHtml, /<a href="https:\/\/www\.w3\.org\/WAI\/WCAG22\/quickref\/"[^>]*><img src="\.\.\/assets\/wcag22aa-blue\.svg"/);
