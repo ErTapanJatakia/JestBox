@@ -98,6 +98,17 @@ A second Bearer run on the remediation branch evaluated the same 175 rules and r
 
 Evidence: [Bearer run #44992014592](https://github.com/ErTapanJatakia/JestBox/actions/runs/44992014592) · [artifact 14742267318](https://github.com/ErTapanJatakia/JestBox/actions/runs/44992014592/artifacts/14742267318).
 
+#### PR #81 verification evidence
+
+- **Regression tests:** 14/14 Python tests and 44/44 Node.js tests passed.
+- **Android debug and unsigned release:** both builds passed; the final packaged manifest verifier passed.
+- **Signed assessment APK:** [hardened assurance run #44992111646](https://github.com/ErTapanJatakia/JestBox/actions/runs/44992111646) · [artifact 14742462807](https://github.com/ErTapanJatakia/JestBox/actions/runs/44992111646/artifacts/14742462807).
+- **APK SHA-256:** `a935551b8242ae631d12f62bc1896b284c5a15fc7baca0a7462597eab1c1a5fb`; size 10,417,338 bytes.
+- **Signing:** APK Signature Scheme v3 verified; signer certificate SHA-256 `bf24d400008bf790561b6a20e4724d95cbd312e9dd6a07a38d8872fb83dcc61f`.
+- **Runtime:** Android API 30 Google APIs x86_64 emulator install, launch, process survival, force-stop and relaunch passed; no matching fatal exception was observed.
+
+The signed candidate is evidence only. No production release, store submission, or distribution was performed.
+
 
 The evaluation will compare language coverage, findings quality, rule overlap with CodeQL/njsscan/DevSkim, false-positive rate, execution time, and operational reliability. **Bearer is not yet an adopted required scanner**; adoption requires the follow-up remediation/re-scan and an evidence-based decision.
 
