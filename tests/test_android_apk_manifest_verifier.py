@@ -10,6 +10,7 @@ ANDROID = "http://schemas.android.com/apk/res/android"
 
 
 def manifest(application_attributes="", components=None, extra_permissions=""):
+    backup_attribute = "" if "android:allowBackup=" in application_attributes else 'android:allowBackup="false"'
     components = components if components is not None else """
       <activity android:name=".MainActivity" android:exported="true">
         <intent-filter>
@@ -25,7 +26,7 @@ def manifest(application_attributes="", components=None, extra_permissions=""):
       <uses-sdk android:minSdkVersion="29" android:targetSdkVersion="36" />
       <uses-permission android:name="android.permission.INTERNET" />
       {extra_permissions}
-      <application android:allowBackup="false" {application_attributes}>
+      <application {backup_attribute} {application_attributes}>
         {components}
       </application>
     </manifest>"""
