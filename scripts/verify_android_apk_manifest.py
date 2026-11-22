@@ -11,7 +11,8 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ANDROID = "{http://schemas.android.com/apk/res/android}"
+# Android manifest namespace identifier, not an HTTP endpoint.
+ANDROID = "{http://schemas.android.com/apk/res/android}"  # DevSkim: ignore DS137138
 EXPECTED_APPLICATION_ID = "com.jestbox.app"
 EXPECTED_MIN_SDK = 29
 EXPECTED_APK_RELATIVE_PATHS = {
