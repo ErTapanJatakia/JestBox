@@ -4,10 +4,11 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { ANDROID_XML_NAMESPACE } from "./helpers/android-xml-namespace.mjs";
 
 const script = resolve("scripts/prepare-android-security.mjs");
 const manifest = `<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="${ANDROID_XML_NAMESPACE}">
   <application android:allowBackup="true" android:label="JestBox">
     <activity android:name=".MainActivity" android:exported="true" />
   </application>
