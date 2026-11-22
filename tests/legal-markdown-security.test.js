@@ -51,9 +51,11 @@ test("legal-page generation escapes untrusted markup and restricts raw HTML", as
     assert.doesNotMatch(privacyHtml, /<script\b/i);
     assert.doesNotMatch(privacyHtml, /href="javascript:/i);
 
-    const injectedLink = privacyHtml.match(/<a href="https:\/\/example\.test\/&quot;"[^>]*>/i)?.[0];
+    const anchorTags = privacyHtml.match(/<a\\b[^>]*>/gi) ?? [];
+    const injectedLink = anchorTags.find(tag => tag.includes("example.test"));
     assert.ok(injectedLink, "expected the URL to be retained as an escaped href value");
-    assert.doesNotMatch(injectedLink, /\sonmouseover\s*=/i);
+    assert.match(injectedLink, /&quot;/i);
+    assert.doesNotMatch(injectedLink, /\\sonmouseover\\s*=/i);
 
     const accessibilityHtml = await readFile(join(root, "www/legal/accessibility-en-US.html"), "utf8");
     assert.match(accessibilityHtml, /<a href="https:\/\/www\.w3\.org\/WAI\/WCAG22\/quickref\/"[^>]*><img src="\.\.\/assets\/wcag22aa-blue\.svg"/);
