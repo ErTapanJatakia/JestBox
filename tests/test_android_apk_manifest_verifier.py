@@ -1,9 +1,10 @@
 import sys
 import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from verify_android_apk_manifest import VerificationError, verify_manifest
+from verify_android_apk_manifest import VerificationError, resolve_workspace_path, verify_manifest
 
 
 ANDROID = "http://schemas.android.com/apk/res/android"
@@ -33,6 +34,33 @@ def manifest(application_attributes="", components=None, extra_permissions=""):
 
 
 class PackagedApkManifestVerifierTests(unittest.TestCase):
+    def test_workspace_path_accepts_a_local_apk(self):
+        with TemporaryDirectory() as temporary:
+            workspace = Path(temporary).resolve()
+            apk = workspace / "app.apk"
+            apk.write_bytes(b"apk")
+            self.assertEqual(resolve_workspace_path("app.apk", "APK", workspace, strict=True), apk)
+
+    def test_workspace_path_rejects_parent_traversal(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            workspace = root / "workspace"
+            workspace.mkdir()
+            (root / "outside.apk").write_bytes(b"apk")
+            with self.assertRaisesRegex(VerificationError, "inside the repository workspace"):
+                resolve_workspace_path("../outside.apk", "APK", workspace)
+
+    def test_workspace_path_rejects_symlinks_escaping_workspace(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            workspace = root / "workspace"
+            workspace.mkdir()
+            outside = root / "outside.apk"
+            outside.write_bytes(b"apk")
+            (workspace / "linked.apk").symlink_to(outside)
+            with self.assertRaisesRegex(VerificationError, "inside the repository workspace"):
+                resolve_workspace_path("linked.apk", "APK", workspace, strict=True)
+
     def test_accepts_expected_hardened_manifest(self):
         result = verify_manifest(manifest())
         self.assertEqual(result["result"], "passed")
