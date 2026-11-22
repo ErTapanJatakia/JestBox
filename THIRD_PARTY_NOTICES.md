@@ -110,7 +110,7 @@ The committed root lockfile pins 2.9.1 and declares 0BSD. The immutable upstream
 
 ## 5. Apache-2.0 — Playwright 1.56.1 and Playwright Core 1.56.1
 
-**Copyright / attribution:** Copyright (c) Microsoft Corporation.  
+**Copyright / attribution:** Copyright (c) Microsoft Corporation; the upstream Apache licence text also identifies portions copyright 2017 Google Inc.  
 **Versioned upstream source:** [Playwright v1.56.1 LICENSE](https://github.com/microsoft/playwright/blob/v1.56.1/LICENSE), [NOTICE](https://github.com/microsoft/playwright/blob/v1.56.1/NOTICE), and the versioned [`playwright`](https://github.com/microsoft/playwright/blob/v1.56.1/packages/playwright/package.json) / [`playwright-core`](https://github.com/microsoft/playwright/blob/v1.56.1/packages/playwright-core/package.json) package manifests. Both manifests identify version 1.56.1 and Apache-2.0. The versioned source trees also contain `ThirdPartyNotices.txt` in each package directory: [playwright](https://github.com/microsoft/playwright/blob/v1.56.1/packages/playwright/ThirdPartyNotices.txt) and [playwright-core](https://github.com/microsoft/playwright/blob/v1.56.1/packages/playwright-core/ThirdPartyNotices.txt).
 
 ### 5.1 Upstream NOTICE
