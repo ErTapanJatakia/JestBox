@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Third-party notices — JestBox</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light dark}
+body{margin:0;background:#101827;color:#f8f9ff;line-height:1.65}
+main{width:min(900px,calc(100% - 2rem));margin:2rem auto;padding:clamp(1rem,4vw,2.5rem);background:#1b2940;border:1px solid #8092ad;border-radius:1rem}
+a{color:#75e6da;overflow-wrap:anywhere}
+h1,h2,h3{line-height:1.2}h2{margin-top:2rem}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#101827;border:1px solid #52647e;border-radius:.6rem;font: .88rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
+.home{display:inline-block;margin:1rem 0;padding:.6rem 1rem;border:1px solid currentColor;border-radius:.6rem;text-decoration:none}
+.note{padding:1rem;border-left:4px solid #75e6da;background:#142338}
+@media(prefers-color-scheme:light){body{background:#f4f0e7;color:#20252b}main{background:#fffdf7;border-color:#6d7884}a{color:#075d68}pre{background:#f2f4f8;border-color:#c4ccd8;color:#20252b}.note{background:#eef7f6}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body><main>
+<a class="home" href="../index.html">← JestBox</a>
+<h1>Third-party notices</h1>
+<p>JestBox uses third-party software. The notices below identify the permissively licensed components recorded for the app's Capacitor integration and its JavaScript dependency tree.</p>
+<p class="note"><strong>Scope:</strong> This in-app notice covers the MIT and 0BSD packages identified in the root application lockfile. Playwright is isolated in the repository's tablet-validation tooling and was not found in the inspected Android APKs; its Apache-2.0 licence and upstream attribution remain documented in the repository's <a href="https://github.com/ErTapanJatakia/JestBox/blob/main/THIRD_PARTY_NOTICES.md">developer notice record</a>.</p>
+<h2>Capacitor Android 8.6.2 — MIT</h2>
+<p>Copyright (c) 2017-present Drifty Co. The Capacitor Android runtime is part of the native Android application.</p>
+<p>Version-pinned source: <a href="https://github.com/ionic-team/capacitor/blob/8.6.2/LICENSE">Capacitor 8.6.2 LICENSE</a>.</p>
+<h2>Capacitor Core 8.6.2 — MIT</h2>
+<p>Copyright (c) 2017-present Drifty Co.</p>
+<pre>MIT License
+
+Copyright (c) 2017-present Drifty Co.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</pre>
+<p>Version-pinned source: <a href="https://github.com/ionic-team/capacitor/blob/8.6.2/LICENSE">Capacitor 8.6.2 LICENSE</a>.</p>
+<h2>Capacitor Share 8.0.3 — MIT</h2>
+<p>Copyright 2020-present Ionic · <a href="https://ionic.io">https://ionic.io</a></p>
+<pre>MIT License
+
+Copyright 2020-present Ionic
+https://ionic.io
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
+<p>Version-pinned source: <a href="https://github.com/ionic-team/capacitor-plugins/blob/%40capacitor%2Fshare%408.0.3/share/LICENSE">Capacitor Share 8.0.3 LICENSE</a>.</p>
+<h2>tslib 2.9.1 — 0BSD</h2>
+<p>Copyright (c) Microsoft Corporation.</p>
+<pre>Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.</pre>
+<p>Version-pinned sources: <a href="https://github.com/microsoft/tslib/blob/v2.9.1/package.json">tslib v2.9.1 package manifest</a> and <a href="https://github.com/microsoft/tslib/blob/v2.9.1/LICENSE.txt">LICENSE.txt</a>.</p>
+<h2>Developer tooling — Playwright 1.56.1</h2>
+<p>Playwright and Playwright Core are Apache-2.0 licensed Microsoft projects used by JestBox's isolated tablet-browser validation tooling. They were not found in the inspected Android debug or unsigned release APKs. Their upstream LICENSE, NOTICE, and package-specific third-party notices are retained in the repository's <a href="https://github.com/ErTapanJatakia/JestBox/blob/main/THIRD_PARTY_NOTICES.md">full third-party notice record</a>.</p>
+<p>These notices are provided for attribution and licence compliance. They do not imply that every dependency listed in a lockfile is included in every release artefact.</p>
+<a class="home" href="../index.html">← JestBox</a>
+</main></body></html>

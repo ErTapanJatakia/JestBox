@@ -13,6 +13,7 @@ test("Android staging script copies only the local web app and bundled assets", 
     await cp("jokes.js", join(fixture, "jokes.js"));
     await cp("share-bridge.bundle.js", join(fixture, "share-bridge.bundle.js"));
     await cp("styles.css", join(fixture, "styles.css"));
+    await cp("THIRD_PARTY_NOTICES.html", join(fixture, "THIRD_PARTY_NOTICES.html"));
     await cp("assets", join(fixture, "assets"), { recursive: true });
     for (const name of ["PRIVACY-POLICY", "ACCESSIBILITY-STATEMENT"]) {
       for (const locale of ["", ".es-PE", ".ru-RU", ".es-ES", ".en-IN", ".hi-IN", ".ur-IN", ".ur-PK"]) {
@@ -27,6 +28,10 @@ test("Android staging script copies only the local web app and bundled assets", 
       const staged = await readFile(join(fixture, "www", file), "utf8");
       assert.equal(staged, source, `${file} must be copied byte-for-byte`);
     }
+
+    const noticeSource = await readFile("THIRD_PARTY_NOTICES.html", "utf8");
+    const noticeStaged = await readFile(join(fixture, "www/legal/third-party-notices.html"), "utf8");
+    assert.equal(noticeStaged, noticeSource, "third-party notices must be packaged byte-for-byte");
 
     const sourceAsset = await readFile("assets/wcag22aa-blue.svg", "utf8");
     const stagedAsset = await readFile(join(fixture, "www/assets/wcag22aa-blue.svg"), "utf8");
