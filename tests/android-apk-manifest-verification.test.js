@@ -59,7 +59,7 @@ test("final APK manifest rejects backup, cleartext, old SDK and exported non-lau
 test("final APK manifest rejects sensitive permissions and a missing ProfileInstaller receiver", async () => {
   const unsafe = validManifest
     .replace('  <uses-permission android:name="android.permission.INTERNET" />', '  <uses-permission android:name="android.permission.INTERNET" />\n  <uses-permission android:name="android.permission.READ_CONTACTS" />')
-    .replace(/    <receiver android:name="androidx.profileinstaller.ProfileInstallReceiver" android:exported="false" \/>\n/, "");
+    .replace('    <receiver android:name="androidx.profileinstaller.ProfileInstallReceiver" android:exported="false" />\n', "");
   const { result, json } = await runVerifier(unsafe);
   assert.notEqual(result.status, 0);
   assert.match(json.failures.join("\n"), /sensitive permission|ProfileInstallReceiver/);
