@@ -14,6 +14,7 @@ from pathlib import Path
 ANDROID = "{http://schemas.android.com/apk/res/android}"
 EXPECTED_APPLICATION_ID = "com.jestbox.app"
 EXPECTED_MIN_SDK = 29
+EXPECTED_APK_RELATIVE_PATH = Path("android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk")
 MIN_SAFE_TARGET_SDK = 28
 
 SENSITIVE_PERMISSIONS = {
@@ -211,12 +212,11 @@ def resolve_workspace_path(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--apk", required=True, help="Built APK inside the repository workspace")
     parser.add_argument("--output", help="Optional JSON evidence report path inside the repository workspace")
     args = parser.parse_args()
 
     try:
-        apk = resolve_workspace_path(args.apk, "APK", must_exist=True)
+        apk = resolve_workspace_path(str(EXPECTED_APK_RELATIVE_PATH), "APK", must_exist=True)
         output = (
             resolve_workspace_path(args.output, "Output report", must_exist=False)
             if args.output
