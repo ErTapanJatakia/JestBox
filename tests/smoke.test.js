@@ -116,14 +116,12 @@ test("Urdu locales are independent, searchable, fully localized, and rendered ri
 
 
 test("random joke selection uses unbiased Web Crypto rather than Math.random",()=>{
- const start=js.indexOf("function secureRandomIndex(max){");
- const end=js.indexOf("\n}",start)+2;
- const helper=start>=0&&end>1?js.slice(start,end):null;
- assert.ok(helper,"secureRandomIndex helper must exist");
- const randomIndex=vm.runInNewContext(helper+"; secureRandomIndex",{crypto:webcrypto,Uint32Array,Number,Math,RangeError});
+ const helper=read("random-index.js");
+ const randomIndex=vm.runInNewContext(helper+"; JestBoxRandomIndex",{crypto:webcrypto,Uint32Array,Number,Math,RangeError});
  for(let i=0;i<2000;i++){const value=randomIndex(17);assert.ok(Number.isInteger(value)&&value>=0&&value<17)}
  assert.equal(randomIndex(1),0);
  assert.throws(()=>randomIndex(0),RangeError);
  assert.throws(()=>randomIndex(0x100000001),RangeError);
- assert.match(js,/mode==="random"\?secureRandomIndex\(a\.length\)/);
+ assert.match(html,/random-index\\.js/);
+ assert.match(js,/mode==="random"\\?secureRandomIndex\\(a\\.length\\)/);
 });
