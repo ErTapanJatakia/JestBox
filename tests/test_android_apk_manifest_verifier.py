@@ -7,10 +7,10 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from verify_android_apk_manifest import VerificationError, resolve_workspace_path, verify_manifest
+from verify_android_apk_manifest import ANDROID as ANDROID_NAMESPACE, VerificationError, resolve_workspace_path, verify_manifest
 
 
-ANDROID = "http://schemas.android.com/apk/res/android"
+ANDROID = ANDROID_NAMESPACE[1:-1]
 
 
 def manifest(application_attributes="", components=None, extra_permissions=""):
