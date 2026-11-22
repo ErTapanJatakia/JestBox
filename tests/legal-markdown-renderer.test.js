@@ -34,7 +34,7 @@ test("retains headings, emphasis, lists and plain text", () => {
   assert.match(output, /<h1>Heading<\/h1>/);
   assert.match(output, /<strong>bold<\/strong>/);
   assert.match(output, /<em>italic<\/em>/);
-  assert.match(output, /<ul><li>First<\/li><li>Second<\/li><\/ul>/);
+  assert.match(output, /<ul>\s*<li>First<\/li>\s*<li>Second<\/li>\s*<\/ul>/);
 });
 
 test("all eight localized accessibility statements use the approved safe image syntax", async () => {
