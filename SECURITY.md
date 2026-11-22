@@ -61,6 +61,22 @@ The verifier fails closed if a custom `networkSecurityConfig` is introduced, unt
 
 **Coverage boundary:** this is packaged-manifest verification plus an automated API 30 emulator smoke test. It is not a human-led penetration test, rooted-device/TLS interception assessment, physical-device certification, app-store acceptance, or public release. The signed APK is an assessment candidate only; no store submission or distribution was performed.
 
+### Bearer CLI controlled SAST evaluation — PR in progress
+
+A non-blocking evaluation workflow is being added for **Bearer CLI v2.1.3**. The official CLI supports JavaScript and TypeScript and provides SAST rules covering OWASP Top 10/CWE Top 25 security risks. The open-source CLI is distributed under Elastic License 2.0 (ELv2); its terms permit internal use but are not an OSI-approved permissive licence.
+
+- **Tool release:** [Bearer CLI v2.1.3](https://github.com/Bearer/bearer/releases/tag/v2.1.3)
+- **Documentation:** [Bearer CLI](https://docs.bearer.com/) · [scan command reference](https://docs.bearer.com/reference/commands/)
+- **Pinned Linux AMD64 archive SHA-256:** `974d4ad7bb71bc578675684d444e345e8fbad91c85557aac035406ef5cc04c68`
+- **Scope:** SAST only. Bearer's optional secrets scanner is excluded from this trial because Gitleaks already covers secret-pattern detection.
+- **Reporting:** SARIF retained as a workflow artifact for manual triage; it is not uploaded into GitHub Code Scanning during the evaluation.
+- **CI policy:** non-blocking (`--exit-code=0`); no existing scanner, required check, or CI gate is changed or weakened.
+- **Credentials/network:** no Bearer Cloud API key is used; domain resolution and version-check network calls are disabled during the scan.
+
+The evaluation will compare language coverage, findings quality, rule overlap with CodeQL/njsscan/DevSkim, false-positive rate, execution time, and operational reliability. Findings must be reviewed before any alert disposition or adoption decision.
+
+**Status:** workflow implementation is on a pull-request branch. Do not count Bearer as an adopted required scanner until the trial run and evidence review are complete. This evaluation does not imply that every finding is a confirmed vulnerability.
+
 ### Main-branch post-merge verification — 22 November 2026
 
 **Result:** all 15 main-branch workflow runs and all 16 commit checks completed successfully on main. This assessment covers commit `519ecd7ec69ee59987e02e74d3669c73d5e27044`; it is automated post-merge verification, not a production release certification.
