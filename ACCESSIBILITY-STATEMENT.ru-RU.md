@@ -3,7 +3,7 @@
 **Последняя проверка:** 19 ноября 2026 года  
 **Продукт:** JestBox
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="Руководство WCAG 2.2"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Справочная графическая отметка WCAG 2.2, уровень AA"></a></p>
+[![Справочная графическая отметка WCAG 2.2, уровень AA](assets/wcag22aa-blue.svg)](https://www.w3.org/WAI/WCAG22/quickref/)
 
 ## Наши обязательства
 
@@ -36,7 +36,7 @@ JestBox стремится быть удобным для людей с разн
 - **Телефон:** [+91 9664332984](tel:+919664332984)
 - **Сайт:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="Руководство WCAG 2.2"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="Справочная графическая отметка WCAG 2.2, уровень AA"></a></p>
+[![Справочная графическая отметка WCAG 2.2, уровень AA](assets/wcag22aa-blue.svg)](https://www.w3.org/WAI/WCAG22/quickref/)
 
 ## Справочный материал
 
