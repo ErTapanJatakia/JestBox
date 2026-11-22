@@ -29,5 +29,5 @@ test("in-app notices preserve the required runtime licence texts and attribution
     "third-party notice record"
   ]) assert.ok(page.includes(marker), "Missing notice marker: " + marker);
   assert.match(page, /The above copyright notice and this permission notice shall be included in all/);
-  assert.match(page, /permission to use, copy, modify, and\/or distribute this software/);
+  assert.ok(page.toLowerCase().includes("permission to use, copy, modify, and/or distribute this software"), "0BSD permission grant must be present");
 });
