@@ -22,6 +22,7 @@ test("Android staging script copies only the local web app and bundled assets", 
       }
     }
     await cp("scripts/prepare-web.mjs", join(fixture, "prepare-web.mjs"));
+    await cp("scripts/legal-markdown-renderer.mjs", join(fixture, "legal-markdown-renderer.mjs"));
     await execFileSync(process.execPath, [join(fixture, "prepare-web.mjs")], { cwd: fixture });
 
     for (const file of ["index.html", "script.js", "random-index.js", "jokes.js", "share-bridge.bundle.js", "styles.css"]) {
