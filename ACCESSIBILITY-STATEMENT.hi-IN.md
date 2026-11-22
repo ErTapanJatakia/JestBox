@@ -3,7 +3,7 @@
 **अंतिम समीक्षा:** 19 नवंबर 2026  
 **उत्पाद:** JestBox
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 मार्गदर्शिका"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 स्तर AA सुगम्यता संदर्भ चिह्न"></a></p>
+[![WCAG 2.2 स्तर AA सुगम्यता संदर्भ चिह्न](assets/wcag22aa-blue.svg)](https://www.w3.org/WAI/WCAG22/quickref/)
 
 ## हमारी प्रतिबद्धता
 
@@ -36,7 +36,7 @@ JestBox का उद्देश्य अलग-अलग सुगम्य�
 - **फ़ोन:** [+91 9664332984](tel:+919664332984)
 - **वेबसाइट:** [https://linktr.ee/ertapanjatakia](https://linktr.ee/ertapanjatakia)
 
-<p align="center"><a href="https://www.w3.org/WAI/WCAG22/quickref/" title="WCAG 2.2 मार्गदर्शिका"><img src="assets/wcag22aa-blue.svg" width="88" height="31" alt="WCAG 2.2 स्तर AA सुगम्यता संदर्भ चिह्न"></a></p>
+[![WCAG 2.2 स्तर AA सुगम्यता संदर्भ चिह्न](assets/wcag22aa-blue.svg)](https://www.w3.org/WAI/WCAG22/quickref/)
 
 ## संदर्भ
 
