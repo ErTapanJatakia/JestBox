@@ -519,3 +519,56 @@ For a cancelled or failed workflow, link the run and describe what actually exec
 - [Canonical security document history](https://github.com/ErTapanJatakia/JestBox/commits/main/SECURITY.md)
 - [Historical assessment-document changes](https://github.com/ErTapanJatakia/JestBox/commits/main/SECURITY-ASSESSMENT.md)
 - [Historical testing-document changes](https://github.com/ErTapanJatakia/JestBox/commits/main/SECURITY-TESTING.md)
+
+### Post-merge security assurance and packaged-notice verification — 23 November 2026
+
+**Result: 18/18 main-branch commit checks passed** on merge commit `94022328d8530ec5d5829f9af648a7a910428957`. PR #83 was merged after its own 27/27 checks passed. This entry supersedes earlier in-progress status notes for this commit; it does not replace historical assessment records.
+
+- **PR:** [#83 — Android APK manifest verifier workflow compatibility](https://github.com/ErTapanJatakia/JestBox/pull/83)
+- **Merge commit:** `94022328d8530ec5d5829f9af648a7a910428957`
+- **Main-branch checks:** [18/18 successful commit checks](https://github.com/ErTapanJatakia/JestBox/commit/94022328d8530ec5d5829f9af648a7a910428957/checks)
+- **PR validation:** 27/27 checks passed before merge.
+- **Build and runtime assessment:** [Run #45063593421](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593421) · [assessment artifact 14770022883](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593421/artifacts/14770022883)
+- **Android debug build:** [Run #45063593352](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593352) · [artifact 14770323311](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593352/artifacts/14770323311)
+- **Trivy:** [Run #45063593348](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593348) · [report artifact 14770416668](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593348/artifacts/14770416668)
+- **ZAP DAST:** [Run #45063593443](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593443)
+- **CodeQL:** [Run #45063593103](https://github.com/ErTapanJatakia/JestBox/actions/runs/45063593103)
+
+The 18 checks included JavaScript/TypeScript, Python and GitHub Actions CodeQL analyses; ZAP DAST; signed APK build, signature and emulator runtime assessment; Android debug build; Trivy, OSV, Bearer and njsscan; SBOM generation; supply-chain posture; tablet browser validation; workflow lint/security audit; smoke tests; and repository-history secret scanning. Every check concluded success. Scanner execution success is recorded separately from individual finding disposition.
+
+#### Trivy licence-note evidence and disposition
+
+The Trivy SARIF from run #45063593348 contained **5 Note-level licence inventory results, 0 Warning results and 0 Error results**. These are licence notices, not vulnerability findings. The exact alert/package mapping is:
+
+| GitHub alert | Component and version | Licence | Evidence in built APK | Compliance disposition |
+|---|---|---|---|---|
+| #1 | `@capacitor/core` 8.6.2 | MIT | Capacitor Core attribution and full MIT text present in packaged notice | Attribution verified |
+| #2 | `@capacitor/share` 8.0.3 | MIT | Capacitor Share attribution and full MIT text present in packaged notice | Attribution verified |
+| #3 | `tslib` 2.9.1 | 0BSD | Microsoft copyright and 0BSD text present in packaged notice | Attribution verified |
+| #120 | `playwright` 1.56.1 | Apache-2.0 | Not found in inspected APK contents; isolated tablet CI tooling | Developer-tool notice retained in repository record |
+| #121 | `playwright-core` 1.56.1 | Apache-2.0 | Not found in inspected APK contents; isolated tablet CI tooling | Developer-tool notice retained in repository record |
+
+The following APKs were opened as ZIP archives and their packaged `assets/public/legal/third-party-notices.html` was inspected directly:
+
+| APK | SHA-256 |
+|---|---|
+| Debug `app-debug.apk` | `55ef306a22ec6fcca76825b8425c4b487a9309b53920ab25782097e70cff2736` |
+| Unsigned release `app-release-unsigned.apk` | `921deb5a72cbc06a9dd7c25c113b6e2319b6074249c01c9cb4c238ae5b64078b` |
+| Signed hardened assessment candidate `jestbox-hardened-assessment-signed.apk` | `b1d6cd6eda2983cb9745f7c466aade3bf2318f4b4e191eeac274d2d8fa02684f` |
+
+All three APKs contained the notice file with the three app dependency attributions and their licence text. The Playwright components were not found as APK paths; the notice correctly identifies them as isolated developer tooling and points to the repository's detailed developer notice record. The notice file is packaged under `assets/public/legal/` in each APK.
+
+**Alert lifecycle limitation:** the package attribution evidence is now complete and documented, but the available GitHub connector does not expose individual Code Scanning alert state or dismissal controls. Therefore this report does not claim alerts #1, #2, #3, #120 or #121 are closed. Do not dismiss them as false positives: they are valid licence-inventory observations with documented compliance evidence. Their live GitHub status must be confirmed in the [Security alerts page](https://github.com/ErTapanJatakia/JestBox/security/code-scanning). No scanner suppression or CI gate weakening was introduced.
+
+#### Android assessment result
+
+The signed hardened assessment candidate was verified with APK signature scheme v3 and installed/launched on an Android API 30 Google APIs x86_64 emulator. Initial process survival (45 seconds), force-stop, relaunch and second observation (10 seconds) passed; no matching fatal exception was observed. The packaged manifest assessment passed: application ID `com.jestbox.app`, min SDK 29, target SDK 36, `allowBackup=false`, no cleartext opt-in, no custom network security config, only the launcher activity exported, and no sensitive permissions detected.
+
+This is an automated build/emulator assessment, not a human-led penetration test, physical-device certification, production deployment or store release. The assessment candidate and debug/unsigned APK artifacts remain CI evidence only; no distribution or submission was performed.
+
+#### Remaining assurance work
+
+1. Verify the live GitHub status of the five Trivy licence alerts in the Security UI; record their exact status without misclassifying them as vulnerabilities or suppressing scanner output.
+2. Continue triage of the existing ZAP, MobSF and Bearer findings using their underlying reports; green workflow status alone does not close findings.
+3. Keep production-edge header verification, human-led penetration testing and production release controls separate from this local-build assessment.
+4. Run the documentation commit's CI and preserve its result. No deployment, signing for distribution, store submission or APK release is authorised by this assessment.
