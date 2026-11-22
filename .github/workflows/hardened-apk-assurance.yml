@@ -80,6 +80,7 @@ jobs:
           node --check share-bridge.entry.js
           node --check scripts/prepare-web.mjs
           node --check scripts/legal-markdown-renderer.mjs
+          node --check scripts/legal-page-bootstrap.mjs
           node --check scripts/prepare-android-branding.mjs
           node --check scripts/prepare-android-security.mjs
           python3 -m unittest discover -s tests -p 'test_android_apk_manifest_verifier.py' -v
