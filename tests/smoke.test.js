@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
+import { webcrypto } from "node:crypto";
 const read=(name)=>fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html=read("index.html"),js=read("script.js"),css=read("styles.css"),jokesSource=read("jokes.js");
 const dataContext={window:{}};vm.runInNewContext(jokesSource,dataContext);const jokes=dataContext.window.JESTBOX_JOKES;
@@ -111,4 +112,16 @@ test("Urdu locales are independent, searchable, fully localized, and rendered ri
  }
  const build=read("scripts/prepare-web.mjs");
  assert.match(build,/locale\.startsWith\("ur-"\) \? "rtl" : "ltr"/);
+});
+
+
+test("random joke selection uses unbiased Web Crypto rather than Math.random",()=>{
+ const helper=js.match(/function secureRandomIndex\\(max\\)\\{[\\s\\S]*?\\n\\}/)?.[0];
+ assert.ok(helper,"secureRandomIndex helper must exist");
+ const randomIndex=vm.runInNewContext(helper+"; secureRandomIndex",{crypto:webcrypto,Uint32Array,Number,Math,RangeError});
+ for(let i=0;i<2000;i++){const value=randomIndex(17);assert.ok(Number.isInteger(value)&&value>=0&&value<17)}
+ assert.equal(randomIndex(1),0);
+ assert.throws(()=>randomIndex(0),RangeError);
+ assert.throws(()=>randomIndex(0x100000001),RangeError);
+ assert.match(js,/mode==="random"\?secureRandomIndex\(a\.length\)/);
 });
