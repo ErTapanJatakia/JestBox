@@ -619,3 +619,37 @@ The detailed ZAP and Bearer triage update was committed as `5e6574fa8baf701301a3
 - **Commit checks:** [16/16 successful](https://github.com/ErTapanJatakia/JestBox/commit/5e6574fa8baf701301a376d31ddde074b6755714/checks)
 
 This confirms the documentation change passed the repository's existing checks. It does not close the five GitHub licence alerts, validate production-host headers, or substitute for the deferred MobSF and human-led assessments.
+
+
+### DevSkim Code Scanning alert triage — 23 November 2026
+
+The latest DevSkim report was retrieved and reviewed from the workflow artifact, rather than relying only on the alert titles.
+
+- **Commit scanned:** `160604b17bb1bf72cf5d3b67e5d4d68d47c5947f`
+- **Workflow:** [#45065523626](https://github.com/ErTapanJatakia/JestBox/actions/runs/45065523626)
+- **Artifact:** [14771670451 — DevSkim SARIF and summary](https://github.com/ErTapanJatakia/JestBox/actions/runs/45065523626/artifacts/14771670451)
+- **SARIF summary:** 1 Error, 3 Warnings, 25 Notes (29 results total). These are DevSkim SARIF levels, not CVSS ratings.
+
+#### Review of the four relevant source findings
+
+| GitHub alert | DevSkim rule | Location | Technical review | Recommended disposition |
+|---|---|---|---|---|
+| [#127](https://github.com/ErTapanJatakia/JestBox/security/code-scanning/127) | `DS173237` — token/key in source | `.github/workflows/bearer-evaluation.yml:47` | The literal is the published SHA-256 digest for the pinned Bearer CLI v2.1.3 Linux archive. The workflow uses it with `sha256sum --check --strict` before extracting the downloaded binary. It is an integrity pin, not an authentication token, API key, password or credential. Removing it would weaken supply-chain verification. | Contextual false positive. Retain the checksum and verification. Do not move it to a secret store or remove the pin. |
+| [#126](https://github.com/ErTapanJatakia/JestBox/security/code-scanning/126) | `DS137138` — insecure URL | `scripts/verify_android_apk_manifest.py:14` | The URL is the fixed `http://schemas.android.com/apk/res/android` XML namespace identifier used to read Android manifest attributes. It is not fetched and does not create an HTTP connection. | Contextual false positive. Retain the standard Android namespace URI. |
+| [#125](https://github.com/ErTapanJatakia/JestBox/security/code-scanning/125) | `DS137138` — insecure URL | `tests/test_android_apk_manifest_verifier.py:13` | The same Android XML namespace identifier is used by the manifest test fixture. It is not a network endpoint. | Contextual false positive. Retain the standard Android namespace URI. |
+| [#124](https://github.com/ErTapanJatakia/JestBox/security/code-scanning/124) | `DS137138` — insecure URL | `tests/android-security-hardening.test.js:10` | The same Android XML namespace identifier appears in an in-memory manifest fixture used by the Android hardening test. It is not a network request. | Contextual false positive. Retain the standard Android namespace URI. |
+
+The scanner report contains exactly three `DS137138` warning results at the three locations above and one `DS173237` error result. The #124 mapping is based on the otherwise-unlisted third `DS137138` occurrence in the same scanned report; its live GitHub status was not independently available through the connected GitHub interface. Alerts #125–#127 were shown as open in the user's supplied Code Scanning view.
+
+**Remediation decision:** no source change is warranted for these four findings. Rewriting a required XML namespace or removing a verified release checksum merely to silence a pattern-based rule would reduce correctness or supply-chain assurance. No DevSkim rule was suppressed, no scanner finding was deleted, and no CI gate was weakened. The findings should be dismissed in GitHub only with the documented contextual rationale, after confirming each alert's current state in the Security UI; no dismissal or closure is claimed by this report.
+
+#### Other DevSkim observations
+
+The same report contains 25 SARIF Note-level results, mostly `DS162092` observations concerning debug-oriented output in CI workflows and tests, plus one `DS172411` `setTimeout` review note in `script.js`. They are not part of the three user-shared warning/error alerts above. They remain separate review items; the Note classification is not proof of a vulnerability or of harmlessness. Preserve the raw SARIF artifact for item-level review rather than treating the workflow's successful exit as a clean scan.
+
+#### Follow-up
+
+1. Confirm the live status and exact metadata of alert #124 in GitHub Security; the SARIF location strongly maps it to the third Android namespace occurrence.
+2. Apply the evidence-based false-positive rationale above to alerts #124–#127 only after checking each alert's live details.
+3. Continue separate triage of the 25 Note-level observations if they surface as actionable alerts.
+4. Do not alter the pinned checksum, Android namespace identifiers, tests, scanner rules or CI gates to manufacture a green alert count.
