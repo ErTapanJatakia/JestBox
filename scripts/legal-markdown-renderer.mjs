@@ -1,18 +1,5 @@
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[character]);
-}
-
-function applyEmphasis(value) {
-  return value
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
-}
+const WCAG_IMAGE_SRC = "../assets/wcag22aa-blue.svg";
+const WCAG_GUIDANCE_URL = "https://www.w3.org/WAI/WCAG22/quickref/";
 
 function safeLinkTarget(value) {
   try {
@@ -25,114 +12,179 @@ function safeLinkTarget(value) {
   }
 }
 
-function inlineMarkdown(value) {
+export function parseInline(markdown) {
   const tokens = [];
-  const hold = (html) => {
-    const index = tokens.push(html) - 1;
-    return "\u0000" + index + "\u0000";
-  };
+  const pattern = /\[!\[([^\]]*)\]\(assets\/wcag22aa-blue\.svg\)\]\((https:\/\/www\.w3\.org\/WAI\/WCAG22\/quickref\/)\)|!\[([^\]]*)\]\(assets\/wcag22aa-blue\.svg\)|\[([^\]]+)\]\((https?:\/\/[^ )]+|mailto:[^ )]+|tel:[^ )]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
+  let cursor = 0;
 
-  let source = value.replace(
-    /\[!\[([^\]]*)\]\(assets\/wcag22aa-blue\.svg\)\]\((https:\/\/www\.w3\.org\/WAI\/WCAG22\/quickref\/)\)/g,
-    (match, alt, target) => {
-      const safeTarget = safeLinkTarget(target);
-      if (!safeTarget) return match;
-      return hold(
-        '<a href="' + escapeHtml(safeTarget) + '">' +
-        '<img class="reference-mark" src="../assets/wcag22aa-blue.svg" width="88" height="31" alt="' +
-        escapeHtml(alt) + '" loading="lazy"></a>'
-      );
+  for (const match of markdown.matchAll(pattern)) {
+    if (match.index > cursor) {
+      tokens.push({ type: "text", value: markdown.slice(cursor, match.index) });
     }
-  );
 
-  source = source.replace(
-    /!\[([^\]]*)\]\(assets\/wcag22aa-blue\.svg\)/g,
-    (_match, alt) => hold(
-      '<img class="reference-mark" src="../assets/wcag22aa-blue.svg" width="88" height="31" alt="' +
-      escapeHtml(alt) + '" loading="lazy">'
-    )
-  );
-
-  source = source.replace(
-    /\[([^\]]+)\]\((https?:\/\/[^ )]+|mailto:[^ )]+|tel:[^ )]+)\)/g,
-    (match, label, target) => {
-      const safeTarget = safeLinkTarget(target);
-      if (!safeTarget) return match;
-      return hold(
-        '<a href="' + escapeHtml(safeTarget) + '">' +
-        applyEmphasis(escapeHtml(label)) + '</a>'
-      );
+    if (match[1] !== undefined) {
+      const href = safeLinkTarget(match[2]);
+      if (href === WCAG_GUIDANCE_URL) {
+        tokens.push({ type: "image", alt: match[1], src: WCAG_IMAGE_SRC, href });
+      } else {
+        tokens.push({ type: "text", value: match[0] });
+      }
+    } else if (match[3] !== undefined) {
+      tokens.push({ type: "image", alt: match[3], src: WCAG_IMAGE_SRC });
+    } else if (match[4] !== undefined) {
+      const href = safeLinkTarget(match[5]);
+      if (href) tokens.push({ type: "link", label: match[4], href });
+      else tokens.push({ type: "text", value: match[0] });
+    } else if (match[6] !== undefined) {
+      tokens.push({ type: "strong", value: match[6] });
+    } else if (match[7] !== undefined) {
+      tokens.push({ type: "em", value: match[7] });
     }
-  );
 
-  const rendered = applyEmphasis(escapeHtml(source));
-  return rendered.replace(/\u0000(\d+)\u0000/g, (_match, index) => tokens[Number(index)]);
+    cursor = match.index + match[0].length;
+  }
+
+  if (cursor < markdown.length) {
+    tokens.push({ type: "text", value: markdown.slice(cursor) });
+  }
+  return tokens;
 }
 
-export function renderMarkdown(markdown) {
-  const lines = markdown.split(/\r?\n/);
-  const out = [];
+export function parseMarkdown(markdown) {
+  const blocks = [];
   let paragraph = [];
   let list = null;
+
   const flushParagraph = () => {
     if (paragraph.length) {
-      out.push("<p>" + inlineMarkdown(paragraph.join(" ")) + "</p>");
+      blocks.push({ type: "paragraph", children: parseInline(paragraph.join(" ")) });
       paragraph = [];
     }
   };
   const flushList = () => {
     if (list) {
-      out.push("</" + list + ">");
+      blocks.push(list);
       list = null;
     }
   };
 
-  for (const line of lines) {
+  for (const line of markdown.split(/\r?\n/)) {
     if (!line.trim()) {
       flushParagraph();
       flushList();
       continue;
     }
+
     const heading = line.match(/^(#{1,6})\s+(.+)$/);
     if (heading) {
       flushParagraph();
       flushList();
-      const level = heading[1].length;
-      out.push("<h" + level + ">" + inlineMarkdown(heading[2]) + "</h" + level + ">");
+      blocks.push({ type: "heading", level: heading[1].length, children: parseInline(heading[2]) });
       continue;
     }
+
     if (/^\s*---+\s*$/.test(line)) {
       flushParagraph();
       flushList();
-      out.push("<hr>");
+      blocks.push({ type: "rule" });
       continue;
     }
+
     const unordered = line.match(/^\s*[-*]\s+(.+)$/);
-    if (unordered) {
-      flushParagraph();
-      if (list !== "ul") {
-        flushList();
-        list = "ul";
-        out.push("<ul>");
-      }
-      out.push("<li>" + inlineMarkdown(unordered[1]) + "</li>");
-      continue;
-    }
     const ordered = line.match(/^\s*\d+\.\s+(.+)$/);
-    if (ordered) {
+    if (unordered || ordered) {
       flushParagraph();
-      if (list !== "ol") {
+      const orderedList = Boolean(ordered);
+      const listType = orderedList ? "ordered-list" : "unordered-list";
+      if (!list || list.type !== listType) {
         flushList();
-        list = "ol";
-        out.push("<ol>");
+        list = { type: listType, items: [] };
       }
-      out.push("<li>" + inlineMarkdown(ordered[1]) + "</li>");
+      list.items.push(parseInline((ordered || unordered)[1]));
       continue;
     }
+
     flushList();
     paragraph.push(line.trim());
   }
+
   flushParagraph();
   flushList();
-  return out.join("\n");
+  return blocks;
+}
+
+function appendInline(tokens, parent, doc) {
+  for (const token of tokens) {
+    if (token.type === "text") {
+      parent.appendChild(doc.createTextNode(token.value));
+      continue;
+    }
+
+    if (token.type === "strong" || token.type === "em") {
+      const element = doc.createElement(token.type);
+      element.textContent = token.value;
+      parent.appendChild(element);
+      continue;
+    }
+
+    if (token.type === "link") {
+      const anchor = doc.createElement("a");
+      anchor.setAttribute("href", token.href);
+      anchor.textContent = token.label;
+      parent.appendChild(anchor);
+      continue;
+    }
+
+    if (token.type === "image") {
+      const image = doc.createElement("img");
+      image.setAttribute("class", "reference-mark");
+      image.setAttribute("src", token.src);
+      image.setAttribute("width", "88");
+      image.setAttribute("height", "31");
+      image.setAttribute("alt", token.alt);
+      image.setAttribute("loading", "lazy");
+      if (token.href) {
+        const anchor = doc.createElement("a");
+        anchor.setAttribute("href", token.href);
+        anchor.appendChild(image);
+        parent.appendChild(anchor);
+      } else {
+        parent.appendChild(image);
+      }
+    }
+  }
+}
+
+export function renderMarkdown(markdown, container, doc = document) {
+  container.replaceChildren();
+  for (const block of parseMarkdown(markdown)) {
+    if (block.type === "rule") {
+      container.appendChild(doc.createElement("hr"));
+      continue;
+    }
+
+    if (block.type === "heading") {
+      const heading = doc.createElement("h" + block.level);
+      appendInline(block.children, heading, doc);
+      container.appendChild(heading);
+      continue;
+    }
+
+    if (block.type === "paragraph") {
+      const paragraph = doc.createElement("p");
+      appendInline(block.children, paragraph, doc);
+      container.appendChild(paragraph);
+      continue;
+    }
+
+    if (block.type === "ordered-list" || block.type === "unordered-list") {
+      const list = doc.createElement(block.type === "ordered-list" ? "ol" : "ul");
+      for (const item of block.items) {
+        const listItem = doc.createElement("li");
+        appendInline(item, listItem, doc);
+        list.appendChild(listItem);
+      }
+      container.appendChild(list);
+    }
+  }
 }
