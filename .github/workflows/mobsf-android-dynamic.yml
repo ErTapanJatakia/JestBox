@@ -53,6 +53,7 @@ jobs:
           npx cap add android
           node scripts/prepare-android-branding.mjs
           npx cap sync android
+          node scripts/prepare-android-security.mjs
           cd android
           for attempt in 1 2 3; do
             if ./gradlew --no-daemon --max-workers=2 assembleDebug 2>&1 | tee "$RUNNER_TEMP/gradle-build.log"; then
@@ -68,6 +69,8 @@ jobs:
             fi
           done
           test -s app/build/outputs/apk/debug/app-debug.apk
+          cd ..
+          python3 scripts/verify_android_apk_config.py --artifact debug
 
       - name: Start Android API 30 emulator and run MobSF dynamic analysis (auto mode)
         shell: bash
