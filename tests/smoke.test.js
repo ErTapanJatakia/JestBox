@@ -162,4 +162,6 @@ test("first launch detects a supported device locale, falls back safely, and pre
  assert.match(js,/isSupportedLocale\(prefs\.locale\)\?prefs\.locale/);
  assert.match(js,/prefs\.locale=code;savePrefs\(\)/);
  assert.doesNotMatch(source,/geolocation|permissions|fetch\(|XMLHttpRequest|localStorage/i);
+ const prepare=read("scripts/prepare-web.mjs");
+ assert.match(prepare,/requiredFiles = \[[^\]]*"locale-detection\\.js"/);
 });
