@@ -27,7 +27,7 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 - [Release QA Checklist](QA-CHECKLIST.md)
 - [Proprietary Licence — All Rights Reserved](LICENSE)
 - [Security Policy](SECURITY.md)
-- [Security Assessment Programme](SECURITY-ASSESSMENT.md)
+- [Security Assessment Programme](SECURITY.md#security-assessment-programme)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Android Implementation Plan](ANDROID-IMPLEMENTATION.md)
