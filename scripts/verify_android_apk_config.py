@@ -45,17 +45,17 @@ def verify_config(xml_text: str) -> dict:
 def verify_aapt2_dump(dump: str, resource: str) -> dict | None:
     # aapt2 decodes Android binary XML to a textual element/attribute tree.
     # Only the Cordova <widget> resource is relevant; unrelated XML is ignored.
-    if not re.search(r"^\\s*E:\\s+widget(?:\\s|$)", dump, re.MULTILINE):
+    if not re.search(r"^\s*E:\s+widget(?:\s|$)", dump, re.MULTILINE):
         return None
-    if not re.search(r"^\\s*E:\\s+access(?:\\s|$)", dump, re.MULTILINE):
+    if not re.search(r"^\s*E:\s+access(?:\s|$)", dump, re.MULTILINE):
         raise VerificationError(f"{resource}: <widget> has no <access> rules.")
-    origins = re.findall(r'origin(?:\\([^)]*\\))?[^\\n]*?="([^"]*)"', dump)
+    origins = re.findall(r'origin(?:\([^)]*\))?[^\n]*?="([^"]*)"', dump)
     if not origins:
         raise VerificationError(f"{resource}: unable to decode access origin attributes.")
     unexpected = sorted(set(origins) - {ALLOWED_ORIGIN})
     if unexpected:
         raise VerificationError("Unapproved packaged Cordova access origin(s): " + ", ".join(unexpected))
-    access_count = len(re.findall(r"^\\s*E:\\s+access(?:\\s|$)", dump, re.MULTILINE))
+    access_count = len(re.findall(r"^\s*E:\s+access(?:\s|$)", dump, re.MULTILINE))
     if access_count != len(origins):
         raise VerificationError(f"{resource}: one or more access rules have undecoded origins.")
     return {"result":"passed","resource":resource,"accessRuleCount":access_count,"accessOrigins":origins,"wildcardOrigins":0}
