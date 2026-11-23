@@ -263,4 +263,4 @@ jobs:
     permissions:
       actions: read
       contents: read
-    uses: ./.github/workflows/mobsf-signed-apk.yml
+    uses: $/.github/workflows/mobsf-signed-apk.yml
