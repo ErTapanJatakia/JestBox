@@ -40,7 +40,7 @@ test("sets and verifies the approved Android update version", async () => {
 });
 
 test("fails closed when the generated version metadata is missing or ambiguous", async () => {
-  await withGradleFile(template.replace("versionCode 1", "versionCode 1\\n        versionCode 3"), async (gradlePath) => {
+  await withGradleFile(template.replace("versionCode 1", "versionCode 1\n        versionCode 3"), async (gradlePath) => {
     await assert.rejects(prepareAndroidReleaseVersion({ gradlePath }), /exactly one versionCode/);
   });
 });
