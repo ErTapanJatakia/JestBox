@@ -78,6 +78,7 @@ jobs:
         shell: bash
         env:
           MOBSF_API_KEY: ${{ steps.mobsf.outputs.api_key }}
+          APK_SHA256: ${{ steps.verify.outputs.apk_sha256 }}
           SOURCE_RUN_ID: ${{ github.run_id }}
           SOURCE_COMMIT: ${{ github.sha }}
         run: |
@@ -87,7 +88,7 @@ jobs:
             -F "file=@$APK" http://127.0.0.1:8000/api/v1/upload)"
           HASH="$(printf '%s' "$UPLOAD" | jq -er '.hash')"
           FILE_NAME="$(printf '%s' "$UPLOAD" | jq -er '.file_name')"
-          printf '%s\n' "$UPLOAD" > mobsf-upload.json
+          printf '%s\\n' "$UPLOAD" > mobsf-upload.json
           curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
             -H "Authorization: $MOBSF_API_KEY" \
             --data-urlencode "hash=$HASH" \
@@ -113,7 +114,7 @@ jobs:
             echo
             echo "- Source commit: $SOURCE_COMMIT"
             echo "- Source hardened workflow run: $SOURCE_RUN_ID"
-            echo "- APK SHA-256: ${{ steps.verify.outputs.apk_sha256 }}"
+            echo "- APK SHA-256: $APK_SHA256"
             echo "- Package: $(jq -r '.package_name // "unknown"' mobsf-report.json)"
             echo "- Version: $(jq -r '.version_name // "unknown"' mobsf-report.json) (code $(jq -r '.version_code // "unknown"' mobsf-report.json))"
             echo "- Security score: $(jq -r '.security_score // "not supplied"' mobsf-report.json)"
