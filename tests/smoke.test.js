@@ -157,9 +157,9 @@ test("first launch detects a supported device locale, falls back safely, and pre
  assert.equal(detect(["ur"],supported),"ur-PK");
  assert.equal(detect(["fr-FR","zh-CN"],supported),"en-US");
  assert.equal(detect("ru-RU",supported),"ru-RU");
- assert.match(html,/locale-detection\\.js"><\\/script><script src="script\\.js"/);
- assert.match(js,/detectPreferredLocale\\(systemLocalePreferences,LOCALES\\.map/);
- assert.match(js,/isSupportedLocale\\(prefs\\.locale\\)\\?prefs\\.locale/);
- assert.match(js,/prefs\\.locale=code;savePrefs\\(\\)/);
- assert.doesNotMatch(source,/geolocation|permissions|fetch\\(|XMLHttpRequest|localStorage/i);
+ assert.match(html,/locale-detection\.js"><\/script><script src="script\.js"/);
+ assert.match(js,/detectPreferredLocale\(systemLocalePreferences,LOCALES\.map/);
+ assert.match(js,/isSupportedLocale\(prefs\.locale\)\?prefs\.locale/);
+ assert.match(js,/prefs\.locale=code;savePrefs\(\)/);
+ assert.doesNotMatch(source,/geolocation|permissions|fetch\(|XMLHttpRequest|localStorage/i);
 });
