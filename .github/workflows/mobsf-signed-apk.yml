@@ -1,0 +1,145 @@
+name: MobSF assessment of signed release candidate
+
+on:
+  workflow_call:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  mobsf-signed-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Download signed APK evidence from the completed hardened run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: jestbox-hardened-apk-assessment-candidate
+          path: candidate
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.run_id }}
+
+      - name: Verify signed APK checksum and evidence
+        id: verify
+        shell: bash
+        env:
+          SOURCE_RUN_ID: ${{ github.run_id }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          APK="$(find candidate -type f -name 'jestbox-hardened-assessment-signed.apk' -print -quit)"
+          HASH_FILE="$(find candidate -type f -name 'hardened-apk.sha256' -print -quit)"
+          CERT_FILE="$(find candidate -type f -name 'signed-certificate.txt' -print -quit)"
+          test -s "$APK"
+          test -s "$HASH_FILE"
+          test -s "$CERT_FILE"
+          EXPECTED="$(awk 'NR==1 {print $1}' "$HASH_FILE")"
+          ACTUAL="$(sha256sum "$APK" | awk '{print $1}')"
+          [[ "$EXPECTED" =~ ^[a-fA-F0-9]{64}$ ]]
+          [[ "$ACTUAL" == "$EXPECTED" ]]
+          echo "APK=$APK" >> "$GITHUB_ENV"
+          echo "apk_sha256=$ACTUAL" >> "$GITHUB_OUTPUT"
+          {
+            echo "# Signed APK MobSF assessment"
+            echo
+            echo "- Source hardened workflow run: $SOURCE_RUN_ID"
+            echo "- Source commit: $SOURCE_COMMIT"
+            echo "- APK SHA-256: $ACTUAL"
+            echo "- Checksum verification: passed"
+            echo "- Signing certificate evidence: present"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Start isolated pinned MobSF scanner
+        id: mobsf
+        shell: bash
+        run: |
+          set -euo pipefail
+          API_KEY="$(openssl rand -hex 32)"
+          echo "::add-mask::$API_KEY"
+          echo "api_key=$API_KEY" >> "$GITHUB_OUTPUT"
+          docker run -d --name jestbox-mobsf -p 8000:8000 \
+            -e MOBSF_API_KEY="$API_KEY" \
+            -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
+            -e MOBSF_VT_ENABLED=0 \
+            opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954
+          for _ in {1..90}; do
+            if curl --silent --fail --connect-timeout 5 --max-time 15 http://127.0.0.1:8000/ >/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker logs jestbox-mobsf
+          exit 1
+
+      - name: Upload and analyse the exact signed APK
+        id: scan
+        shell: bash
+        env:
+          MOBSF_API_KEY: ${{ steps.mobsf.outputs.api_key }}
+          APK_SHA256: ${{ steps.verify.outputs.apk_sha256 }}
+          SOURCE_RUN_ID: ${{ github.run_id }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          UPLOAD="$(curl --silent --show-error --fail --connect-timeout 10 --max-time 120 \
+            -H "Authorization: $MOBSF_API_KEY" \
+            -F "file=@$APK" http://127.0.0.1:8000/api/v1/upload)"
+          HASH="$(printf '%s' "$UPLOAD" | jq -er '.hash')"
+          FILE_NAME="$(printf '%s' "$UPLOAD" | jq -er '.file_name')"
+          printf '%s\\n' "$UPLOAD" > mobsf-upload.json
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
+            -H "Authorization: $MOBSF_API_KEY" \
+            --data-urlencode "hash=$HASH" \
+            --data-urlencode "file_name=$FILE_NAME" \
+            --data-urlencode "scan_type=apk" \
+            http://127.0.0.1:8000/api/v1/scan > mobsf-scan-response.json
+          completed=false
+          for _ in {1..60}; do
+            if curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
+              -H "Authorization: $MOBSF_API_KEY" --data-urlencode "hash=$HASH" \
+              http://127.0.0.1:8000/api/v1/report_json -o mobsf-report.json; then
+              if jq -e 'type == "object" and (has("error") | not)' mobsf-report.json >/dev/null; then
+                completed=true
+                break
+              fi
+            fi
+            sleep 5
+          done
+          [[ "$completed" == "true" ]] || { docker logs jestbox-mobsf; exit 1; }
+          jq -e '.package_name == "com.jestbox.app"' mobsf-report.json >/dev/null
+          {
+            echo "# MobSF signed APK static assessment"
+            echo
+            echo "- Source commit: $SOURCE_COMMIT"
+            echo "- Source hardened workflow run: $SOURCE_RUN_ID"
+            echo "- APK SHA-256: $APK_SHA256"
+            echo "- Package: $(jq -r '.package_name // "unknown"' mobsf-report.json)"
+            echo "- Version: $(jq -r '.version_name // "unknown"' mobsf-report.json) (code $(jq -r '.version_code // "unknown"' mobsf-report.json))"
+            echo "- Security score: $(jq -r '.security_score // "not supplied"' mobsf-report.json)"
+            echo "- High findings: $(jq -r '.high // "not supplied"' mobsf-report.json)"
+            echo "- Warning findings: $(jq -r '.warning // "not supplied"' mobsf-report.json)"
+            echo "- Info findings: $(jq -r '.info // "not supplied"' mobsf-report.json)"
+            echo
+            echo "Static analysis of the exact signed release candidate. Findings require manual validation; this is not dynamic testing or a penetration test."
+          } > mobsf-signed-summary.md
+          cat mobsf-signed-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload MobSF report and checksum evidence
+        if: always() && hashFiles('mobsf-report.json') != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-mobsf-signed-apk-report
+          path: |
+            mobsf-upload.json
+            mobsf-scan-response.json
+            mobsf-report.json
+            mobsf-signed-summary.md
+            candidate/**
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Stop MobSF container
+        if: always()
+        run: docker rm -f jestbox-mobsf || true
