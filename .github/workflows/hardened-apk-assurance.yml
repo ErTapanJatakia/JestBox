@@ -115,6 +115,7 @@ jobs:
           done
           cd ..
           test -s android/app/build/outputs/apk/release/app-release-unsigned.apk
+          python3 scripts/verify_android_apk_config.py --artifact release-unsigned
 
       - name: Decrypt existing production signing identity and sign candidate
         shell: bash
