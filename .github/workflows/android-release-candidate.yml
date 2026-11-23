@@ -206,6 +206,7 @@ jobs:
 
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$SIGNED"
           "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -v 4 "$SIGNED"
+          python3 scripts/verify_android_apk_config.py --artifact release-signed
           sha256sum "$SIGNED" | tee "$SIGNED.sha256"
           echo "Production-signed APK successfully verified." >> "$GITHUB_STEP_SUMMARY"
           rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"
