@@ -791,7 +791,7 @@ The MobSF report for this APK recorded a score of **81/100 (Grade A / Low Risk)*
 
 The remaining MobSF observations were reviewed against the app and bundled Capacitor framework source. The hardcoded-sensitive-information heuristic did not identify a concrete application secret; external-storage and temporary-file alerts mapped to generic Capacitor URI/document/media and image-capture handling, with no corresponding JestBox file-picker/capture feature or broad storage permission; and the logging observation did not establish sensitive-data disclosure in the non-debuggable assessment APK. No exploitable application vulnerability was established from these four remaining observations, and no broad suppression or scanner-rule change was made. Retain the findings as contextual scanner observations rather than claiming they were removed.
 
-**Build correlation matters:** the ANY.RUN, VirusTotal, Hybrid Analysis and MobSF Live URLs above refer to SHA-256 `b1d6cd6d...`. They must not be represented as scans of SHA-256 `47848a2d...`. Only the supplied follow-up MobSF PDF is evidence for the latter hash. No new ANY.RUN, VirusTotal or Hybrid Analysis analysis of the hardened APK is claimed here.
+**Build correlation matters:** the ANY.RUN report still refers to the earlier APK (SHA-256 `b1d6cd6d...`) and must not be represented as an analysis of the hardened APK. The MobSF, VirusTotal and Hybrid Analysis links in this subsection refer to the signed assessment APK (SHA-256 `47848a2d...`). The historical ANY.RUN link remains listed separately; no fresh ANY.RUN scan of the hardened APK is claimed.
 
 #### Dynamic analysis status and release relationship
 
