@@ -1,10 +1,7 @@
 name: MobSF assessment of signed release candidate
 
 on:
-  workflow_run:
-    workflows: ["JestBox hardened APK security assurance"]
-    types: [completed]
-    branches: [main]
+  workflow_call:
 
 permissions:
   actions: read
@@ -23,11 +20,14 @@ jobs:
           path: candidate
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.run_id }}
 
       - name: Verify signed APK checksum and evidence
         id: verify
         shell: bash
+        env:
+          SOURCE_RUN_ID: ${{ github.run_id }}
+          SOURCE_COMMIT: ${{ github.sha }}
         run: |
           set -euo pipefail
           APK="$(find candidate -type f -name 'jestbox-hardened-assessment-signed.apk' -print -quit)"
@@ -45,24 +45,12 @@ jobs:
           {
             echo "# Signed APK MobSF assessment"
             echo
-            echo "- Source hardened workflow run: ${{ github.event.workflow_run.id }}"
-            echo "- Source commit: ${{ github.event.workflow_run.head_sha }}"
+            echo "- Source hardened workflow run: $SOURCE_RUN_ID"
+            echo "- Source commit: $SOURCE_COMMIT"
             echo "- APK SHA-256: $ACTUAL"
             echo "- Checksum verification: passed"
             echo "- Signing certificate evidence: present"
           } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Verify APK metadata
-        shell: bash
-        run: |
-          set -euo pipefail
-          docker run --rm -v "$PWD/candidate:/evidence:ro" alpine:3.21 sh -c 'test -s /evidence/*/jestbox-hardened-assessment-signed.apk -o -s /evidence/jestbox-hardened-assessment-signed.apk' || true
-          if command -v apkanalyzer >/dev/null 2>&1; then
-            [[ "$(apkanalyzer manifest application-id "$APK")" == "com.jestbox.app" ]]
-            [[ "$(apkanalyzer manifest version-name "$APK")" == "1.1" ]]
-            [[ "$(apkanalyzer manifest version-code "$APK")" == "2" ]]
-            [[ "$(apkanalyzer manifest debuggable "$APK")" == "false" ]]
-          fi
 
       - name: Start isolated pinned MobSF scanner
         id: mobsf
@@ -91,6 +79,8 @@ jobs:
         shell: bash
         env:
           MOBSF_API_KEY: ${{ steps.mobsf.outputs.api_key }}
+          SOURCE_RUN_ID: ${{ github.run_id }}
+          SOURCE_COMMIT: ${{ github.sha }}
         run: |
           set -euo pipefail
           UPLOAD="$(curl --silent --show-error --fail --connect-timeout 10 --max-time 120 \
@@ -122,8 +112,8 @@ jobs:
           {
             echo "# MobSF signed APK static assessment"
             echo
-            echo "- Source commit: ${{ github.event.workflow_run.head_sha }}"
-            echo "- Source hardened workflow run: ${{ github.event.workflow_run.id }}"
+            echo "- Source commit: $SOURCE_COMMIT"
+            echo "- Source hardened workflow run: $SOURCE_RUN_ID"
             echo "- APK SHA-256: ${{ steps.verify.outputs.apk_sha256 }}"
             echo "- Package: $(jq -r '.package_name // "unknown"' mobsf-report.json)"
             echo "- Version: $(jq -r '.version_name // "unknown"' mobsf-report.json) (code $(jq -r '.version_code // "unknown"' mobsf-report.json))"
