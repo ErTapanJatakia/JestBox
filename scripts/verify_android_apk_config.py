@@ -9,6 +9,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 APK_PATHS = {
+    "debug": Path("android/app/build/outputs/apk/debug/app-debug.apk"),
     "assessment-signed": Path("android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk"),
     "release-unsigned": Path("android/app/build/outputs/apk/release/app-release-unsigned.apk"),
     "release-signed": Path("android/app/build/outputs/apk/release/jestbox-release-signed.apk"),
