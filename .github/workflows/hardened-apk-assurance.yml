@@ -153,6 +153,7 @@ jobs:
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest debuggable "$SIGNED" | grep -Fx "false"
           "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest min-sdk "$SIGNED" | grep -Fx "29"
           export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+          python3 scripts/verify_android_apk_config.py --artifact assessment-signed
           python3 scripts/verify_android_apk_manifest.py \
             --output android-apk-manifest-assessment.json
           sha256sum "$SIGNED" | tee hardened-apk.sha256
