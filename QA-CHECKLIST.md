@@ -5,7 +5,9 @@
 
 ## Functional and content checks
 
-- [ ] Fresh launch defaults to American English (`en-US`).
+- [ ] On first launch, a supported device/browser locale is selected automatically; unsupported languages fall back to `en-US`.
+- [ ] Verify first-launch matching for all eight supported locales, language-only tags, unsupported regions, multiple preferred languages, and the `en-US` fallback.
+- [ ] Verify a saved/manual locale survives relaunch and is not overridden when the device language changes.
 - [ ] Search/select each locale: `en-US`, `es-PE`, `ru-RU`, `es-ES`, `en-IN`, `hi-IN`, `ur-IN`, and `ur-PK`.
 - [ ] Confirm each locale displays its country on a separate line in the searchable selector.
 - [ ] Confirm every visible line, heading, status, button label, accessible name, category, and dialog is localised after changing locale.
@@ -49,7 +51,7 @@
 
 - [ ] Verify the core experience works offline after app assets have loaded.
 - [ ] Inspect network activity; app logic must not call external APIs or telemetry endpoints.
-- [ ] Inspect browser storage; only the `jestbox.preferences.v1` local preference record may be written. Confirm it contains display/accessibility preferences only and is not transmitted or synced.
+- [ ] Inspect browser storage; only the `jestbox.preferences.v1` local preference record may be written. Confirm it contains the selected locale plus display/accessibility preferences only and is not transmitted or synced.
 - [ ] Confirm no account, sign-in, analytics, advertising, tracking, or personal-data prompt appears.
 - [ ] Confirm the app does not read existing clipboard contents.
 - [ ] Confirm sharing is initiated only after an explicit user action and the user chooses the destination app.
