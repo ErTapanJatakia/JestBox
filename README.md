@@ -54,7 +54,7 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 
 ## Security automation
 
-The public repository is configured for automated source, dependency, supply-chain, and Android APK security checks. See [SECURITY-ASSESSMENT.md](SECURITY-ASSESSMENT.md) for scanner scope, schedules, report locations, and known limitations. Automated scanning is not a substitute for manual assessment or physical-device testing.
+The public repository is configured for automated source, dependency, supply-chain, and Android APK security checks. See [SECURITY.md](SECURITY.md#security-assessment-programme) for scanner scope, schedules, report locations, and known limitations. Automated scanning is not a substitute for manual assessment or physical-device testing.
 
 ## Run and validate
 
