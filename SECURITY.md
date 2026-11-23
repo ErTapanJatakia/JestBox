@@ -753,3 +753,52 @@ Source remediations and scanner SARIF results are documented separately from Git
 - Trivy, OSV-Scanner, ZAP, njsscan, Gitleaks, zizmor, actionlint, Syft SBOM, tablet browser validation, Android debug build and hardened APK assessment workflows completed successfully for the recorded checkpoint.
 
 **Overall conclusion:** the planned automated repository and Android build assurance for this checkpoint is complete and the evidence is recorded. This is not a claim of zero vulnerabilities or a formal security certification. MobSF remains deferred by agreement because of tool reliability issues. Human-led penetration testing, rooted-device and TLS-interception testing, and production-edge header verification remain outside the completed automated scope. JestBox has not been deployed as a website; no APK distribution or app-store submission was performed or authorised.
+
+
+### External Android APK scanner reports — 23 November 2026
+
+This section preserves the external scanner references supplied during the JestBox APK assessment. The links below are **historical evidence for the earlier assessment APK**, not evidence that the later hardened candidate was scanned by every service.
+
+#### Earlier assessment APK
+
+- **Package:** `com.jestbox.app`
+- **Version:** `1.0` (versionCode `1`)
+- **SHA-256:** `b1d6cd6eda2983cb9745f7c466aade3bf2318f4b4e191eeac274d2d8fa02684f`
+- **ANY.RUN interactive analysis:** [Task report](https://app.any.run/tasks/95cbcaf1-0d41-4e46-8a15-495720d19d68)
+- **VirusTotal:** [File report](https://www.virustotal.com/gui/file/b1d6cd6eda2983cb9745f7c466aade3bf2318f4b4e191eeac274d2d8fa02684f)
+- **Hybrid Analysis:** [Sample report](https://hybrid-analysis.com/sample/b1d6cd6eda2983cb9745f7c466aade3bf2318f4b4e191eeac274d2d8fa02684f)
+- **MobSF Live:** [Static analysis report](https://mobsf.live/static_analyzer/60ea6e1404ed7f63f3d09cedaa98ffc8)
+
+The MobSF report for this APK recorded a score of **81/100 (Grade A / Low Risk)**, with four Medium findings and one Informational finding. The principal observations included a wildcard Cordova `<access origin="*">` policy, generic Capacitor framework patterns for sensitive information/external storage/temporary files, and logging. These are scanner observations requiring context; the score is not a security certification. The wildcard access policy was subsequently remediated and verified against the packaged APK as described in the Android origin-policy remediation section below.
+
+#### Hardened assessment APK — MobSF follow-up
+
+- **Build source:** PR [#92 — Fix Android packaged Cordova origin policy](https://github.com/ErTapanJatakia/JestBox/pull/92), head commit `59e42e064b359052a9917d03d5de24ad6af79611` (merged into main as `fb54d4fc85da7c8bd169b5733a9b656e46ad4587`).
+- **Package:** `com.jestbox.app`
+- **SHA-256:** `47848a2deb70530f4c0375e0f877914c448273a42f7fb24f7cbcff9b18d6dc71`
+- **MobSF report:** user-supplied PDF, dated 23 November 2026 (419 pages; retained in the assessment conversation; no public report URL was supplied).
+- **MobSF score:** **85/100**.
+- **Observed Code Analysis results:** three Warning-level findings and one Informational finding remained. The earlier wildcard-origin finding was no longer present.
+- **Manifest summary:** no manifest-analysis findings reported; no trackers detected; declared permissions limited to `INTERNET` and the app-specific dynamic receiver permission; V3 signing detected.
+
+The remaining MobSF observations were reviewed against the app and bundled Capacitor framework source. The hardcoded-sensitive-information heuristic did not identify a concrete application secret; external-storage and temporary-file alerts mapped to generic Capacitor URI/document/media and image-capture handling, with no corresponding JestBox file-picker/capture feature or broad storage permission; and the logging observation did not establish sensitive-data disclosure in the non-debuggable assessment APK. No exploitable application vulnerability was established from these four remaining observations, and no broad suppression or scanner-rule change was made. Retain the findings as contextual scanner observations rather than claiming they were removed.
+
+**Build correlation matters:** the ANY.RUN, VirusTotal, Hybrid Analysis and MobSF Live URLs above refer to SHA-256 `b1d6cd6d...`. They must not be represented as scans of SHA-256 `47848a2d...`. Only the supplied follow-up MobSF PDF is evidence for the latter hash. No new ANY.RUN, VirusTotal or Hybrid Analysis analysis of the hardened APK is claimed here.
+
+#### Dynamic analysis status and release relationship
+
+The GitHub Actions workflow `.github/workflows/mobsf-android-dynamic.yml` provides an optional, manually triggered isolated Android API 30 emulator/MobSF assessment. A previous successful run [#44545632539](https://github.com/ErTapanJatakia/JestBox/actions/runs/44545632539) predates the hardened APK and assessed commit `e31454274b9dd1b94a9b81c32d4afcf8bc0eaa89`; it is not a fresh dynamic assessment of the hardened candidate.
+
+Dynamic analysis is supplementary vulnerability-discovery work, **not a release-blocking gate**. If the hosted emulator, MobSF integration, or dynamic instrumentation fails or proves unreliable, record the failure and coverage limitation, preserve existing CI/security controls, and continue the independent release-readiness work. Do not report a dynamic test as passed unless its run and evidence artifact complete successfully. This does not waive remediation of confirmed vulnerabilities or other established release requirements.
+
+#### Android packaged Cordova origin-policy remediation — 23 November 2026
+
+PR #92 replaced wildcard Cordova access with the explicit `http://localhost` origin after Capacitor sync and added fail-closed verification of the actual compiled APK resource. It was merged as commit `fb54d4fc85da7c8bd169b5733a9b656e46ad4587`.
+
+- **PR checks:** [27 check runs](https://github.com/ErTapanJatakia/JestBox/pull/92/checks) completed successfully.
+- **Android hardened APK assurance:** [run #45117675274](https://github.com/ErTapanJatakia/JestBox/actions/runs/45117675274).
+- **Build / emulator / security workflow evidence:** [PR #92 checks](https://github.com/ErTapanJatakia/JestBox/pull/92/checks).
+
+The DevSkim check completed successfully but reported **1 Warning and 10 Notes** on PR changes, largely around localhost test/configuration fixtures. A successful workflow conclusion means the scanner ran; it does not mean its observations are absent. These observations remain subject to contextual review and are not described as a warning-free scan. The packaged APK verifier confirmed exactly one Cordova access origin, `http://localhost`, with no wildcard or unapproved origin.
+
+**Assessment boundary:** external sandbox reports, static APK analysis, source review, packaged-resource verification and automated emulator smoke testing are separate evidence types. None alone is a human-led penetration test, formal independent audit, certification, guarantee of vulnerability-free software, physical-device certification, or app-store acceptance. No public APK release or store submission is implied by these records.
