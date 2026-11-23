@@ -69,7 +69,7 @@ const cordovaConfig = cordovaInput.replace(
 
 if (/android:allowBackup="true"/.test(manifest) ||
     /^\s*minSdkVersion\s*=\s*24\s*$/m.test(variables) ||
-    wildcardAccessRule) {
+    [...cordovaConfig.matchAll(wildcardAccessRule)].length > 0) {
   throw new Error("One or more Android security hardening invariants failed.");
 }
 
