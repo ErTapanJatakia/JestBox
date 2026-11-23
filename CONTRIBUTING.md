@@ -19,7 +19,7 @@ The current joke data foundation has 100 jokes per locale. The product target is
 ## Engineering principles
 
 - Preserve offline-first operation and local bundling.
-- Do not add accounts, analytics, advertising, trackers, telemetry, remote APIs, or remote/synced user data. Local-only display and accessibility preferences are permitted; any other persistent storage requires explicit approval and privacy/security review.
+- Do not add accounts, analytics, advertising, trackers, telemetry, remote APIs, or remote/synced user data. Local-only selected-locale, display, and accessibility preferences are permitted; any other persistent storage requires explicit approval and privacy/security review.
 - Keep all interface strings localised across all eight locales, including right-to-left layout for Urdu.
 - Preserve keyboard access, screen-reader names and announcements, visible focus, responsive reflow, text resizing, reduced motion, and forced-colors support.
 - Keep themes accessible; verify text and non-text contrast for every palette.
