@@ -15,7 +15,7 @@ const manifest = `<?xml version="1.0" encoding="utf-8"?>
 </manifest>`;
 const variables = `ext {\n    minSdkVersion = 24\n    compileSdkVersion = 36\n    targetSdkVersion = 36\n}\n`;
 const cordova = `<?xml version="1.0" encoding="utf-8"?>
-<widget><access origin="*" /><allow-navigation href="http://localhost/*" /></widget>`;
+<widget><access origin="*" /><access origin='*' /><allow-navigation href="http://localhost/*" /></widget>`;
 
 async function fixture() {
   const root = await mkdtemp(join(tmpdir(), "jestbox-android-hardening-"));
@@ -42,8 +42,8 @@ test("Android hardening closes the MobSF manifest and hybrid-origin gaps", async
     assert.ok(m.includes('android:name="androidx.profileinstaller.ProfileInstallReceiver" android:exported="false" tools:replace="android:exported" tools:node="merge"'));
     assert.match(v, /minSdkVersion = 29/);
     assert.doesNotMatch(v, /minSdkVersion = 24/);
-    assert.ok(c.includes('<access origin="http://localhost" />'));
-    assert.ok(!c.includes('<access origin="*" />'));
+    assert.equal((c.match(/<access origin="http:\/\/localhost" \/>/g) || []).length, 2);
+    assert.doesNotMatch(c, /<access\b(?=[^>]*\borigin\s*=\s*["']\*["'])[^>]*\/>/);
     assert.ok(c.includes('<allow-navigation href="http://localhost/*" />'));
   } finally {
     await rm(root, { recursive: true, force: true });

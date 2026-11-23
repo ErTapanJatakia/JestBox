@@ -19,8 +19,10 @@ if (!/android:allowBackup\s*=\s*"(?:true|false)"/.test(manifestInput)) {
 if (!/^\s*minSdkVersion\s*=\s*24\s*$/m.test(variablesInput)) {
   throw new Error("Expected Capacitor minSdkVersion = 24 in variables.gradle; inspect template before changing.");
 }
-if (!/<access\s+origin=["']\*["']\s*\/>/.test(cordovaInput)) {
-  throw new Error('Expected Cordova wildcard <access origin="*" /> rule; refusing to silently skip origin restriction.');
+const wildcardAccessRule = /<access\b(?=[^>]*\borigin\s*=\s*["']\*["'])[^>]*\/>/g;
+const wildcardAccessMatches = [...cordovaInput.matchAll(wildcardAccessRule)];
+if (wildcardAccessMatches.length === 0) {
+  throw new Error('Expected at least one Cordova wildcard access rule; refusing to silently skip origin restriction.');
 }
 
 let manifest = manifestInput.replace(
@@ -61,13 +63,13 @@ const variables = variablesInput.replace(
   "    minSdkVersion = 29"
 );
 const cordovaConfig = cordovaInput.replace(
-  /<access\s+origin=["']\*["']\s*\/>/,
+  wildcardAccessRule,
   '<access origin="http://localhost" />'
 );
 
 if (/android:allowBackup="true"/.test(manifest) ||
     /^\s*minSdkVersion\s*=\s*24\s*$/m.test(variables) ||
-    /<access\s+origin=["']\*["']\s*\/>/.test(cordovaConfig)) {
+    [...cordovaConfig.matchAll(wildcardAccessRule)].length > 0) {
   throw new Error("One or more Android security hardening invariants failed.");
 }
 
@@ -76,4 +78,4 @@ await Promise.all([
   writeFile(variablesPath, variables),
   writeFile(cordovaConfigPath, cordovaConfig)
 ]);
-console.log("Android hardening applied: API 29 minimum, app backup disabled, ProfileInstallReceiver non-exported, Cordova origin restricted to localhost.");
+console.log("Android hardening applied: API 29 minimum, app backup disabled, ProfileInstallReceiver non-exported, all Cordova access origins restricted to localhost.");

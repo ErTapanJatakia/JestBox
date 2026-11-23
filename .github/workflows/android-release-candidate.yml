@@ -70,6 +70,7 @@ jobs:
           node --check scripts/prepare-web.mjs
           node --check scripts/prepare-android-branding.mjs
           node --check scripts/prepare-android-security.mjs
+          python3 -m unittest discover -s tests -p 'test_android_apk_*.py' -v
           node --test
 
       - name: Verify canonical Android application ID
@@ -93,11 +94,11 @@ jobs:
       - name: Apply JestBox Android branding
         run: node scripts/prepare-android-branding.mjs
 
-      - name: Apply MobSF-driven Android security hardening
-        run: node scripts/prepare-android-security.mjs
-
       - name: Synchronize Capacitor Android project
         run: npx cap sync android
+
+      - name: Apply Android security hardening after Capacitor sync
+        run: node scripts/prepare-android-security.mjs
 
       - name: Assemble release APK
         shell: bash
@@ -108,6 +109,7 @@ jobs:
           cd ..
           APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
           test -s "$APK"
+          python3 scripts/verify_android_apk_config.py --artifact release-unsigned
           echo "UNSIGNED_APK=$APK" >> "$GITHUB_ENV"
 
       - name: Validate package identity, release flags, assets and alignment
@@ -204,6 +206,7 @@ jobs:
 
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$SIGNED"
           "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -v 4 "$SIGNED"
+          python3 scripts/verify_android_apk_config.py --artifact release-signed
           sha256sum "$SIGNED" | tee "$SIGNED.sha256"
           echo "Production-signed APK successfully verified." >> "$GITHUB_STEP_SUMMARY"
           rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"
