@@ -2,6 +2,9 @@ name: MobSF Android dynamic assessment
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'security/dynamic-assessment/**'
 
 permissions:
   contents: read
