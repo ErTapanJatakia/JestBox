@@ -69,14 +69,17 @@ def main() -> int:
 
         reports = []
         decode_errors = []
+        decode_samples = []
         for resource in xml_paths:
             result = subprocess.run(
                 [str(analyzer), "resources", "xml", "--file", resource, str(apk)],
                 check=False, capture_output=True, text=True, timeout=60, shell=False,
             )
             if result.returncode != 0:
-                decode_errors.append(f"{resource}: {result.stderr.strip() or result.stdout.strip()}")
+                decode_errors.append(f"{resource}: rc={result.returncode}; {result.stderr.strip() or result.stdout.strip()}")
                 continue
+            if len(decode_samples) < 8:
+                decode_samples.append(f"{resource}: {result.stdout[:1200]!r}")
             try:
                 root = ET.fromstring(result.stdout)
             except ET.ParseError:
@@ -88,7 +91,8 @@ def main() -> int:
 
         if len(reports) != 1:
             detail = "; ".join(decode_errors[:5])
-            suffix = f" Decoder diagnostics: {detail}" if detail else ""
+            samples = " | ".join(decode_samples[:8])
+            suffix = f" Decoder diagnostics: {detail}. Successful decode samples: {samples}" if (detail or samples) else ""
             raise VerificationError(
                 f"Expected exactly one decoded packaged Cordova <widget> resource; found {len(reports)}."
                 + suffix
