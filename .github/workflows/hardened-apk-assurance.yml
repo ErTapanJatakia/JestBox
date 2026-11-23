@@ -83,7 +83,7 @@ jobs:
           node --check scripts/legal-page-bootstrap.mjs
           node --check scripts/prepare-android-branding.mjs
           node --check scripts/prepare-android-security.mjs
-          python3 -m unittest discover -s tests -p 'test_android_apk_manifest_verifier.py' -v
+          python3 -m unittest discover -s tests -p 'test_android_apk_*.py' -v
           node --test
 
       - name: Build hardened Android release APK
@@ -97,8 +97,8 @@ jobs:
           npm run prepare:web
           npx cap add android
           node scripts/prepare-android-branding.mjs
-          node scripts/prepare-android-security.mjs
           npx cap sync android
+          node scripts/prepare-android-security.mjs
           cd android
           for attempt in 1 2 3; do
             if ./gradlew --no-daemon --max-workers=2 assembleRelease 2>&1 | tee "$RUNNER_TEMP/gradle-release.log"; then
