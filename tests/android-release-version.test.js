@@ -34,7 +34,7 @@ test("sets and verifies the approved Android update version", async () => {
     assert.deepEqual(result, { versionCode: 2, versionName: "1.1" });
     assert.match(output, /versionCode 2/);
     assert.match(output, /versionName "1.1"/);
-    assert.match(output, /applicationId "com\\.jestbox\\.app"/);
+    assert.match(output, /applicationId "com\.jestbox\.app"/);
     assert.match(output, /minSdkVersion 29/);
   });
 });
