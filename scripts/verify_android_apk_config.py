@@ -62,9 +62,11 @@ def main() -> int:
             executable=analyzer, check=True, capture_output=True, text=True,
             timeout=60, shell=False,
         )
+        # apkanalyzer versions differ on whether files-list paths begin with '/'.
+        # Normalize that presentation detail before filtering and decoding resources.
         xml_paths = sorted({
-            line.strip() for line in listing.stdout.splitlines()
-            if line.strip().startswith("/res/") and line.strip().endswith(".xml")
+            line.strip().lstrip("/") for line in listing.stdout.splitlines()
+            if line.strip().lstrip("/").startswith("res/") and line.strip().endswith(".xml")
         })
         widget_resources = []
         for resource_path in xml_paths:
