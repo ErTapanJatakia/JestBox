@@ -13,6 +13,7 @@ test("Android staging script copies only the local web app and bundled assets", 
     await cp("random-index.js", join(fixture, "random-index.js"));
     await cp("jokes.js", join(fixture, "jokes.js"));
     await cp("share-bridge.bundle.js", join(fixture, "share-bridge.bundle.js"));
+    await cp("locale-detection.js", join(fixture, "locale-detection.js"));
     await cp("styles.css", join(fixture, "styles.css"));
     await cp("THIRD_PARTY_NOTICES.html", join(fixture, "THIRD_PARTY_NOTICES.html"));
     await cp("assets", join(fixture, "assets"), { recursive: true });
@@ -27,7 +28,7 @@ test("Android staging script copies only the local web app and bundled assets", 
     await cp("scripts/legal-page-bootstrap.mjs", join(fixture, "scripts/legal-page-bootstrap.mjs"));
     await execFileSync(process.execPath, [join(fixture, "prepare-web.mjs")], { cwd: fixture });
 
-    for (const file of ["index.html", "script.js", "random-index.js", "jokes.js", "share-bridge.bundle.js", "styles.css"]) {
+    for (const file of ["index.html", "script.js", "random-index.js", "jokes.js", "share-bridge.bundle.js", "locale-detection.js", "styles.css"]) {
       const source = await readFile(file, "utf8");
       const staged = await readFile(join(fixture, "www", file), "utf8");
       assert.equal(staged, source, `${file} must be copied byte-for-byte`);
