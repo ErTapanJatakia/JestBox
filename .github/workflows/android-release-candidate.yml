@@ -70,6 +70,7 @@ jobs:
           node --check scripts/prepare-web.mjs
           node --check scripts/prepare-android-branding.mjs
           node --check scripts/prepare-android-security.mjs
+          node --check scripts/prepare-android-release-version.mjs
           python3 -m unittest discover -s tests -p 'test_android_apk_*.py' -v
           node --test
 
@@ -99,6 +100,9 @@ jobs:
 
       - name: Apply Android security hardening after Capacitor sync
         run: node scripts/prepare-android-security.mjs
+
+      - name: Prepare and verify RuStore update version
+        run: node scripts/prepare-android-release-version.mjs
 
       - name: Assemble release APK
         shell: bash
