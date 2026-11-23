@@ -812,3 +812,27 @@ PR #92 replaced wildcard Cordova access with the explicit `http://localhost` ori
 The DevSkim check completed successfully but reported **1 Warning and 10 Notes** on PR changes, largely around localhost test/configuration fixtures. A successful workflow conclusion means the scanner ran; it does not mean its observations are absent. These observations remain subject to contextual review and are not described as a warning-free scan. The packaged APK verifier confirmed exactly one Cordova access origin, `http://localhost`, with no wildcard or unapproved origin.
 
 **Assessment boundary:** external sandbox reports, static APK analysis, source review, packaged-resource verification and automated emulator smoke testing are separate evidence types. None alone is a human-led penetration test, formal independent audit, certification, guarantee of vulnerability-free software, physical-device certification, or app-store acceptance. No public APK release or store submission is implied by these records.
+
+
+### Post-merge signed APK and DAST review — 24 November 2026
+
+**Assessed main commit:** `9a27b9591e57bedf15c9130e65bdd74525148941` (PR [#99](https://github.com/ErTapanJatakia/JestBox/pull/99)). All 15 post-merge workflow runs completed successfully. This is automated assurance evidence, not a production release certification or human-led penetration test.
+
+- **Hardened Android / signed APK / emulator workflow:** [run #45260617409](https://github.com/ErTapanJatakia/JestBox/actions/runs/45260617409); both the hardened build/emulator job and dependent MobSF job succeeded.
+- **MobSF report artifact:** [artifact 14860821783](https://github.com/ErTapanJatakia/JestBox/actions/runs/45260617409/artifacts/14860821783).
+- **Exact assessed APK:** package `com.jestbox.app`, version `1.1`, versionCode `2`; SHA-256 `1906704999261b8f0667f7dee07cffe146543fba05561bbf77ded839a8ef1504`. The MobSF workflow verified this checksum against the signed APK evidence before scanning.
+- **Signature:** APK Signature Scheme v3; RSA 4096-bit certificate. Certificate SHA-256 fingerprint: `bf24d400008bf790561b6a20e4724d95cbd312e9dd6a07a38d8872fb83dcc61f`.
+- **MobSF machine-readable report:** code-analysis summary: 0 High, 3 Warning, 1 Informational; manifest analysis: 0 High, 0 Warning, 0 Informational; network-security analysis: no findings; secret scanner: empty result; detected trackers: 0 of 432. The JSON report did not provide an overall security score, so no score is asserted for this scan.
+- **MobSF warning triage:** `android_read_write_external` and `android_temp_file` point to bundled Capacitor framework classes `BridgeWebChromeClient.java` and `FileUtils.java`; `android_hardcoded` points to Capacitor Share/Bridge/Plugin/AppUUID classes. These are third-party framework heuristics, not evidence of an app-owned credential. MobSF's secret result is empty, but the framework data-handling paths remain candidates for manual validation if the app later handles user-supplied files or sensitive content. JestBox's current product logic does not request personal information and bundles its joke content locally. `android_logging` points to Capacitor's Logger class; the static finding does not establish that sensitive user data is logged.
+- **MobSF limitations:** static APK analysis only; malware reputation lookups were disabled. It is not dynamic analysis, a rooted-device assessment, or a penetration test.
+
+#### OWASP ZAP local-build assessment
+
+- **Workflow:** [run #45260619340](https://github.com/ErTapanJatakia/JestBox/actions/runs/45260619340); [report artifact 14859988423](https://github.com/ErTapanJatakia/JestBox/actions/runs/45260619340/artifacts/14859988423).
+- **Target:** disposable local static build at `http://127.0.0.1:8080`, served by Python's built-in `http.server`; this is not the production hosting edge.
+- **Active scan summary:** 0 High, 2 Medium, 6 Low, 3 Informational. No ZAP FAIL alerts; 137 rules passed.
+- **Header/server observations:** CSP, anti-clickjacking, COEP, COOP, CORP, Permissions Policy and X-Content-Type-Options were absent on the local test server; its default Server header also disclosed implementation/version information. These observations describe the Python test harness response, not the JestBox HTML/JavaScript source and not production HTTP headers. They must not be represented as confirmed production vulnerabilities or silently suppressed.
+- **Informational observations:** suspicious-comment heuristic, cacheable static content, and user-agent response variation; no exploit was demonstrated.
+- **Production edge verification:** remains open until a production hosting URL is intentionally deployed and its actual response headers can be assessed. The GitHub Pages workflow is manual-dispatch only; this assessment did not deploy it or contact a production service.
+
+**Disposition:** no application-code remediation is justified solely by these local-server header alerts or the generic Capacitor static heuristics. Preserve the findings and scope limitations as evidence. Reassess the framework warnings if file upload/download or sensitive-data features are introduced, and test actual hosting headers before any public deployment. No release, store submission, or production deployment was performed.
