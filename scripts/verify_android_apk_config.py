@@ -25,9 +25,12 @@ def verify_config(xml_text: str) -> dict:
         root = ET.fromstring(xml_text)
     except ET.ParseError as exc:
         raise VerificationError(f"Invalid packaged Cordova config XML: {exc}") from exc
-    if root.tag != "widget":
+    # Cordova config.xml commonly declares the W3C Widgets default namespace.
+    # ElementTree then expands tags to {namespace}widget/access; compare local names.
+    local_name = lambda tag: tag.rsplit("}", 1)[-1] if isinstance(tag, str) else tag
+    if local_name(root.tag) != "widget":
         raise VerificationError("Packaged Cordova config root is not <widget>.")
-    rules = [node for node in root.iter() if node.tag == "access"]
+    rules = [node for node in root.iter() if local_name(node.tag) == "access"]
     if not rules:
         raise VerificationError("Packaged Cordova config contains no <access> rule.")
     origins = []
