@@ -254,3 +254,13 @@ jobs:
         run: |
           adb -s emulator-5554 emu kill >/dev/null 2>&1 || true
           rm -f "$RUNNER_TEMP/jestbox-release.jks" "$RUNNER_TEMP/jestbox-release.jks.gpg" "$RUNNER_TEMP/jestbox-release-aligned.apk"
+
+
+  mobsf-signed-apk:
+    name: MobSF static assessment of signed APK
+    if: github.event_name != 'pull_request'
+    needs: build-and-assess
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/mobsf-signed-apk.yml
