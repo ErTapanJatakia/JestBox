@@ -72,7 +72,8 @@ test("generated legal pages use a translated document title for every locale",()
 
 test("Android launcher branding is generated from the canonical original PNG",()=>{const branding=read("scripts/prepare-android-branding.mjs");assert.ok(branding.includes("assets/JestBox-Original.png"));assert.ok(branding.includes("drawable-nodpi/jestbox_icon.png"));assert.ok(branding.includes("jestbox_launcher"));const workflow=read(".github/workflows/android-debug.yml");assert.ok(workflow.includes("node scripts/prepare-android-branding.mjs"))});
 
-test("launch screen brand title, tagline, and skip hint use 20 percent larger default typography",()=>{assert.ok(css.includes(".launch-brand{margin:.1rem 0 .25rem;font-size:clamp(2.4rem,9.6vw,3.6rem)"));assert.ok(css.includes(".launch-tagline{max-width:30ch;margin:.25rem auto 0;color:var(--text);font-size:clamp(.984rem,2.88vw,1.2rem)"));assert.ok(css.includes(".launch-hint{margin:.25rem 0 0;color:var(--muted);font-size:.864rem"));assert.ok(css.includes(".launch-brand{grid-column:2;grid-row:1;font-size:clamp(1.68rem,6vh,2.4rem)}"));assert.ok(css.includes(".launch-tagline{grid-column:2;grid-row:2;max-width:none;margin:0;font-size:clamp(.864rem,2.76vh,1.08rem)"))});
+test("launch screen brand and tagline typography are increased by 50 percent, including landscape",()=>{assert.ok(css.includes(".launch-card img{width:clamp(156px,28.5vh,228px);max-height:39vh}"));assert.ok(css.includes(".launch-brand{font-size:clamp(3.6rem,14.4vw,5.4rem)}"));assert.ok(css.includes(".launch-tagline{font-size:clamp(1.476rem,4.32vw,1.8rem);line-height:1.4}"));assert.ok(css.includes(".launch-card img{width:clamp(96px,27vh,156px);max-height:36vh}"));assert.ok(css.includes(".launch-brand{font-size:clamp(2.52rem,9vh,3.6rem)}"));assert.ok(css.includes(".launch-tagline{font-size:clamp(1.296rem,4.14vh,1.62rem);line-height:1.3}"));});
+test("launch screen English copy uses six separate requested lines",()=>{assert.match(js,/launch:"Pocket-sized local laughs\\.\\\\nOffline\\\\nNo Account Registration\\.\\\\nNo Tracking\\.\\\\nNo Data Snooping\\.\\\\nYour phone's funny sidekick\\."/);});
 
 test("all eight interface dictionaries expose the same complete set of non-empty translations",()=>{
  const start=js.indexOf("const UI=")+ "const UI=".length;
@@ -140,3 +141,5 @@ test("random joke selection uses unbiased Web Crypto rather than Math.random",()
  assert.match(js,/const secureRandomIndex=globalThis\.JestBoxRandomIndex/);
  assert.match(js,/secureRandomIndex\(a\.length\)/);
 });
+
+test("Accessibility Statement and Third-party Notices buttons share a responsive footer row",()=>{assert.match(html,/id="accessibility-link" class="footer-button"/);assert.match(html,/id="third-party-notices-link" class="footer-button"/);assert.ok(css.includes(".site-footer{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:.5rem}"));assert.ok(css.includes(".site-footer>.footer-button{width:100%;min-width:0;padding-inline:.4rem}"));assert.ok(css.includes(".site-footer>#privacy-link,.site-footer>#wcag-mark-link,.site-footer>#footer-line{grid-column:1/-1}"));});
