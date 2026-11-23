@@ -57,12 +57,34 @@ def main() -> int:
         print("ERROR: Android SDK apkanalyzer is unavailable.", file=sys.stderr)
         return 2
     try:
-        result = subprocess.run(
-            ["apkanalyzer", "resources", "xml", "--file", "res/xml/config.xml", str(apk)],
+        listing = subprocess.run(
+            ["apkanalyzer", "files", "list", str(apk)],
             executable=analyzer, check=True, capture_output=True, text=True,
             timeout=60, shell=False,
         )
-        report = verify_config(result.stdout)
+        xml_paths = sorted({
+            line.strip() for line in listing.stdout.splitlines()
+            if line.strip().startswith("/res/") and line.strip().endswith(".xml")
+        })
+        widget_resources = []
+        for resource_path in xml_paths:
+            decoded = subprocess.run(
+                ["apkanalyzer", "resources", "xml", "--file", resource_path, str(apk)],
+                executable=analyzer, check=True, capture_output=True, text=True,
+                timeout=60, shell=False,
+            )
+            try:
+                parsed = ET.fromstring(decoded.stdout)
+            except ET.ParseError:
+                continue
+            if parsed.tag == "widget":
+                widget_resources.append((resource_path, decoded.stdout))
+        if len(widget_resources) != 1:
+            raise VerificationError(
+                f"Expected exactly one packaged Cordova widget resource; found {len(widget_resources)}."
+            )
+        report = verify_config(widget_resources[0][1])
+        report["resource"] = widget_resources[0][0]
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, VerificationError) as exc:
         print(f"ERROR: packaged Cordova policy verification failed: {exc}", file=sys.stderr)
         return 1
