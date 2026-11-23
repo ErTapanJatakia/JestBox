@@ -128,6 +128,7 @@ jobs:
           python3 scripts/verify_android_apk_manifest.py --artifact release-unsigned --output android-apk-manifest-assessment.json
           echo "Unsigned release APK packaged-manifest verification: passed" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload debug APK and checksum
+        if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: jestbox-android-debug
@@ -137,5 +138,5 @@ jobs:
             android/app/build/outputs/apk/release/app-release-unsigned.apk
             android/app/build/outputs/apk/release/app-release-unsigned.apk.sha256
             android-apk-manifest-assessment.json
-          if-no-files-found: error
-          retention-days: 14
+          if-no-files-found: warn
+          retention-days: 3
