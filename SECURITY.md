@@ -1,5 +1,9 @@
 # JestBox Security Policy and Security Assessment Programme
 
+
+[![MobSF static analysis score: 85/100](https://img.shields.io/badge/MobSF%20static%20analysis-85%2F100-yellowgreen)](https://mobsf.live/static_analyzer/15ef959d97334f14a20c4b347f9995ef/)
+
+**Latest signed Android assessment APK:** SHA-256 `47848a2deb70530f4c0375e0f877914c448273a42f7fb24f7cbcff9b18d6dc71` · [MobSF Live report](https://mobsf.live/static_analyzer/15ef959d97334f14a20c4b347f9995ef/). The score is a point-in-time static-analysis result for this APK, not a certification or guarantee of security.
 ## Reporting
 Report suspected vulnerabilities privately. Do not publish exploit details in public issues or pull requests.
 
