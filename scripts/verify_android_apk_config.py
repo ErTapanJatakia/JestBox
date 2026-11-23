@@ -20,6 +20,9 @@ ALLOWED_ORIGIN = "http://localhost"
 class VerificationError(Exception):
     pass
 
+def local_name(tag):
+    return tag.rsplit("}", 1)[-1] if isinstance(tag, str) else tag
+
 def verify_config(xml_text: str) -> dict:
     try:
         root = ET.fromstring(xml_text)
@@ -27,7 +30,6 @@ def verify_config(xml_text: str) -> dict:
         raise VerificationError(f"Invalid packaged Cordova config XML: {exc}") from exc
     # Cordova config.xml commonly declares the W3C Widgets default namespace.
     # ElementTree then expands tags to {namespace}widget/access; compare local names.
-    local_name = lambda tag: tag.rsplit("}", 1)[-1] if isinstance(tag, str) else tag
     if local_name(root.tag) != "widget":
         raise VerificationError("Packaged Cordova config root is not <widget>.")
     rules = [node for node in root.iter() if local_name(node.tag) == "access"]
@@ -87,7 +89,7 @@ def main() -> int:
                 root = ET.fromstring(result.stdout)
             except ET.ParseError:
                 continue
-            if root.tag == "widget":
+            if local_name(root.tag) == "widget":
                 report = verify_config(result.stdout)
                 report["resource"] = resource
                 reports.append(report)
