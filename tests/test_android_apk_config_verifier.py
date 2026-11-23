@@ -7,6 +7,9 @@ from verify_android_apk_config import VerificationError, verify_config
 class PackagedCordovaConfigTests(unittest.TestCase):
     def test_accepts_localhost_only(self):
         self.assertEqual(verify_config('<widget><access origin="http://localhost" /></widget>')["result"], "passed")
+    def test_accepts_namespaced_cordova_config(self):
+        xml = '<widget xmlns="http://www.w3.org/ns/widgets"><access origin="http://localhost" /></widget>'
+        self.assertEqual(verify_config(xml)["accessOrigins"], ["http://localhost"])
     def test_rejects_wildcard(self):
         with self.assertRaisesRegex(VerificationError, "Unapproved"):
             verify_config('<widget><access origin="*" /></widget>')
