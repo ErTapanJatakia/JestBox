@@ -83,6 +83,7 @@ jobs:
           node --check scripts/legal-page-bootstrap.mjs
           node --check scripts/prepare-android-branding.mjs
           node --check scripts/prepare-android-security.mjs
+          node --check scripts/prepare-android-release-version.mjs
           python3 -m unittest discover -s tests -p 'test_android_apk_*.py' -v
           node --test
 
@@ -98,6 +99,7 @@ jobs:
           npx cap add android
           node scripts/prepare-android-branding.mjs
           npx cap sync android
+          node scripts/prepare-android-release-version.mjs
           node scripts/prepare-android-security.mjs
           cd android
           for attempt in 1 2 3; do

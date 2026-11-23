@@ -9,7 +9,7 @@ JestBox is an offline-first joke app. Its core features run from files bundled w
 
 ## 2. Information kept on your device
 
-The selected joke language, category, and current joke are held temporarily in app memory. The app stores only your display and accessibility preferences on your device: selected theme, text size, extra contrast, reduced motion, underlined links, larger touch targets, line spacing, and focus visibility. These preferences stay on that device, are not sent to JestBox, and are not synced to an account. You can change them at any time in Settings & Superpowers or clear the app's local site data through your device or browser settings.
+The selected joke language, category, and current joke are held temporarily in app memory. The app stores your selected interface language alongside your display and accessibility preferences on your device: selected theme, text size, extra contrast, reduced motion, underlined links, larger touch targets, line spacing, and focus visibility. These preferences stay on that device, are not sent to JestBox, and are not synced to an account. On first launch, JestBox uses the language preferences supplied by your browser or Android WebView to select the closest supported locale; if none match, it uses American English (`en-US`). You can change the locale at any time in the language selector or clear the app's local site data through your device or browser settings. This detection does not use location data or require additional permissions.
 
 The app does not ask for your name, email address, phone number, location, contacts, photos, files, camera, or microphone. It does not read existing clipboard contents.
 

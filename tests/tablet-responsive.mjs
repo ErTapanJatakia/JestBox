@@ -46,6 +46,8 @@ try {
     { name: "tablet-portrait-768x1024", width: 768, height: 1024 },
     { name: "tablet-portrait-800x1280", width: 800, height: 1280 },
     { name: "tablet-portrait-834x1194", width: 834, height: 1194 },
+    { name: "tablet-portrait-1024x1366", width: 1024, height: 1366 },
+    { name: "tablet-portrait-1600x2560", width: 1600, height: 2560 },
     { name: "tablet-landscape-1024x768", width: 1024, height: 768 },
     { name: "tablet-landscape-1280x800", width: 1280, height: 800 },
     { name: "tablet-landscape-1366x1024", width: 1366, height: 1024 }

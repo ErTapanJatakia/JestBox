@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import { constants } from "node:fs";
 
 
-const requiredFiles = ["index.html", "script.js", "jokes.js", "random-index.js", "share-bridge.bundle.js", "styles.css"];
+const requiredFiles = ["index.html", "script.js", "jokes.js", "random-index.js", "share-bridge.bundle.js", "locale-detection.js", "styles.css"];
 for (const file of requiredFiles) await access(file, constants.R_OK);
 
 await rm("www", { recursive: true, force: true });

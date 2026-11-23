@@ -19,7 +19,7 @@ JestBox is an offline-first joke application with eight regional language experi
 | `ur-IN` | Indian Urdu — Republic of India |
 | `ur-PK` | Pakistani Urdu — Islamic Republic of Pakistan |
 
-English (`en-US`) is selected by default. The current content library contains 100 jokes per locale (800 total), with 20 jokes in each of five categories, including Wordplay. Automated checks validate counts, category balance, uniqueness, and the expected writing system for each locale. Regional humour quality still benefits from native-speaker review.
+On first launch, JestBox selects the closest supported locale from the device or browser language preferences; unsupported languages fall back to American English (`en-US`). A selected locale is saved locally and takes precedence on later launches until the user changes it. The current content library contains 100 jokes per locale (800 total), with 20 jokes in each of five categories, including Wordplay. Automated checks validate counts, category balance, uniqueness, and the expected writing system for each locale. Regional humour quality still benefits from native-speaker review.
 
 ## Brand identity and assets
 
@@ -44,7 +44,7 @@ Content should be independently written or culturally adapted for each locale. A
 
 ## 4. Runtime and privacy model
 
-The web app is static HTML, CSS, and JavaScript. Joke content, theme palettes, and UI dictionaries are bundled locally. The core experience makes no app-initiated network requests and does not use cookies or remote preference sync. Locale, category, and current joke remain in page memory. Display and accessibility preferences are stored locally on the device only; they are not transmitted or associated with an account.
+The web app is static HTML, CSS, and JavaScript. Joke content, theme palettes, and UI dictionaries are bundled locally. The core experience makes no app-initiated network requests and does not use cookies or remote preference sync. On first launch, the app reads only the browser/WebView-provided language preferences (`navigator.languages`, falling back to `navigator.language`) to select a supported locale. It does not query location, SIM, contacts, or other device data. The selected locale, display preferences, and accessibility preferences are stored locally on the device only; they are not transmitted or associated with an account. A saved locale takes precedence over later system-language changes, while the user can change it at any time in the locale selector.
 
 The share dialog invokes the official Capacitor Share plugin in Android builds, which opens the Android Sharesheet and exposes compatible installed share targets. Browser builds use the Web Share API where supported. The user initiates the action and chooses the recipient app; JestBox does not receive recipient details.
 
