@@ -143,3 +143,23 @@ test("random joke selection uses unbiased Web Crypto rather than Math.random",()
 });
 
 test("Accessibility Statement and Third-party Notices buttons share a responsive footer row",()=>{assert.match(html,/id="accessibility-link" class="footer-button"/);assert.match(html,/id="third-party-notices-link" class="footer-button"/);assert.ok(css.includes(".site-footer{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:.5rem}"));assert.ok(css.includes(".site-footer>.footer-button{width:100%;min-width:0;padding-inline:.4rem}"));assert.ok(css.includes(".site-footer>#privacy-link,.site-footer>#wcag-mark-link,.site-footer>#footer-line{grid-column:1/-1}"));});
+
+test("first launch detects a supported device locale, falls back safely, and preserves the user's choice",()=>{
+ const source=read("locale-detection.js");
+ const context={};
+ vm.runInNewContext(source,context);
+ const detect=context.JestBoxLocaleDetection.detectPreferredLocale;
+ const supported=["en-US","es-PE","ru-RU","es-ES","en-IN","hi-IN","ur-IN","ur-PK"];
+ assert.equal(detect(["es-PE","en-US"],supported),"es-PE");
+ assert.equal(detect(["fr-FR","hi-IN"],supported),"hi-IN");
+ assert.equal(detect(["en-GB"],supported),"en-US");
+ assert.equal(detect(["es-MX"],supported),"es-ES");
+ assert.equal(detect(["ur"],supported),"ur-PK");
+ assert.equal(detect(["fr-FR","zh-CN"],supported),"en-US");
+ assert.equal(detect("ru-RU",supported),"ru-RU");
+ assert.match(html,/locale-detection\\.js"><\\/script><script src="script\\.js"/);
+ assert.match(js,/detectPreferredLocale\\(systemLocalePreferences,LOCALES\\.map/);
+ assert.match(js,/isSupportedLocale\\(prefs\\.locale\\)\\?prefs\\.locale/);
+ assert.match(js,/prefs\\.locale=code;savePrefs\\(\\)/);
+ assert.doesNotMatch(source,/geolocation|permissions|fetch\\(|XMLHttpRequest|localStorage/i);
+});
