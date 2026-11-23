@@ -122,3 +122,17 @@ html[dir="rtl"]{direction:rtl}html[dir="rtl"] body{text-align:right}html[dir="rt
 @media (min-width: 700px) and (max-width: 1100px), (min-width: 1101px) and (max-width: 1400px) and (orientation: landscape) {
   #category-search { min-height: 48px; }
 }
+
+
+/* Requested launch-screen scale and two-column legal-link footer refinement. */
+.launch-card img{width:clamp(156px,28.5vh,228px);max-height:39vh}
+.launch-brand{font-size:clamp(3.6rem,14.4vw,5.4rem)}
+.launch-tagline{font-size:clamp(1.476rem,4.32vw,1.8rem);line-height:1.4}
+.site-footer{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:.5rem}
+.site-footer>#privacy-link,.site-footer>#wcag-mark-link,.site-footer>#footer-line{grid-column:1/-1}
+.site-footer>.footer-button{width:100%;min-width:0;padding-inline:.4rem}
+@media(max-height:520px) and (min-width:641px) and (orientation:landscape){
+ .launch-card img{width:clamp(96px,27vh,156px);max-height:36vh}
+ .launch-brand{font-size:clamp(2.52rem,9vh,3.6rem)}
+ .launch-tagline{font-size:clamp(1.296rem,4.14vh,1.62rem);line-height:1.3}
+}
