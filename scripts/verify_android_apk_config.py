@@ -3,12 +3,12 @@
 from __future__ import annotations
 import argparse
 import os
-import re
 import shutil
 import subprocess
 import sys
 import zipfile
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 APK_PATHS = {
     "assessment-signed": Path("android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk"),
@@ -21,7 +21,6 @@ class VerificationError(Exception):
     pass
 
 def verify_config(xml_text: str) -> dict:
-    import xml.etree.ElementTree as ET
     try:
         root = ET.fromstring(xml_text)
     except ET.ParseError as exc:
@@ -40,25 +39,7 @@ def verify_config(xml_text: str) -> dict:
     unexpected = sorted(set(origins) - {ALLOWED_ORIGIN})
     if unexpected:
         raise VerificationError("Unapproved packaged Cordova access origin(s): " + ", ".join(unexpected))
-    return {"result":"passed","accessRuleCount":len(rules),"accessOrigins":origins,"wildcardOrigins":0}
-
-def verify_aapt2_dump(dump: str, resource: str) -> dict | None:
-    # aapt2 decodes Android binary XML to a textual element/attribute tree.
-    # Only the Cordova <widget> resource is relevant; unrelated XML is ignored.
-    if not re.search(r"^\s*E:\s+widget(?:\s|$)", dump, re.MULTILINE):
-        return None
-    if not re.search(r"^\s*E:\s+access(?:\s|$)", dump, re.MULTILINE):
-        raise VerificationError(f"{resource}: <widget> has no <access> rules.")
-    origins = re.findall(r'origin(?:\([^)]*\))?[^\n]*?="([^"]*)"', dump)
-    if not origins:
-        raise VerificationError(f"{resource}: unable to decode access origin attributes.")
-    unexpected = sorted(set(origins) - {ALLOWED_ORIGIN})
-    if unexpected:
-        raise VerificationError("Unapproved packaged Cordova access origin(s): " + ", ".join(unexpected))
-    access_count = len(re.findall(r"^\s*E:\s+access(?:\s|$)", dump, re.MULTILINE))
-    if access_count != len(origins):
-        raise VerificationError(f"{resource}: one or more access rules have undecoded origins.")
-    return {"result":"passed","resource":resource,"accessRuleCount":access_count,"accessOrigins":origins,"wildcardOrigins":0}
+    return {"result": "passed", "accessRuleCount": len(rules), "accessOrigins": origins, "wildcardOrigins": 0}
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -68,37 +49,55 @@ def main() -> int:
     if not apk.is_relative_to(Path.cwd().resolve()) or not apk.is_file():
         print("ERROR: APK path is missing or outside the workspace.", file=sys.stderr)
         return 2
+
     sdk = Path(os.environ.get("ANDROID_HOME", ""))
-    aapt2 = sdk / "build-tools" / "36.0.0" / "aapt2"
-    if not aapt2.is_file():
-        found = shutil.which("aapt2")
+    analyzer = sdk / "cmdline-tools" / "latest" / "bin" / "apkanalyzer"
+    if not analyzer.is_file():
+        found = shutil.which("apkanalyzer")
         if found:
-            aapt2 = Path(found)
-    if not aapt2.is_file():
-        print("ERROR: Android SDK aapt2 is unavailable.", file=sys.stderr)
+            analyzer = Path(found)
+    if not analyzer.is_file():
+        print("ERROR: Android SDK apkanalyzer is unavailable.", file=sys.stderr)
         return 2
+
     try:
         with zipfile.ZipFile(apk) as archive:
-            xml_paths = sorted(n for n in archive.namelist() if n.startswith("res/") and n.endswith(".xml"))
+            xml_paths = sorted(name for name in archive.namelist()
+                               if name.startswith("res/") and name.endswith(".xml"))
         if not xml_paths:
             raise VerificationError("APK contains no packaged res/*.xml resources.")
-        widget_reports = []
+
+        reports = []
+        decode_errors = []
         for resource in xml_paths:
             result = subprocess.run(
-                [str(aapt2), "dump", "xmltree", str(apk), "--file", resource],
+                [str(analyzer), "resources", "xml", "--file", resource, str(apk)],
                 check=False, capture_output=True, text=True, timeout=60, shell=False,
             )
             if result.returncode != 0:
+                decode_errors.append(f"{resource}: {result.stderr.strip() or result.stdout.strip()}")
                 continue
-            report = verify_aapt2_dump(result.stdout, resource)
-            if report is not None:
-                widget_reports.append(report)
-        if len(widget_reports) != 1:
-            raise VerificationError(f"Expected exactly one packaged Cordova widget resource; found {len(widget_reports)}.")
-        report = widget_reports[0]
+            try:
+                root = ET.fromstring(result.stdout)
+            except ET.ParseError:
+                continue
+            if root.tag == "widget":
+                report = verify_config(result.stdout)
+                report["resource"] = resource
+                reports.append(report)
+
+        if len(reports) != 1:
+            detail = "; ".join(decode_errors[:5])
+            suffix = f" Decoder diagnostics: {detail}" if detail else ""
+            raise VerificationError(
+                f"Expected exactly one decoded packaged Cordova <widget> resource; found {len(reports)}."
+                + suffix
+            )
+        report = reports[0]
     except (zipfile.BadZipFile, subprocess.TimeoutExpired, VerificationError) as exc:
         print(f"ERROR: packaged Cordova policy verification failed: {exc}", file=sys.stderr)
         return 1
+
     report["apk"] = apk.name
     report["apkBytes"] = apk.stat().st_size
     print(report)
