@@ -2,6 +2,7 @@
 """Fail-closed check of res/xml/config.xml decoded from the actual APK."""
 from __future__ import annotations
 import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -48,6 +49,10 @@ def main() -> int:
         print("ERROR: APK path is missing or outside the workspace.", file=sys.stderr)
         return 2
     analyzer = shutil.which("apkanalyzer")
+    if analyzer is None and os.environ.get("ANDROID_HOME"):
+        candidate = Path(os.environ["ANDROID_HOME"]) / "cmdline-tools" / "latest" / "bin" / "apkanalyzer"
+        if candidate.is_file():
+            analyzer = str(candidate)
     if analyzer is None:
         print("ERROR: Android SDK apkanalyzer is unavailable.", file=sys.stderr)
         return 2
