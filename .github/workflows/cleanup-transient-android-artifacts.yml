@@ -1,0 +1,69 @@
+name: Cleanup transient Android APK artifacts
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: jestbox-transient-artifact-cleanup
+  cancel-in-progress: false
+
+jobs:
+  prune:
+    name: Retain only the latest main-branch debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Find and delete superseded transient APK artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh api --paginate --slurp "repos/${GH_REPO}/actions/artifacts?per_page=100" \
+            > "$RUNNER_TEMP/artifacts-pages.json"
+
+          # Only the exact transient APK artifact names below are eligible.
+          # Production-signed APKs and MobSF reports are deliberately excluded.
+          KEEP_ID="$(jq -r '
+            [.[].artifacts[]
+              | select(.name == "jestbox-android-debug")
+              | select(.expired == false)
+              | select(.workflow_run.head_branch == "main")]
+            | sort_by(.created_at)
+            | last
+            | .id // empty
+          ' "$RUNNER_TEMP/artifacts-pages.json")"
+
+          if [[ -z "$KEEP_ID" ]]; then
+            echo "No unexpired main-branch debug APK artifact found; no debug artifact will be retained."
+          else
+            echo "Retaining latest main-branch debug APK artifact ID: $KEEP_ID"
+          fi
+
+          jq -r --arg keep "$KEEP_ID" '
+            [.[].artifacts[]
+              | select(
+                  .name == "jestbox-android-debug"
+                  or .name == "jestbox-android-unsigned-release-candidate"
+                )
+              | select(.expired == false)
+              | select((.id | tostring) != $keep)
+              | [.id, .name, .size_in_bytes, .created_at]
+              | @tsv]
+            | .[]
+          ' "$RUNNER_TEMP/artifacts-pages.json" |
+          while IFS=$'\t' read -r artifact_id artifact_name size_bytes created_at; do
+            [[ -n "$artifact_id" ]] || continue
+            echo "Deleting superseded artifact: id=$artifact_id name=$artifact_name size_bytes=$size_bytes created_at=$created_at"
+            gh api --method DELETE "repos/${GH_REPO}/actions/artifacts/${artifact_id}"
+          done
+
+          echo "Cleanup complete. Production-signed APK and MobSF artifact names were not selected for deletion."
