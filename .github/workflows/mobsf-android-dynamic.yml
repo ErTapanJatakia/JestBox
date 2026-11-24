@@ -270,4 +270,5 @@ jobs:
             kvm-permissions.txt
             device-identity.txt
           if-no-files-found: warn
-          retention-days: 30
+          # MobSF security evidence: retain for the public-repository maximum.
+          retention-days: 90
