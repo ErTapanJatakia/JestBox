@@ -322,7 +322,8 @@ jobs:
             mobsf-report.json
             mobsf-production-summary.md
           if-no-files-found: error
-          retention-days: 30
+          # MobSF security evidence: retain for the public-repository maximum.
+          retention-days: 90
 
       - name: Stop Batch 1 MobSF container
         if: always() && inputs.run_batch1_mobsf
