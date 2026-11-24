@@ -138,7 +138,8 @@ jobs:
             mobsf-signed-summary.md
             candidate/**
           if-no-files-found: error
-          retention-days: 30
+          # GitHub Actions artifacts are time-limited; retain for the public-repo maximum.
+          retention-days: 90
 
       - name: Stop MobSF container
         if: always()
