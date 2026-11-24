@@ -349,4 +349,5 @@ jobs:
             android/app/build/outputs/apk/release/jestbox-release-signed.apk
             android/app/build/outputs/apk/release/jestbox-release-signed.apk.sha256
           if-no-files-found: error
-          retention-days: 30
+          # Production-signed APK evidence: retain for the public-repository maximum.
+          retention-days: 90
