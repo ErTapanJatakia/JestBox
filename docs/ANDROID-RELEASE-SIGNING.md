@@ -2,7 +2,7 @@
 
 ## Selected Android architecture
 
-JestBox uses the Capacitor Android project generated from the canonical web application. The repository's locked Capacitor 8 toolchain, `@capacitor/share` integration, offline web asset preparation, and Android branding script are the release build inputs.
+JestBox uses the Capacitor Android project generated from the canonical web application. The locked Capacitor 8 toolchain, `@capacitor/share` integration, offline web asset preparation, and Android branding script are the release build inputs.
 
 The standalone native WebView implementation in the draft Android wrapper PR is not the selected production architecture. Do not merge a second Android application module alongside Capacitor.
 
@@ -13,54 +13,62 @@ The standalone native WebView implementation in the draft Android wrapper PR is 
 - Keep this application ID stable after the first store release. Changing it later makes Android and app stores treat the application as a different app.
 - Before the first store upload, confirm that the RuStore app card is created with exactly this application ID.
 
-## Release candidate workflow
+## Current build and signing state (24 November 2026)
 
-Run **JestBox Android release candidate** from GitHub Actions and select the branch, tag, or commit to build. The workflow:
+**Production signing is intentionally disabled in source-controlled build workflows.** PR [#103](https://github.com/ErTapanJatakia/JestBox/pull/103) removed signing operations and production keystore-secret references from `.github/workflows/android-release-candidate.yml`. The workflow now builds and validates an **unsigned release candidate only**.
 
-1. Installs the locked npm dependencies and Android SDK in an ephemeral GitHub-hosted runner.
-2. Runs the JavaScript regression suite.
-3. Verifies that the canonical Capacitor application ID is `com.jestbox.app`.
-4. Generates and synchronizes the Capacitor Android project.
-5. Builds the unsigned release APK.
-6. Checks the final APK application ID, version code/name, non-debuggable release manifest, bundled offline entry point, and APK alignment.
-7. Uploads the unsigned candidate with a SHA-256 checksum.
-8. Signs and verifies a second APK only when all four production signing secrets are configured.
+- The release-candidate workflow does not sign APKs and does not produce a distributable release.
+- The Android debug workflow produces a debug-signed development APK; that debug certificate is not the production signing identity.
+- Do not distribute, submit, or upload either the debug APK or unsigned release candidate as a production release.
+- No signing credentials were generated, rotated, or changed by PR #103. No release, store submission, or production publication was performed.
+- The previously assessed signed APK and its certificate fingerprint are historical security-assessment evidence only. They do not establish that a production signing pipeline is currently enabled.
 
-An unsigned APK is an engineering artifact only. It must not be distributed, uploaded to RuStore, or treated as a production release.
+The current main-branch release-candidate workflow is deliberately unsigned until a separately protected signing design is implemented and verified.
 
-## Cloud-only signing identity bootstrap
+## Signing bootstrap workflow — do not run yet
 
-No local Android Studio, SDK, Gradle, Java, or command-line development is required. Key generation, encryption, recovery verification, and APK signing run on ephemeral GitHub-hosted Actions runners.
+The repository currently contains `.github/workflows/android-signing-bootstrap.yml`, a manually dispatched workflow that can generate a new RSA-4096 JKS keystore and upload an encrypted backup artifact. It is **not** a production signing workflow, and it does not establish the required protected signing environment or reviewer gate.
 
-Before running **JestBox Android signing identity bootstrap** from the `main` branch, configure these three repository Actions secrets. Each must be a unique randomly generated password of at least 24 characters, stored in a password manager:
+**Do not dispatch this workflow at this stage.** Before any key-generation operation, the workflow and its recovery procedure must be reviewed and reconciled with the approved signing architecture. In particular:
 
-- `ANDROID_KEYSTORE_PASSWORD`: protects the JKS keystore.
-- `ANDROID_KEY_PASSWORD`: protects the private key entry.
-- `ANDROID_KEYSTORE_BACKUP_PASSWORD`: independent passphrase for the encrypted offline backup.
+- The current bootstrap expects three repository Actions secrets: `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_PASSWORD`, and `ANDROID_KEYSTORE_BACKUP_PASSWORD`.
+- It uploads the encrypted keystore as a GitHub Actions artifact with a 90-day retention period. The workflow summary also contains base64-encoded encrypted ciphertext; ciphertext is still sensitive recovery material and must be handled accordingly.
+- The workflow does not itself create a GitHub Environment, configure required reviewers, or establish environment-scoped secrets.
+- Its generated key is not automatically wired into the current unsigned release-candidate workflow.
+- Do not create, rotate, restore, or replace a signing identity merely to make a workflow green. First agree on the identity, recovery custody, and release controls.
 
-Do not reuse passwords. Do not paste them into chat, workflow inputs, source files, or logs. The key alias is fixed as `jestbox-release`.
+Do not paste passwords, private keys, ciphertext, or recovery material into chat, issues, pull requests, source files, or logs.
 
-The one-time manual workflow:
+## Required target architecture before production signing
 
-1. Validates the three secrets without printing their values.
-2. Generates a 4096-bit RSA release key in a JKS keystore on the ephemeral runner.
-3. Encrypts the keystore using GPG symmetric AES-256 encryption with a strong S2K work factor.
-4. Decrypts the backup on the runner and verifies it byte-for-byte against the generated keystore.
-5. Uploads only the encrypted backup as a 90-day GitHub Actions artifact.
-6. Places only the base64-encoded encrypted ciphertext in the workflow summary so it can be copied through the GitHub browser UI into the repository secret `ANDROID_KEYSTORE_ENCRYPTED_BASE64`.
-7. Removes temporary plaintext key files from the runner.
+A future signing implementation must be a separate, narrowly scoped workflow and must satisfy all of the following before it is enabled:
 
-After the workflow succeeds, download the encrypted artifact through the GitHub browser and store it in at least two controlled offline locations. Keep the backup passphrase separately from the encrypted file. Then add the ciphertext from the workflow summary as `ANDROID_KEYSTORE_ENCRYPTED_BASE64`. The release workflow decrypts this secret on the ephemeral runner before signing; the plaintext keystore is never committed or uploaded as an artifact.
+1. A dedicated GitHub Environment (for example, `production-signing`) with required human reviewer approval, configured and independently verified in repository settings.
+2. Signing credentials scoped to that environment, not available to pull-request builds or ordinary source-validation jobs.
+3. A trusted immutable source commit from the protected `main` branch; no arbitrary PR head, fork, tag override, or user-supplied source ref may access signing credentials.
+4. Least-privilege workflow permissions, pinned third-party actions, and checkout with persisted credentials disabled where appropriate.
+5. Fail-closed verification of application ID, version, merged manifest, APK checksum, alignment, and release flags before signing.
+6. An isolated signing job that receives only the validated candidate and required environment-scoped secrets.
+7. Post-sign verification of APK signature schemes, signer certificate SHA-256 fingerprint, and exact APK checksum.
+8. A durable evidence package containing the signed APK, checksum, certificate fingerprint, source commit, build metadata/provenance, SBOM, and corresponding MobSF report.
+9. A separate explicit approval before any store upload, moderation submission, publication, or distribution.
 
-The artifact expires after 90 days, so the offline backup is the durable recovery copy. Do not delete the workflow run or artifact until the offline copies have been verified. Keep the three password secrets and encrypted-ciphertext secret in GitHub Actions Secrets.
+Do not assume that a GitHub Environment or required reviewers exist until the settings have been inspected and verified. A workflow-level `environment:` declaration alone does not configure protection rules.
 
-## Production signing identity
+## Evidence retention and archive policy
 
-The maintainer confirmed that no APK with the previous package ID `com.ertapanjatakia.jestbox` had been uploaded to RuStore or distributed outside development/testing. A new signing identity may therefore be created for the first production identity, subject to preserving the key securely.
+GitHub Actions artifacts are temporary evidence. The repository's current maximum artifact retention is 90 days; the transient debug APK artifact has a shorter three-day retention. Neither should be described as permanent.
 
-Create one dedicated long-lived JestBox release key through the cloud-only bootstrap workflow, securely back it up in at least two controlled offline locations, then configure the five secrets above. Losing the key can prevent updates to installations signed with it.
+A durable archive should be created only after an approved signed release exists. The proposed evidence set is:
 
-Do not use the debug signing key. Do not publish the unsigned candidate.
+- Production-signed APK (the exact binary assessed and approved for distribution).
+- SHA-256 checksum and signing-certificate fingerprint.
+- Source commit, versionCode/versionName, build run identifiers, and build provenance.
+- SBOM for the exact release build.
+- MobSF static report and assessment summary correlated to the same APK checksum.
+- Release notes and approval record.
+
+A GitHub Release asset archive is a candidate approach, subject to confirming repository policy, asset access, retention expectations, and recovery arrangements. No Release has been created by this work. Do not create or publish one without explicit maintainer approval. Describe evidence as retained only while the Release/archive remains available and retained; do not promise absolute or perpetual preservation.
 
 ## Release metadata
 
@@ -68,6 +76,6 @@ Do not use the debug signing key. Do not publish the unsigned candidate.
 - npm project version: `1.0.0`.
 - The generated Android version code/name are validated from the actual APK at build time. Increase versionCode for each subsequent store release and keep the application ID stable.
 
-## Out of scope for this workflow
+## Release and distribution boundary
 
-This workflow does not upload to RuStore, submit moderation, publish, create or rotate signing keys, or modify the live application. Those are separate gated release stages. The RuStore workflow must require explicit approval before moderation submission, with automatic publication only after RuStore has approved moderation, as specified in the release architecture decision.
+The current release-candidate workflow builds and validates an unsigned APK only. It does not sign, upload to RuStore, submit moderation, publish, or modify a live application. Store submission and distribution are separate gated stages and require explicit approval. No production release or store submission is authorised by this document.
