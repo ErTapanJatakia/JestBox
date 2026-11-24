@@ -25,17 +25,16 @@ The standalone native WebView implementation in the draft Android wrapper PR is 
 
 The current main-branch release-candidate workflow is deliberately unsigned until a separately protected signing design is implemented and verified.
 
-## Signing bootstrap workflow — do not run yet
+## Legacy signing bootstrap retired
 
-The repository currently contains `.github/workflows/android-signing-bootstrap.yml`, a manually dispatched workflow that can generate a new RSA-4096 JKS keystore and upload an encrypted backup artifact. It is **not** a production signing workflow, and it does not establish the required protected signing environment or reviewer gate.
+The former `.github/workflows/android-signing-bootstrap.yml` workflow has been removed from the repository because it was not suitable for production key custody:
 
-**Do not dispatch this workflow at this stage.** Before any key-generation operation, the workflow and its recovery procedure must be reviewed and reconciled with the approved signing architecture. In particular:
+- It generated a new RSA-4096 JKS using repository-level secrets rather than a verified, reviewer-protected GitHub Environment.
+- It placed base64-encoded encrypted keystore ciphertext in the workflow summary as well as uploading an encrypted backup artifact. Ciphertext is still sensitive recovery material and should not be exposed in broadly visible run summaries.
+- It did not create or verify an Environment, configure required reviewers, or wire a trusted signing job to the release candidate workflow.
+- Its 90-day artifact retention was not a durable recovery strategy.
 
-- The current bootstrap expects three repository Actions secrets: `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_PASSWORD`, and `ANDROID_KEYSTORE_BACKUP_PASSWORD`.
-- It uploads the encrypted keystore as a GitHub Actions artifact with a 90-day retention period. The workflow summary also contains base64-encoded encrypted ciphertext; ciphertext is still sensitive recovery material and must be handled accordingly.
-- The workflow does not itself create a GitHub Environment, configure required reviewers, or establish environment-scoped secrets.
-- Its generated key is not automatically wired into the current unsigned release-candidate workflow.
-- Do not create, rotate, restore, or replace a signing identity merely to make a workflow green. First agree on the identity, recovery custody, and release controls.
+**Do not recreate or replace this bootstrap with another key-generation workflow until the target controls and recovery custody are verified.** No key-generation workflow has been run as part of this remediation. No signing credentials, private keys, or encrypted backups were generated or changed.
 
 Do not paste passwords, private keys, ciphertext, or recovery material into chat, issues, pull requests, source files, or logs.
 
@@ -46,14 +45,15 @@ A future signing implementation must be a separate, narrowly scoped workflow and
 1. A dedicated GitHub Environment (for example, `production-signing`) with required human reviewer approval, configured and independently verified in repository settings.
 2. Signing credentials scoped to that environment, not available to pull-request builds or ordinary source-validation jobs.
 3. A trusted immutable source commit from the protected `main` branch; no arbitrary PR head, fork, tag override, or user-supplied source ref may access signing credentials.
-4. Least-privilege workflow permissions, pinned third-party actions, and checkout with persisted credentials disabled where appropriate.
-5. Fail-closed verification of application ID, version, merged manifest, APK checksum, alignment, and release flags before signing.
-6. An isolated signing job that receives only the validated candidate and required environment-scoped secrets.
-7. Post-sign verification of APK signature schemes, signer certificate SHA-256 fingerprint, and exact APK checksum.
-8. A durable evidence package containing the signed APK, checksum, certificate fingerprint, source commit, build metadata/provenance, SBOM, and corresponding MobSF report.
-9. A separate explicit approval before any store upload, moderation submission, publication, or distribution.
+4. Verified branch protection or repository rules that prevent unreviewed changes to signing workflows and release-critical build scripts.
+5. Least-privilege workflow permissions, pinned third-party actions, and checkout with persisted credentials disabled where appropriate.
+6. Fail-closed verification of application ID, version, merged manifest, APK checksum, alignment, and release flags before signing.
+7. An isolated signing job that receives only the validated candidate and required environment-scoped secrets.
+8. Post-sign verification of APK signature schemes, signer certificate SHA-256 fingerprint, and exact APK checksum.
+9. A durable evidence package containing the signed APK, checksum, certificate fingerprint, source commit, build metadata/provenance, SBOM, and corresponding MobSF report.
+10. A separate explicit approval before any store upload, moderation submission, publication, or distribution.
 
-Do not assume that a GitHub Environment or required reviewers exist until the settings have been inspected and verified. A workflow-level `environment:` declaration alone does not configure protection rules.
+Do not assume that a GitHub Environment, required reviewers, or branch protection exist until the settings have been inspected and verified. A workflow-level `environment:` declaration alone does not configure protection rules.
 
 ## Evidence retention and archive policy
 
