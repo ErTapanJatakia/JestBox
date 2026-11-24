@@ -15,7 +15,7 @@ The standalone native WebView implementation in the draft Android wrapper PR is 
 
 ## Current build and signing state (24 November 2026)
 
-**Production signing is intentionally disabled in source-controlled build workflows.** PR [#103](https://github.com/ErTapanJatakia/JestBox/pull/103) removed signing operations and production keystore-secret references from `.github/workflows/android-release-candidate.yml`. The workflow now builds and validates an **unsigned release candidate only**.
+**Production signing is not yet safely disabled across all workflows.** The ordinary `.github/workflows/android-release-candidate.yml` workflow builds and validates an **unsigned release candidate only**, but the separate `.github/workflows/hardened-apk-assurance.yml` workflow still contains a production-keystore decryption and APK-signing step backed by repository-level secrets. This is an unsafe, unprotected signing path. PR `security/retire-unprotected-signed-assurance` removes that workflow and its signed-MobSF caller. Until that remediation is merged, the hardened assurance workflow must be disabled in GitHub Actions settings and must not be run.
 
 - The release-candidate workflow does not sign APKs and does not produce a distributable release.
 - The Android debug workflow produces a debug-signed development APK; that debug certificate is not the production signing identity.
@@ -23,11 +23,13 @@ The standalone native WebView implementation in the draft Android wrapper PR is 
 - No signing credentials were generated, rotated, or changed by PR #103. No release, store submission, or production publication was performed.
 - The previously assessed signed APK and its certificate fingerprint are historical security-assessment evidence only. They do not establish that a production signing pipeline is currently enabled.
 
-The current main-branch release-candidate workflow is deliberately unsigned until a separately protected signing design is implemented and verified.
+The current main-branch release-candidate workflow is deliberately unsigned. Production signing must remain unavailable until a separately protected signing design is implemented and verified. The legacy hardened assurance workflow is being retired because it bypasses that required protection.
 
 ## Legacy signing bootstrap retired
 
-The former `.github/workflows/android-signing-bootstrap.yml` workflow has been removed from the repository because it was not suitable for production key custody:
+The former `.github/workflows/android-signing-bootstrap.yml` bootstrap and the separate `.github/workflows/hardened-apk-assurance.yml` signing workflow are being retired because neither provides acceptable production key custody. The hardened workflow had direct access to repository-level signing secrets and no protected environment gate. Its reusable `.github/workflows/mobsf-signed-apk.yml` caller is also being retired with it.
+
+The former bootstrap was unsuitable for production key custody:
 
 - It generated a new RSA-4096 JKS using repository-level secrets rather than a verified, reviewer-protected GitHub Environment.
 - It placed base64-encoded encrypted keystore ciphertext in the workflow summary as well as uploading an encrypted backup artifact. Ciphertext is still sensitive recovery material and should not be exposed in broadly visible run summaries.
