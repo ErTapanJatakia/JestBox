@@ -246,7 +246,8 @@ jobs:
             android-logcat.txt
             ${{ runner.temp }}/emulator.log
           if-no-files-found: warn
-          retention-days: 30
+          # Signed APK evidence: retain for the public-repository maximum.
+          retention-days: 90
 
       - name: Stop emulator and remove temporary signing material
         if: always()
