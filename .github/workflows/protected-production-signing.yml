@@ -24,7 +24,7 @@ jobs:
       - name: Check out the exact trusted main commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: \${{ github.sha }}
+          ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Set up Node.js
@@ -102,10 +102,10 @@ jobs:
       - name: Verify protected secrets and sign with original identity
         shell: bash
         env:
-          PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64: \${{ secrets.PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64 }}
-          PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD: \${{ secrets.PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD }}
-          PRODUCTION_ANDROID_KEYSTORE_PASSWORD: \${{ secrets.PRODUCTION_ANDROID_KEYSTORE_PASSWORD }}
-          PRODUCTION_ANDROID_KEY_PASSWORD: \${{ secrets.PRODUCTION_ANDROID_KEY_PASSWORD }}
+          PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64: ${{ secrets.PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64 }}
+          PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD }}
+          PRODUCTION_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.PRODUCTION_ANDROID_KEYSTORE_PASSWORD }}
+          PRODUCTION_ANDROID_KEY_PASSWORD: ${{ secrets.PRODUCTION_ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
           for name in \
@@ -113,7 +113,7 @@ jobs:
             PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD \
             PRODUCTION_ANDROID_KEYSTORE_PASSWORD \
             PRODUCTION_ANDROID_KEY_PASSWORD; do
-            if [[ -z "\${!name:-}" ]]; then
+            if [[ -z "${!name:-}" ]]; then
               echo "::error::Missing protected Environment secret: $name"
               exit 1
             fi
@@ -146,9 +146,11 @@ jobs:
             --ks-pass env:PRODUCTION_ANDROID_KEYSTORE_PASSWORD \
             --key-pass env:PRODUCTION_ANDROID_KEY_PASSWORD \
             --out "$SIGNED" "$ALIGNED"
-          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$SIGNED" |
-            tee signed-certificate.txt
-          grep -Fqi "$EXPECTED_CERT" signed-certificate.txt
+          APKSIGNER_OUTPUT="$("$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$SIGNED")"
+          printf '%s\n' "$APKSIGNER_OUTPUT" | tee signed-certificate.txt
+          APK_CERT="$(printf '%s\n' "$APKSIGNER_OUTPUT" |
+            awk -F': ' '/certificate SHA-256 digest/ {gsub(/:/, "", $2); print tolower($2); exit}')"
+          test "$APK_CERT" = "$EXPECTED_CERT"
           "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -v 4 "$SIGNED"
 
           APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
