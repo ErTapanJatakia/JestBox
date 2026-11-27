@@ -106,6 +106,7 @@ jobs:
           PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD }}
           PRODUCTION_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.PRODUCTION_ANDROID_KEYSTORE_PASSWORD }}
           PRODUCTION_ANDROID_KEY_PASSWORD: ${{ secrets.PRODUCTION_ANDROID_KEY_PASSWORD }}
+          JESTBOX_PRODUCTION_CERT_SHA256: ${{ vars.JESTBOX_PRODUCTION_CERT_SHA256 }}
         run: |
           set -euo pipefail
           for name in \
@@ -125,7 +126,12 @@ jobs:
           KEYSTORE="$RUNNER_TEMP/jestbox-release.jks"
           ALIGNED="$RUNNER_TEMP/jestbox-release-aligned.apk"
           SIGNED="production-signed.apk"
-          EXPECTED_CERT="bf24d400008bf790561b6a20e4724d95cbd312e9dd6a07a38d8872fb83dcc61f"
+          EXPECTED_CERT="${JESTBOX_PRODUCTION_CERT_SHA256//:/}"
+          EXPECTED_CERT="${EXPECTED_CERT,,}"
+          if [[ ! "$EXPECTED_CERT" =~ ^[a-f0-9]{64}$ ]]; then
+            echo "::error::Missing or invalid Environment variable JESTBOX_PRODUCTION_CERT_SHA256"
+            exit 1
+          fi
 
           printf '%s' "$PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64" | base64 --decode > "$ENCRYPTED"
           chmod 600 "$ENCRYPTED"
@@ -187,6 +193,8 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+      # MobSF is deliberately bound to the ephemeral runner loopback interface only.
+      # These 127.0.0.1 requests are isolated CI scanner traffic, not production endpoints.
       - name: Start isolated pinned MobSF scanner
         shell: bash
         run: |
