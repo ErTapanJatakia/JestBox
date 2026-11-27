@@ -99,13 +99,17 @@ jobs:
           unzip -l "$APK" | grep -q 'assets/public/index.html'
           (cd "$(dirname "$APK")" && sha256sum app-release-unsigned.apk > app-release-unsigned.apk.sha256)
 
+      # GitHub does not reveal existing repository secret values for migration.
+      # These legacy repository secrets are consumed only in this manually dispatched,
+      # main-only job after the production-signing Environment approval gate.
+      # Environment approval gates execution; it does not change repository-secret scope.
       - name: Verify protected secrets and sign with original identity
         shell: bash
         env:
-          PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64: ${{ secrets.PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64 }}
-          PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD }}
-          PRODUCTION_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.PRODUCTION_ANDROID_KEYSTORE_PASSWORD }}
-          PRODUCTION_ANDROID_KEY_PASSWORD: ${{ secrets.PRODUCTION_ANDROID_KEY_PASSWORD }}
+          PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64: ${{ secrets.ANDROID_KEYSTORE_ENCRYPTED_BASE64 }}
+          PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_BACKUP_PASSWORD }}
+          PRODUCTION_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          PRODUCTION_ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           JESTBOX_PRODUCTION_CERT_SHA256: ${{ vars.JESTBOX_PRODUCTION_CERT_SHA256 }}
         run: |
           set -euo pipefail
@@ -115,7 +119,7 @@ jobs:
             PRODUCTION_ANDROID_KEYSTORE_PASSWORD \
             PRODUCTION_ANDROID_KEY_PASSWORD; do
             if [[ -z "${!name:-}" ]]; then
-              echo "::error::Missing protected Environment secret: $name"
+              echo "::error::Missing repository signing secret (job is gated by production-signing Environment): $name"
               exit 1
             fi
           done
