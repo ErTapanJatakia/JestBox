@@ -13,21 +13,23 @@ The standalone native WebView implementation in the draft Android wrapper PR is 
 - Keep this application ID stable after the first store release. Changing it later makes Android and app stores treat the application as a different app.
 - Before the first store upload, confirm that the RuStore app card is created with exactly this application ID.
 
-## Current build and signing state (24 November 2026)
+## Current build and signing state (28 November 2026)
 
-**Production signing is not yet safely disabled across all workflows.** The ordinary `.github/workflows/android-release-candidate.yml` workflow builds and validates an **unsigned release candidate only**, but the separate `.github/workflows/hardened-apk-assurance.yml` workflow still contains a production-keystore decryption and APK-signing step backed by repository-level secrets. This is an unsafe, unprotected signing path. PR `security/retire-unprotected-signed-assurance` removes that workflow and its signed-MobSF caller. Until that remediation is merged, the hardened assurance workflow must be disabled in GitHub Actions settings and must not be run.
+**The unprotected production-signing workflows have been removed from `main` by PR #105.** The former `.github/workflows/hardened-apk-assurance.yml` workflow and its reusable `.github/workflows/mobsf-signed-apk.yml` caller are no longer present on `main`. The hardened workflow had directly accessed repository-level signing secrets without a protected GitHub Environment gate.
 
-- The release-candidate workflow does not sign APKs and does not produce a distributable release.
+- The release-candidate workflow builds and validates an **unsigned release candidate only**. It does not sign APKs or produce a distributable release.
 - The Android debug workflow produces a debug-signed development APK; that debug certificate is not the production signing identity.
 - Do not distribute, submit, or upload either the debug APK or unsigned release candidate as a production release.
-- No signing credentials were generated, rotated, or changed by PR #103. No release, store submission, or production publication was performed.
+- PR #105 removed workflow files and corrected this documentation. It did not access, print, rotate, regenerate, or delete signing credentials or keys.
 - The previously assessed signed APK and its certificate fingerprint are historical security-assessment evidence only. They do not establish that a production signing pipeline is currently enabled.
 
-The current main-branch release-candidate workflow is deliberately unsigned. Production signing must remain unavailable until a separately protected signing design is implemented and verified. The legacy hardened assurance workflow is being retired because it bypasses that required protection.
+**Production signing remains unavailable and must stay disabled** until a separately protected signing design is implemented and verified. Removal of the unsafe workflows is a containment measure, not evidence that a replacement signing architecture is ready.
 
-## Legacy signing bootstrap retired
+No production signing credentials, private keys, or encrypted backups were generated, changed, rotated, or deleted as part of PR #105. No production release, store submission, or publication was performed.
 
-The former `.github/workflows/android-signing-bootstrap.yml` bootstrap and the separate `.github/workflows/hardened-apk-assurance.yml` signing workflow are being retired because neither provides acceptable production key custody. The hardened workflow had direct access to repository-level signing secrets and no protected environment gate. Its reusable `.github/workflows/mobsf-signed-apk.yml` caller is also being retired with it.
+## Legacy signing bootstrap and workflow retirement
+
+The former `.github/workflows/android-signing-bootstrap.yml` bootstrap had previously been removed. PR #105 removed the separate `.github/workflows/hardened-apk-assurance.yml` signing workflow and its reusable `.github/workflows/mobsf-signed-apk.yml` caller.
 
 The former bootstrap was unsuitable for production key custody:
 
@@ -36,9 +38,9 @@ The former bootstrap was unsuitable for production key custody:
 - It did not create or verify an Environment, configure required reviewers, or wire a trusted signing job to the release candidate workflow.
 - Its 90-day artifact retention was not a durable recovery strategy.
 
-**Do not recreate or replace this bootstrap with another key-generation workflow until the target controls and recovery custody are verified.** No key-generation workflow has been run as part of this remediation. No signing credentials, private keys, or encrypted backups were generated or changed.
+**Do not recreate or replace the retired bootstrap with another key-generation workflow until the target controls and recovery custody are verified.** No key-generation workflow has been run as part of this remediation. Do not generate a replacement signing identity; preserve the existing identity and verify independent recovery custody before any future credential migration.
 
-Do not paste passwords, private keys, ciphertext, or recovery material into chat, issues, pull requests, source files, or logs.
+Do not paste passwords, private keys, ciphertext, or recovery material into chat, issues, pull requests, source files, or logs. Do not delete existing signing secrets until recovery custody is independently verified and a controlled migration plan is approved.
 
 ## Required target architecture before production signing
 
