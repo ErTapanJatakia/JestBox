@@ -206,7 +206,7 @@ jobs:
           API_KEY="$(openssl rand -hex 32)"
           echo "::add-mask::$API_KEY"
           echo "MOBSF_API_KEY=$API_KEY" >> "$GITHUB_ENV"
-          docker run -d --name jestbox-mobsf -p 8000:8000 \
+          docker run -d --name jestbox-mobsf -p 127.0.0.1:8000:8000 \
             -e MOBSF_API_KEY="$API_KEY" \
             -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
             -e MOBSF_VT_ENABLED=0 \
