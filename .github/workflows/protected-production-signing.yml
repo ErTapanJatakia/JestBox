@@ -1,0 +1,293 @@
+name: JestBox protected production APK signing
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jestbox-protected-production-signing
+  cancel-in-progress: false
+
+jobs:
+  sign-and-assess:
+    name: Build, sign and assess production APK
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    environment:
+      name: production-signing
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the exact trusted main commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +o pipefail
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          set -o pipefail
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Install locked dependencies and run regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          node --check script.js
+          node --check jokes.js
+          node --check share-bridge.entry.js
+          node --check scripts/prepare-web.mjs
+          node --check scripts/prepare-android-branding.mjs
+          node --check scripts/prepare-android-security.mjs
+          node --check scripts/prepare-android-release-version.mjs
+          python3 -m unittest discover -s tests -p 'test_android_apk_*.py' -v
+          node --test
+
+      - name: Verify canonical application ID
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module -e '
+            import { readFileSync } from "node:fs";
+            const config = JSON.parse(readFileSync("capacitor.config.json", "utf8"));
+            if (config.appId !== "com.jestbox.app") {
+              throw new Error("Unexpected Android application ID: " + config.appId);
+            }
+          '
+
+      - name: Build unsigned release candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run prepare:web
+          npx cap add android
+          node scripts/prepare-android-branding.mjs
+          npx cap sync android
+          node scripts/prepare-android-security.mjs
+          node scripts/prepare-android-release-version.mjs
+          cd android
+          ./gradlew --no-daemon --max-workers=2 assembleRelease
+          cd ..
+          APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          test -s "$APK"
+          python3 scripts/verify_android_apk_config.py --artifact release-unsigned
+          APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
+          "$APKANALYZER" manifest application-id "$APK" | grep -Fx "com.jestbox.app"
+          "$APKANALYZER" manifest debuggable "$APK" | grep -Fx "false"
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -v 4 "$APK"
+          unzip -l "$APK" | grep -q 'assets/public/index.html'
+          (cd "$(dirname "$APK")" && sha256sum app-release-unsigned.apk > app-release-unsigned.apk.sha256)
+
+      # GitHub does not reveal existing repository secret values for migration.
+      # These legacy repository secrets are consumed only in this manually dispatched,
+      # main-only job after the production-signing Environment approval gate.
+      # Environment approval gates execution; it does not change repository-secret scope.
+      - name: Verify protected secrets and sign with original identity
+        shell: bash
+        env:
+          PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64: ${{ secrets.ANDROID_KEYSTORE_ENCRYPTED_BASE64 }}
+          PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_BACKUP_PASSWORD }}
+          PRODUCTION_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          PRODUCTION_ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          JESTBOX_PRODUCTION_CERT_SHA256: ${{ vars.JESTBOX_PRODUCTION_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+          for name in \
+            PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64 \
+            PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD \
+            PRODUCTION_ANDROID_KEYSTORE_PASSWORD \
+            PRODUCTION_ANDROID_KEY_PASSWORD; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error::Missing repository signing secret (job is gated by production-signing Environment): $name"
+              exit 1
+            fi
+          done
+
+          APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          (cd "$(dirname "$APK")" && sha256sum --check app-release-unsigned.apk.sha256)
+          ENCRYPTED="$RUNNER_TEMP/jestbox-release.jks.gpg"
+          KEYSTORE="$RUNNER_TEMP/jestbox-release.jks"
+          ALIGNED="$RUNNER_TEMP/jestbox-release-aligned.apk"
+          SIGNED="production-signed.apk"
+          EXPECTED_CERT="${JESTBOX_PRODUCTION_CERT_SHA256//:/}"
+          EXPECTED_CERT="${EXPECTED_CERT,,}"
+          if [[ ! "$EXPECTED_CERT" =~ ^[a-f0-9]{64}$ ]]; then
+            echo "::error::Missing or invalid Environment variable JESTBOX_PRODUCTION_CERT_SHA256"
+            exit 1
+          fi
+
+          printf '%s' "$PRODUCTION_ANDROID_KEYSTORE_ENCRYPTED_BASE64" | base64 --decode > "$ENCRYPTED"
+          chmod 600 "$ENCRYPTED"
+          printf '%s' "$PRODUCTION_ANDROID_KEYSTORE_BACKUP_PASSWORD" |
+            gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \
+              --output "$KEYSTORE" --decrypt "$ENCRYPTED"
+          chmod 600 "$KEYSTORE"
+
+          KEYTOOL_OUTPUT="$(keytool -list -v -keystore "$KEYSTORE" \
+            -storepass "$PRODUCTION_ANDROID_KEYSTORE_PASSWORD" -alias jestbox-release)"
+          KEYTOOL_CERT="$(printf '%s\n' "$KEYTOOL_OUTPUT" |
+            awk '/SHA256:/ {print $2; exit}' | tr -d ':' | tr '[:upper:]' '[:lower:]')"
+          test "$KEYTOOL_CERT" = "$EXPECTED_CERT"
+
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -p -f 4 "$APK" "$ALIGNED"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" sign \
+            --ks "$KEYSTORE" --ks-key-alias jestbox-release \
+            --ks-pass env:PRODUCTION_ANDROID_KEYSTORE_PASSWORD \
+            --key-pass env:PRODUCTION_ANDROID_KEY_PASSWORD \
+            --out "$SIGNED" "$ALIGNED"
+          APKSIGNER_OUTPUT="$("$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$SIGNED")"
+          printf '%s\n' "$APKSIGNER_OUTPUT" | tee signed-certificate.txt
+          APK_CERT="$(printf '%s\n' "$APKSIGNER_OUTPUT" |
+            awk -F': ' '/certificate SHA-256 digest/ {gsub(/:/, "", $2); print tolower($2); exit}')"
+          test "$APK_CERT" = "$EXPECTED_CERT"
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -v 4 "$SIGNED"
+
+          APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
+          test "$("$APKANALYZER" manifest application-id "$SIGNED")" = "com.jestbox.app"
+          test "$("$APKANALYZER" manifest debuggable "$SIGNED")" = "false"
+          test "$("$APKANALYZER" manifest min-sdk "$SIGNED")" = "29"
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+          python3 scripts/verify_android_apk_config.py --artifact assessment-signed
+          python3 scripts/verify_android_apk_manifest.py --output android-apk-manifest-assessment.json
+          sha256sum "$SIGNED" | tee production-signed-apk.sha256
+
+          {
+            echo "### Protected production signing"
+            echo "- Source commit: $GITHUB_SHA"
+            echo "- Package: com.jestbox.app"
+            echo "- Signing certificate SHA-256: $EXPECTED_CERT"
+            echo "- Original signing identity check: passed"
+            echo "- APK signature and alignment verification: passed"
+            echo "- Debuggable flag: false"
+            echo "- Distribution / publication: not performed"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"
+
+      - name: Upload production-signed APK and verification evidence
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-production-signed-apk
+          path: |
+            production-signed.apk
+            production-signed-apk.sha256
+            signed-certificate.txt
+            android-apk-manifest-assessment.json
+          if-no-files-found: error
+          retention-days: 90
+
+      # MobSF is deliberately bound to the ephemeral runner loopback interface only.
+      # These 127.0.0.1 requests are isolated CI scanner traffic, not production endpoints.
+      - name: Start isolated pinned MobSF scanner
+        shell: bash
+        run: |
+          set -euo pipefail
+          API_KEY="$(openssl rand -hex 32)"
+          echo "::add-mask::$API_KEY"
+          echo "MOBSF_API_KEY=$API_KEY" >> "$GITHUB_ENV"
+          docker run -d --name jestbox-mobsf -p 127.0.0.1:8000:8000 \
+            -e MOBSF_API_KEY="$API_KEY" \
+            -e MOBSF_DOMAIN_MALWARE_SCAN=0 \
+            -e MOBSF_VT_ENABLED=0 \
+            opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954
+          for _ in {1..90}; do
+            if curl --silent --fail --connect-timeout 5 --max-time 15 http://127.0.0.1:8000/ >/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker logs jestbox-mobsf
+          exit 1
+
+      - name: Scan the exact signed APK with MobSF
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="production-signed.apk"
+          APK_SHA256="$(awk 'NR==1 {print $1}' production-signed-apk.sha256)"
+          test "$(sha256sum "$APK" | awk '{print $1}')" = "$APK_SHA256"
+          UPLOAD="$(curl --silent --show-error --fail --connect-timeout 10 --max-time 120 \
+            -H "Authorization: $MOBSF_API_KEY" \
+            -F "file=@$APK" http://127.0.0.1:8000/api/v1/upload)"
+          HASH="$(printf '%s' "$UPLOAD" | jq -er '.hash')"
+          FILE_NAME="$(printf '%s' "$UPLOAD" | jq -er '.file_name')"
+          printf '%s\n' "$UPLOAD" > mobsf-upload.json
+          curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
+            -H "Authorization: $MOBSF_API_KEY" \
+            --data-urlencode "hash=$HASH" \
+            --data-urlencode "file_name=$FILE_NAME" \
+            --data-urlencode "scan_type=apk" \
+            http://127.0.0.1:8000/api/v1/scan > mobsf-scan-response.json
+
+          completed=false
+          for _ in {1..60}; do
+            if curl --silent --show-error --fail --connect-timeout 10 --max-time 180 -X POST \
+              -H "Authorization: $MOBSF_API_KEY" --data-urlencode "hash=$HASH" \
+              http://127.0.0.1:8000/api/v1/report_json -o mobsf-report.json; then
+              if jq -e 'type == "object" and (has("error") | not)' mobsf-report.json >/dev/null; then
+                completed=true
+                break
+              fi
+            fi
+            sleep 5
+          done
+          [[ "$completed" == "true" ]] || { docker logs jestbox-mobsf; exit 1; }
+          jq -e '.package_name == "com.jestbox.app"' mobsf-report.json >/dev/null
+          {
+            echo "# MobSF production-signed APK static assessment"
+            echo
+            echo "- Source commit: $GITHUB_SHA"
+            echo "- APK SHA-256: $APK_SHA256"
+            echo "- Package: $(jq -r '.package_name // "unknown"' mobsf-report.json)"
+            echo "- Version: $(jq -r '.version_name // "unknown"' mobsf-report.json) (code $(jq -r '.version_code // "unknown"' mobsf-report.json))"
+            echo "- High findings: $(jq -r '.high // "not supplied"' mobsf-report.json)"
+            echo "- Warning findings: $(jq -r '.warning // "not supplied"' mobsf-report.json)"
+            echo "- Informational findings: $(jq -r '.info // "not supplied"' mobsf-report.json)"
+            echo
+            echo "Static analysis of the exact signed APK. Findings require manual validation; this is not dynamic testing or a penetration test."
+          } > mobsf-signed-summary.md
+          cat mobsf-signed-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload MobSF report and signed APK evidence
+        if: always() && hashFiles('mobsf-report.json') != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-mobsf-signed-apk-report
+          path: |
+            mobsf-upload.json
+            mobsf-scan-response.json
+            mobsf-report.json
+            mobsf-signed-summary.md
+            production-signed.apk
+            production-signed-apk.sha256
+            signed-certificate.txt
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Stop MobSF container and remove temporary signing material
+        if: always()
+        shell: bash
+        run: |
+          docker rm -f jestbox-mobsf >/dev/null 2>&1 || true
+          rm -f "$RUNNER_TEMP/jestbox-release.jks" "$RUNNER_TEMP/jestbox-release.jks.gpg" "$RUNNER_TEMP/jestbox-release-aligned.apk"
