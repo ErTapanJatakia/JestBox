@@ -54,7 +54,7 @@ Do not paste passwords, private keys, ciphertext, or recovery material into chat
 
 ## Evidence retention and archive policy
 
-GitHub Actions artifacts are temporary evidence. The workflow requests a longer retention period, but the repository's current maximum artifact retention is **30 days**. The two artifacts linked above are temporary CI evidence, not a permanent archive.
+GitHub Actions artifacts are temporary evidence. The protected signing workflow is configured to request **30 days**, matching the repository's current maximum artifact retention. The two artifacts linked above are temporary CI evidence, not a permanent archive.
 
 A durable archive should preserve the exact approved signed APK, checksum, certificate fingerprint, source commit, version/build metadata, provenance, SBOM, MobSF report, release notes and approval record. A GitHub Release asset archive is a candidate approach, subject to confirming repository policy, access, retention expectations and recovery arrangements.
 
@@ -69,3 +69,17 @@ A durable archive should preserve the exact approved signed APK, checksum, certi
 ## Release and distribution boundary
 
 The protected workflow can create and assess a signed APK, but a successful signing run does not itself authorise publication. Store submission, moderation, public distribution, GitHub Release creation and production deployment remain separate actions requiring explicit approval. No store submission, publication or production deployment occurred as part of the 28 November signing verification.
+
+
+### Latest protected production assessment — 28 November 2026
+
+- **Run:** [#46115617387](https://github.com/ErTapanJatakia/JestBox/actions/runs/46115617387), source commit `e16b46728130524922f1ad549175f266995fa536`.
+- **APK and verification evidence:** [artifact 15252136163](https://github.com/ErTapanJatakia/JestBox/actions/runs/46115617387/artifacts/15252136163).
+- **MobSF report/evidence:** [artifact 15252220554](https://github.com/ErTapanJatakia/JestBox/actions/runs/46115617387/artifacts/15252220554).
+- **Result:** successful protected signing and static assessment; 15/15 job steps passed.
+- **APK SHA-256:** `1906704999261b8f0667f7dee07cffe146543fba05561bbf77ded839a8ef1504`.
+- **SBOM SHA-256:** `9c754bf68b8aee2d7895377da0ac26a60543935d44f8c7f8f27fd730c645ef07`.
+- **MobSF:** 85/100; 0 High, 3 Warning, 1 Informational. The raw report was complete; a workflow-summary path mismatch was identified and is being corrected with schema validation and regression tests.
+- **Retention:** both workflow artifact uploads are being aligned to the repository's 30-day maximum.
+
+No release, publication, distribution, store submission or signing-key change occurred.
