@@ -1,8 +1,9 @@
-import org.cyclonedx.gradle.CyclonedxPlugin
-import org.cyclonedx.model.Component
-
 // Generate an SBOM from the exact Android release runtime dependency graph.
 // This init script deliberately avoids changing the generated Capacitor/Gradle project.
+//
+// Keep plugin resolution in the init-script classpath. Apply by plugin ID rather
+// than importing implementation classes: imports are compiled before the
+// initscript classpath is made available to the script compiler.
 initscript {
     repositories {
         gradlePluginPortal()
@@ -13,7 +14,7 @@ initscript {
 }
 
 rootProject {
-    apply plugin: CyclonedxPlugin
+    apply plugin: 'org.cyclonedx.bom'
 
     allprojects {
         tasks.named('cyclonedxDirectBom') {
@@ -33,7 +34,7 @@ rootProject {
     }
 
     tasks.named('cyclonedxBom') {
-        projectType = Component.Type.APPLICATION
+        projectType = 'application'
         componentName = 'JestBox Android'
         jsonOutput = layout.buildDirectory.file(
             'reports/cyclonedx/jestbox-android-release-sbom.json'
