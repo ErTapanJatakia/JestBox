@@ -61,19 +61,29 @@ The SBOM catalogue did not populate Action licences. To close that gap, each rep
 
 The workflow files also invoke these scanner containers:
 
-| Container image | Workflow reference | Pinning observation | Licence review |
+| Container image | Workflow reference | Pinning observation | Upstream source licence evidence |
 |---|---|---|---|
 | `anchore/syft:v1.54.0` | `.github/workflows/sbom.yml` | Version tag; no digest in workflow | Apache-2.0 at upstream `v1.54.0` tag |
 | `ghcr.io/google/osv-scanner:v2.7.1` | `.github/workflows/osv-scanner.yml` | Version tag; no digest in workflow | Apache-2.0 at upstream `v2.7.1` source tag |
 | `ghcr.io/ossf/scorecard:v5.5.0` | `.github/workflows/scorecard.yml` | Version tag; no digest in workflow | Apache-2.0 at upstream `v5.5.0` source tag |
-| `aquasec/trivy:0.76.2` | `.github/workflows/trivy.yml` | Version tag; no digest in workflow | Upstream licence verification remains open |
-| `zricethezav/gitleaks:v8.24.3` | `.github/workflows/gitleaks.yml` | Version tag; no digest in workflow | Upstream licence verification remains open |
-| `ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af` | `.github/workflows/zap-pt.yml` | Digest-pinned | Upstream image/source licence verification remains open |
-| `ghcr.io/zizmorcore/zizmor:1.32.0` | `.github/workflows/zizmor.yml` | Version tag; no digest in workflow | Upstream licence verification remains open |
-| `opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954` | `.github/workflows/mobsf-android-dynamic.yml`, `.github/workflows/protected-production-signing.yml` | Digest-pinned (MobSF v4.6.9 comment on dynamic workflow) | Upstream image/source licence verification remains open |
-| `opensecurity/mobile-security-framework-mobsf:latest` | `.github/workflows/mobsf-android.yml` | Mutable `:latest` tag; not digest-pinned | Upstream licence verification remains open; mutable tag is a reproducibility/supply-chain follow-up |
+| `aquasec/trivy:0.76.2` | `.github/workflows/trivy.yml` | Version tag; no digest in workflow | Apache-2.0 at upstream `v0.76.2` (Go module metadata) |
+| `zricethezav/gitleaks:v8.24.3` | `.github/workflows/gitleaks.yml` | Version tag; no digest in workflow | MIT at upstream `gitleaks/gitleaks` `v8.24.3` LICENSE |
+| `ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af` | `.github/workflows/zap-pt.yml` | Digest-pinned | Apache-2.0 at upstream `zaproxy/zaproxy` source; exact image digest-to-source correspondence not independently verified |
+| `ghcr.io/zizmorcore/zizmor:1.32.0` | `.github/workflows/zizmor.yml` | Version tag; no digest in workflow | MIT at upstream `zizmorcore/zizmor` `v1.32.0` LICENSE |
+| `opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954` | `.github/workflows/mobsf-android-dynamic.yml`, `.github/workflows/protected-production-signing.yml` | Digest-pinned (MobSF v4.6.9 comment on dynamic workflow) | GPL-3.0 at upstream `MobSF/Mobile-Security-Framework-MobSF` `v4.6.9` LICENSE |
+| `opensecurity/mobile-security-framework-mobsf:latest` | `.github/workflows/mobsf-android.yml` | Mutable `:latest` tag; not digest-pinned | GPL-3.0 at upstream MobSF project; exact mutable image contents are not fixed by this tag |
 
-The workflow inventory is not an exhaustive SBOM of the container images or their operating-system packages. In particular, the MobSF static-analysis workflow currently uses a mutable `:latest` tag; record this as a reproducibility risk for a separate workflow-hardening change, not as a licence incompatibility. Do not change workflow references as part of this documentation-only update.
+The upstream project licence checks above are source-repository evidence, not a complete licence inventory of the corresponding container image layers, operating-system packages or transitive runtime dependencies. MobSF is GPL-3.0; it is used as a CI security-analysis tool and is not included in the JestBox APK. The MobSF static-analysis workflow's mutable `:latest` tag remains a reproducibility/supply-chain follow-up, not a licence incompatibility. Do not change workflow references as part of this documentation-only update.
+
+### Signed production APK inspection — 2026-11-28
+
+The production-signed APK artifact from main workflow run [46091336344](https://github.com/ErTapanJatakia/JestBox/actions/runs/46091336344) was downloaded and inspected as a ZIP archive. The artifact contained `production-signed.apk`, its SHA-256 file, signing-certificate details and the generated Android manifest assessment. The APK SHA-256 recorded by the release workflow is `1906704999261b8f0667f7dee07cffe146543fba05561bbf77ded839a8ef1504`; the artifact ZIP SHA-256 reported by GitHub is `b25d94cd9a6fcfd3c0d940ae7efeacc542fd8baf1c49c8ef8e2eb3e500db4d1a`.
+
+The archive inspection confirms the APK contains a single `classes.dex`, Capacitor application assets, Kotlin runtime metadata, AndroidX version-marker files, and no `lib/<abi>/*.so` native library entries. The APK's AndroidX marker files identify versions including Activity 1.11.0, AppCompat 1.7.1, Core/Core-KTX 1.17.0, Fragment 1.8.9, WebKit 1.14.0, ProfileInstaller 1.4.0 and Kotlin coroutines 1.8.1. Several AndroidX marker files contain unresolved Gradle task text rather than a version number. The package inventory is therefore a preliminary packaged-content observation, not a complete or machine-generated APK SBOM.
+
+The signed APK's manifest assessment reports package `com.jestbox.app`, min SDK 29, target SDK 36, backup disabled, no sensitive permissions detected, and only INTERNET plus the app's non-exported dynamic-receiver permission. The signing report verifies APK Signature Scheme v3 and the expected release certificate. These are release-integrity observations, not licence conclusions.
+
+**Remaining release-SBOM gap:** generate and retain a CycloneDX or SPDX SBOM from the exact signed APK (or the exact resolved Gradle release dependency graph) in the protected production build. It must resolve AndroidX, Kotlin, Capacitor Android bridge/plugins, Gradle plugin and SDK/toolchain components to exact versions and licences, including transitive dependencies. The current source-tree SBOM does not cover these packaged Android dependencies. Do not infer AndroidX or Kotlin licence status solely from the presence of version-marker files.
 
 The source SBOM also detected the root npm packages `@capacitor/core@8.6.2` (MIT) and `@capacitor/share@8.0.3` (MIT), tablet-tooling packages `playwright@1.56.1` and `playwright-core@1.56.1` (Apache-2.0), and `tslib@2.9.1` (0BSD). It did not populate a licence for `fsevents@2.3.2`; the lockfile and upstream manifest review recorded above remain the source for that finding. The SBOM also contains project root package entries without a declared licence; these are project identifiers, not third-party licence findings.
 
@@ -107,4 +117,4 @@ Refresh after dependency updates and at least quarterly. Confirm exact Action re
 | Date | Change |
 |---|---|
 | 2026-11-28 | Enumerated both committed npm lockfiles (126 root entries and 3 tablet-tooling entries), reconciled existing licence inventories/notices, and recorded maintainer-confirmed provenance for the original JestBox logo and W3C/WAI WCAG 2.2 AA conformance logo. |
-| 2026-11-28 | Added evidence-backed PR source-tree SBOM inventory (95 CycloneDX components, 74 SPDX packages, 11 detected GitHub Action identities), verified all 11 immutable Action revisions as MIT from their pinned LICENSE files, inventoried scanner images and recorded remaining licence/pinning gaps, and recorded the maintainer's independent voluntary WCAG self-audit without requiring an audit artefact. Accessibility Statement text explicitly remains out of scope and unchanged. |
+| 2026-11-28 | Added evidence-backed PR source-tree SBOM inventory (95 CycloneDX components, 74 SPDX packages, 11 detected GitHub Action identities), verified all 11 immutable Action revisions as MIT from their pinned LICENSE files, verified scanner upstream project licences where exact source tags were available, documented image-scope limitations, inspected the exact signed production APK archive and recorded the remaining Android release-SBOM gap, and recorded the maintainer's independent voluntary WCAG self-audit without requiring an audit artefact. Accessibility Statement text explicitly remains out of scope and unchanged. |
