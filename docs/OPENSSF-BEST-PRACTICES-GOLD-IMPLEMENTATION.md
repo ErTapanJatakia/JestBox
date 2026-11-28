@@ -8,7 +8,7 @@ Repository: ErTapanJatakia/JestBox
 
 ## Assessment summary
 
-**Not scored.** The register is an internal checklist only. Import the exact current BadgeApp criteria and verify each control individually before submitting any answers. JestBox is proprietary; see [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md). Do not claim an award or eligibility without confirmation from the programme.
+**Not eligible for formal submission while proprietary; not scored.** OpenSSF describes this programme as a FLOSS-project badge. This register is retained solely as an internal checklist. Verify current BadgeApp criteria and evidence for internal benchmarking. See [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md).
 
 
 ## Additional Gold assessment focus
