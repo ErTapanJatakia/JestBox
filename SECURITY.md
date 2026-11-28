@@ -854,3 +854,31 @@ PR [#105](https://github.com/ErTapanJatakia/JestBox/pull/105) removed the former
 **Retention limitation:** GitHub Actions artifact retention is currently capped by repository settings at 30 days, despite the workflow requesting a longer period. These links are temporary CI evidence, not a permanent archive. No GitHub Release or other durable archive has been created. Any permanent archival or distribution requires separate explicit authorisation.
 
 **Scope boundary:** this verifies a protected signing workflow and a specific signed APK. It is not store acceptance, public distribution, a formal certification, a human-led penetration test, or a guarantee that the application is vulnerability-free. No store submission, publication or production deployment occurred.
+
+
+---
+
+## Repository security governance and assurance documentation
+
+The Security Policy and Security Assessment Programme are supported by the following project-specific documents:
+
+- [Threat Model](docs/THREAT-MODEL.md)
+- [Security Assurance Case](docs/SECURITY-ASSURANCE-CASE.md)
+- [Security Assessment Roadmap](docs/SECURITY-BADGE-ROADMAP.md)
+- [OpenSSF Baseline and Best Practices assessment registers](docs/OPENSSF-BASELINE-L1-IMPLEMENTATION.md)
+- [Repository QA Policy](docs/REPOSITORY-QA-POLICY.md)
+- [SAST Policy](docs/SAST-POLICY.md)
+- [Software Composition Analysis and Dependency Policy](docs/SCA-AND-DEPENDENCY-POLICY.md)
+- [Secrets and Credentials Policy](docs/SECRETS-AND-CREDENTIALS-POLICY.md)
+- [Access Governance](docs/ACCESS-GOVERNANCE.md)
+- [Contributor Authorization](docs/CONTRIBUTOR-AUTHORIZATION.md)
+- [Release Policy](docs/RELEASE-POLICY.md) and [Release Verification](docs/RELEASE-VERIFICATION.md)
+- [External Software Interfaces](docs/EXTERNAL-SOFTWARE-INTERFACES.md) and [Network/Cryptography Review](docs/NETWORK-CRYPTOGRAPHY-REVIEW.md)
+- [VEX Process](docs/VEX-PROCESS.md)
+- [Documentation Maintenance](docs/DOCUMENTATION-MAINTENANCE.md)
+
+### Contribution sign-off and DCO status
+
+JestBox is proprietary / All Rights Reserved. The standard DCO 1.1 certification text assumes contributions are submitted under an identified open-source licence; it is not, by itself, a proprietary rights assignment or authorization. JestBox therefore uses a project-specific written contributor authorization and rights-certification policy instead of representing the standard DCO as its operative contribution agreement.
+
+**Automated DCO trailer validation is not currently enforced as a required pull-request check.** A policy statement, a `Signed-off-by` trailer, a validator, and a required CI gate are distinct controls. The repository must not claim DCO enforcement unless the validator is implemented, made a required status check, and verified against actual pull requests. See [Contributor Authorization and Rights Certification](docs/CONTRIBUTOR-AUTHORIZATION.md).
