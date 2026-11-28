@@ -4,11 +4,11 @@ Assessment date: 2026-11-28
 Criteria snapshot: v2026.08.28, confirmed as the current official version on 2026-11-28. Recheck before every formal assessment.  
 Repository: ErTapanJatakia/JestBox
 
-> Internal evidence register only. It is not an OpenSSF award, certification or independent audit. JestBox's proprietary licence fails OSPS-LE-02.01; no formal OSPS Baseline level can be claimed while the project remains proprietary. Level 2's maintainer/user eligibility requirements are additional prerequisites, not substitutes for the licensing requirement.
+> Internal evidence register only. It is not an OpenSSF award, certification or independent audit. JestBox's proprietary licence fails OSPS-LE-02.01 and OSPS-LE-02.02; no formal OSPS Baseline level can be claimed while the project remains proprietary. Level 2's maintainer/user eligibility requirements are additional prerequisites, not substitutes for the licensing requirement.
 
 ## Assessment summary
 
-**Not eligible for formal attestation while proprietary; not scored.** OSPS-LE-02.01 requires an OSI- or FSF-compliant open-source licence. This is an internal gap-analysis register only. Verify exact current controls and evidence for internal benchmarking. See [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md).
+**Not eligible for formal attestation while proprietary; not scored.** OSPS-LE-02.01 require OSI- or FSF-compliant open-source licences for both source code and released software assets. This is an internal gap-analysis register only. Verify exact current controls and evidence for internal benchmarking. See [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md).
 
 
 ## Assessment focus
