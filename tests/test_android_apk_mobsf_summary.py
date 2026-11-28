@@ -45,29 +45,29 @@ class MobSFReportSummaryTests(unittest.TestCase):
         report = valid_report()
         del report["appsec"]
         with self.assertRaisesRegex(MobSFReportError, "missing the appsec object"):
-            summarize_report(report, "e16b467", "a" * 64)
+            summarize_report(report, "a" * 40, "b" * 64)
 
     def test_rejects_missing_severity_array_instead_of_silently_reporting_zero(self):
         report = valid_report()
         del report["appsec"]["warning"]
         with self.assertRaisesRegex(MobSFReportError, "appsec.warning must be an array"):
-            summarize_report(report, "e16b467", "a" * 64)
+            summarize_report(report, "a" * 40, "b" * 64)
 
     def test_rejects_wrong_severity_type(self):
         report = valid_report()
         report["appsec"]["high"] = 0
         with self.assertRaisesRegex(MobSFReportError, "appsec.high must be an array"):
-            summarize_report(report, "e16b467", "a" * 64)
+            summarize_report(report, "a" * 40, "b" * 64)
 
     def test_rejects_malformed_apk_hash(self):
         with self.assertRaisesRegex(MobSFReportError, "64 lowercase hexadecimal"):
-            summarize_report(valid_report(), "e16b467", "not-a-hash")
+            summarize_report(valid_report(), "a" * 40, "not-a-hash")
 
     def test_rejects_invalid_security_score_type(self):
         report = valid_report()
         report["appsec"]["security_score"] = "85"
         with self.assertRaisesRegex(MobSFReportError, "must be numeric"):
-            summarize_report(report, "e16b467", "a" * 64)
+            summarize_report(report, "a" * 40, "b" * 64)
 
     def test_rejects_malformed_source_commit(self):
         with self.assertRaisesRegex(MobSFReportError, "40 lowercase hexadecimal"):
