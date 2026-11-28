@@ -30,6 +30,8 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 - [Threat Model](docs/THREAT-MODEL.md)
 - [Security Assurance Case](docs/SECURITY-ASSURANCE-CASE.md)
 - [Security Assessment Roadmap](docs/SECURITY-BADGE-ROADMAP.md)
+- [OpenSSF Eligibility and Applicability](docs/OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md)
+- [OpenSSF Scorecard Assessment](docs/OPENSSF-SCORECARD.md)
 - [OpenSSF Baseline and Best Practices Assessment Registers](docs/OPENSSF-BASELINE-L1-IMPLEMENTATION.md)
 - [Contributor Authorization and Rights Certification](docs/CONTRIBUTOR-AUTHORIZATION.md)
 - [Access Governance](docs/ACCESS-GOVERNANCE.md)
