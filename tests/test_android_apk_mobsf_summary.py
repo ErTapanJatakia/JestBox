@@ -66,7 +66,7 @@ class MobSFReportSummaryTests(unittest.TestCase):
     def test_rejects_invalid_security_score_type(self):
         report = valid_report()
         report["appsec"]["security_score"] = "85"
-        with self.assertRaisesRegex(MobSFReportError, "must be numeric"):
+        with self.assertRaisesRegex(MobSFReportError, "integer from 0 to 100"):
             summarize_report(report, "a" * 40, "b" * 64)
 
     def test_rejects_malformed_source_commit(self):
