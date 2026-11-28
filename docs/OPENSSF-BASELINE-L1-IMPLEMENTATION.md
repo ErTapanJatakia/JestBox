@@ -9,7 +9,7 @@ Scope: source, documentation, Android application, Capacitor packaging and GitHu
 
 ## Assessment summary
 
-**Not eligible for formal attestation while proprietary; not scored.** OSPS-LE-02.01 requires an OSI- or FSF-compliant open-source licence. This is an internal gap-analysis register only. Verify exact current controls and evidence for internal benchmarking. See [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md).
+**Not eligible for formal attestation while proprietary; not scored.** OSPS-LE-02.01 and OSPS-LE-02.02 require OSI- or FSF-compliant open-source licences for source code and released software assets. This is an internal gap-analysis register only. Verify exact current controls and evidence for internal benchmarking. See [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md).
 
 
 ## Control assessment method
@@ -42,7 +42,7 @@ Reassess after changes to official criteria, application scope, release model, r
 
 ## Official control inventory — v2026.08.28
 
-The identifiers below are transcribed from the official v2026.08.28 control overview. These entries are provided for internal benchmarking only. Because JestBox's proprietary licence fails OSPS-LE-02.01, this register is not a formal compliance assessment. No control is marked Met.
+The identifiers below are transcribed from the official v2026.08.28 control overview. These entries are provided for internal benchmarking only. Because JestBox's proprietary licence fails OSPS-LE-02.01 and OSPS-LE-02.02, this register is not a formal compliance assessment. No control is marked Met.
 
 | Control ID | Control summary | Internal status |
 |---|---|---|
