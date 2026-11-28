@@ -230,7 +230,7 @@ jobs:
             android/build/reports/cyclonedx/jestbox-android-release-sbom.json
             android-release-sbom-binding.json
           if-no-files-found: error
-          retention-days: 90
+          retention-days: 30
 
       # MobSF is deliberately bound to the ephemeral runner loopback interface only.
       # These 127.0.0.1 requests are isolated CI scanner traffic, not production endpoints.
@@ -289,19 +289,12 @@ jobs:
           done
           [[ "$completed" == "true" ]] || { docker logs jestbox-mobsf; exit 1; }
           jq -e '.package_name == "com.jestbox.app"' mobsf-report.json >/dev/null
-          {
-            echo "# MobSF production-signed APK static assessment"
-            echo
-            echo "- Source commit: $GITHUB_SHA"
-            echo "- APK SHA-256: $APK_SHA256"
-            echo "- Package: $(jq -r '.package_name // "unknown"' mobsf-report.json)"
-            echo "- Version: $(jq -r '.version_name // "unknown"' mobsf-report.json) (code $(jq -r '.version_code // "unknown"' mobsf-report.json))"
-            echo "- High findings: $(jq -r '.high // "not supplied"' mobsf-report.json)"
-            echo "- Warning findings: $(jq -r '.warning // "not supplied"' mobsf-report.json)"
-            echo "- Informational findings: $(jq -r '.info // "not supplied"' mobsf-report.json)"
-            echo
-            echo "Static analysis of the exact signed APK. Findings require manual validation; this is not dynamic testing or a penetration test."
-          } > mobsf-signed-summary.md
+          python3 scripts/summarize_mobsf_report.py \
+            --report mobsf-report.json \
+            --output mobsf-signed-summary.md \
+            --source-commit "$GITHUB_SHA" \
+            --apk-sha256 "$APK_SHA256" \
+            --expected-package "com.jestbox.app"
           cat mobsf-signed-summary.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload MobSF report and signed APK evidence
@@ -320,7 +313,7 @@ jobs:
             android/build/reports/cyclonedx/jestbox-android-release-sbom.json
             android-release-sbom-binding.json
           if-no-files-found: error
-          retention-days: 90
+          retention-days: 30
 
       - name: Stop MobSF container and remove temporary signing material
         if: always()
