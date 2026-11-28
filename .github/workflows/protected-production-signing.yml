@@ -185,6 +185,39 @@ jobs:
 
           rm -f "$ENCRYPTED" "$KEYSTORE" "$ALIGNED"
 
+      - name: Generate CycloneDX SBOM and bind it to the exact signed APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android
+          ./gradlew --no-daemon --max-workers=2 \
+            --init-script ../scripts/android-release-sbom.init.gradle \
+            cyclonedxBom
+          cd ..
+          SBOM="android/build/reports/cyclonedx/jestbox-android-release-sbom.json"
+          APK="production-signed.apk"
+          APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
+          test -s "$SBOM"
+          test -s "$APK"
+          python3 scripts/verify_android_release_sbom.py \
+            --sbom "$SBOM" \
+            --apk "$APK" \
+            --output android-release-sbom-binding.json \
+            --source-commit "$GITHUB_SHA" \
+            --package-name "$("$APKANALYZER" manifest application-id "$APK")" \
+            --version-name "$("$APKANALYZER" manifest version-name "$APK")" \
+            --version-code "$("$APKANALYZER" manifest version-code "$APK")"
+          {
+            echo "### Android release SBOM"
+            echo "- Dependency scope: Gradle :app releaseRuntimeClasspath"
+            echo "- CycloneDX SBOM SHA-256: $(sha256sum "$SBOM" | awk '{print $1}')"
+            echo "- Exact signed APK SHA-256: $(sha256sum "$APK" | awk '{print $1}')"
+            echo "- Resolved components: $(jq -r '.componentCount' android-release-sbom-binding.json)"
+            echo "- Maven components: $(jq -r '.mavenComponentCount' android-release-sbom-binding.json)"
+            echo "- AndroidX components: $(jq -r '.androidxComponentCount' android-release-sbom-binding.json)"
+            echo "- Components without declared licence metadata: $(jq -r '.componentsWithoutDeclaredLicense' android-release-sbom-binding.json)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload production-signed APK and verification evidence
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -194,6 +227,8 @@ jobs:
             production-signed-apk.sha256
             signed-certificate.txt
             android-apk-manifest-assessment.json
+            android/build/reports/cyclonedx/jestbox-android-release-sbom.json
+            android-release-sbom-binding.json
           if-no-files-found: error
           retention-days: 90
 
@@ -282,6 +317,8 @@ jobs:
             production-signed.apk
             production-signed-apk.sha256
             signed-certificate.txt
+            android/build/reports/cyclonedx/jestbox-android-release-sbom.json
+            android-release-sbom-binding.json
           if-no-files-found: error
           retention-days: 90
 
