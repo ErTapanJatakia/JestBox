@@ -59,6 +59,26 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Android Implementation Plan](ANDROID-IMPLEMENTATION.md)
 
+## Copyright and licence
+
+JestBox is proprietary software. Copyright in the original JestBox code, joke
+content, designs, documentation, and project materials is reserved by the
+respective rights holders. The repository is public so that people can inspect
+the project and use GitHub's public-repository features.
+
+Public visibility does not make JestBox open source and does not grant a
+general licence to use, copy, modify, adapt, redistribute, sublicense, sell,
+or commercially exploit its proprietary materials. GitHub users may view and
+fork the public repository only to the extent permitted by GitHub's Terms of
+Service and platform rules. Those limited platform permissions are not a
+general licence to use or exploit JestBox outside GitHub.
+
+Third-party dependencies and materials remain subject to their own licences
+and attribution requirements; the JestBox proprietary notice does not override
+rights granted by those third-party licences. See [LICENSE](LICENSE) for the
+full terms. Any additional permission must be obtained in writing from the
+relevant rights holder.
+
 ## Features
 
 - Eight searchable language/region choices and fully localised interface copy.
