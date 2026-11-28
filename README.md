@@ -40,7 +40,7 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 - [Secrets and Credentials Policy](docs/SECRETS-AND-CREDENTIALS-POLICY.md)
 - [SAST Policy](docs/SAST-POLICY.md) · [SCA and Dependency Policy](docs/SCA-AND-DEPENDENCY-POLICY.md)
 - [Dependency and Licence Register](docs/DEPENDENCY-LICENSE-REGISTER.md)
-- [External Software Interfaces](docs/EXTERNAL-SOFTWARE-INTERFACES.md)
+- [External Software Interfaces](docs/EXTERNAL-SOFTWARE-INTERFACES.md) · [Interface Currency Review](docs/INTERFACE-CURRENCY-REVIEW.md)
 - [Network and Cryptography Review](docs/NETWORK-CRYPTOGRAPHY-REVIEW.md)
 - [Accessibility Review](docs/ACCESSIBILITY-REVIEW.md)
 - [Regression Test Review Process](docs/REGRESSION-TEST-REVIEW.md)
