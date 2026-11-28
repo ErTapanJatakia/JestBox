@@ -23,6 +23,8 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 
 - [Product and Technical Documentation](DOCUMENTATION.md)
 - [Build, Validation and Test Instructions](docs/BUILD-AND-TEST-INSTRUCTIONS.md)
+- [Android Release Signing](docs/ANDROID-RELEASE-SIGNING.md)
+- [Joke Content Quality Audit](docs/content-quality-audit.md)
 - [Coding and Documentation Standards](docs/CODING-STANDARDS.md)
 - [Project Governance](docs/PROJECT-GOVERNANCE.md)
 - [Repository QA Policy](docs/REPOSITORY-QA-POLICY.md)
