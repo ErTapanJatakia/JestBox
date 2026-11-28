@@ -955,3 +955,35 @@ The Security Policy and Security Assessment Programme are supported by the follo
 JestBox is proprietary / All Rights Reserved. Standard DCO 1.1 requires contributors to certify that they have the right to submit a contribution under the open-source licence identified by the project. It is not a proprietary rights assignment and does not replace the project's separate written authorization and rights terms.
 
 JestBox therefore requires project-specific written contributor authorization and agreement on ownership/permission terms before accepting contributions. Automated DCO trailer validation is not currently enforced as a required pull-request check. A policy statement, a `Signed-off-by` trailer, a validator, and a required CI gate are distinct controls. Do not claim DCO enforcement. Any future sign-off mechanism must remain consistent with the proprietary licence and separate written contributor authorization.
+
+
+## Post-merge automated findings disposition — 28 November 2026
+
+**Assessed main commit:** `fbcea7ed10babcaad7a46d1d7a69dd12acdbcd92` (PR #120). All 15 post-merge workflow runs and all 17 check runs completed successfully. Workflow success is not equivalent to zero scanner findings.
+
+| Control | Observed result | Disposition |
+|---|---|---|
+| OSV-Scanner | 0 SARIF findings | No dependency vulnerability finding was emitted by this run. This is not a guarantee that all dependency risk is absent. [Run #46164418763](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418763). |
+| Trivy | 0 Error, 0 Warning, 5 Note records | All five are licence classifications: Apache-2.0 for Playwright and Playwright Core, MIT for Capacitor Core and Share, and 0BSD for tslib. They are not vulnerability alerts. [Run #46164418910](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418910). |
+| Bearer CLI 2.1.3 | 175 rules, 4 SARIF findings | Two DOM-rendering rule hits and two logger rule hits; source-level review below. The scan is non-blocking and no finding is claimed as closed by a GitHub alert workflow. [Run #46164418904](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418904) · [artifact 15271475010](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418904/artifacts/15271475010). |
+| ZAP baseline | 0 High, 2 Medium, 6 Low, 2 Informational | 10 alert records on a disposable local static server; findings are recorded as test-harness/hosting-header observations, not Android runtime vulnerabilities. |
+| ZAP active | 0 High, 2 Medium, 6 Low, 3 Informational | 11 alert records, including the User Agent Fuzzer informational observation. No FAIL result was emitted. [Run #46164418915](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418915) · [artifact 15271240634](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418915/artifacts/15271240634). |
+
+### Bearer finding-by-finding review
+
+| Rule / location | Source evidence | Current disposition |
+|---|---|---|
+| `javascript_lang_dangerous_insert_html`, `scripts/legal-markdown-renderer.mjs:124` | Renderer creates fixed DOM elements and assigns parsed text using `textContent`; no HTML-string insertion is used. Link targets pass `safeLinkTarget`, which parses URLs and permits only `https:`, `http:`, `mailto:`, and `tel:`. | Likely static-analysis false positive based on DOM construction. Retain as a tracked finding pending dedicated regression test confirmation; do not suppress the scanner rule. |
+| `javascript_lang_dangerous_insert_html`, `scripts/legal-markdown-renderer.mjs:167` | Image source is constrained by the parser to the fixed WCAG asset path; alt text is assigned as an attribute, not interpreted as markup. | Likely static-analysis false positive based on safe DOM attribute assignment. Retain pending dedicated regression test confirmation; do not suppress the scanner rule. |
+| `javascript_lang_logger_leak`, `scripts/audit-joke-diversity.mjs:50-55` | JSON output contains threshold, category counts, normalized-line uniqueness counts/ratios and category identifiers. It does not print joke content, credentials or personal data. | Contextual false positive candidate. Aggregate diagnostic output is not currently assessed as sensitive; keep the output limited to metrics. |
+| `javascript_lang_logger_leak`, `scripts/prepare-android-release-version.mjs:43` | Output contains only the configured Android version name and version code. | Contextual false positive candidate. These are public release metadata, not secrets. |
+
+These are source-review dispositions, not a claim that Bearer has cleared the findings or that GitHub Code Scanning alerts have been closed. The SARIF is retained for traceability.
+
+### ZAP local-server header observations
+
+The target was a disposable Python `http.server` serving a generated static build at `127.0.0.1:8080`. It was not a production deployment, API backend, authenticated service, or Android WebView runtime assessment. Reported observations include missing CSP, anti-clickjacking, X-Content-Type-Options, Permissions Policy, COEP/COOP/CORP headers and server-version disclosure. The test server's default response headers explain these observations; changing them would harden only the temporary harness and would not demonstrate a change to the Android APK. No production-hosting security claim is made. Reassess response headers if a web-hosted product is intentionally introduced in the future.
+
+### Assurance boundary
+
+The results are automated evidence for the exact commit and target scopes stated above. They do not establish absence of vulnerabilities, independent human review, formal penetration testing, certification, production web security, or app-store acceptance. Bearer and ZAP findings remain documented for reassessment when the affected code or deployment model changes.
