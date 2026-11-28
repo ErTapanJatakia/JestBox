@@ -8,7 +8,7 @@ Repository: ErTapanJatakia/JestBox
 
 ## Assessment summary
 
-**Not eligible for formal attestation while proprietary; not scored.** OSPS-LE-02.01 require OSI- or FSF-compliant open-source licences for both source code and released software assets. This is an internal gap-analysis register only. Verify exact current controls and evidence for internal benchmarking. See [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md).
+**Not eligible for formal attestation while proprietary; not scored.** OSPS-LE-02.01 and OSPS-LE-02.02 require OSI- or FSF-compliant open-source licences for both source code and released software assets. This is an internal gap-analysis register only. Verify exact current controls and evidence for internal benchmarking. See [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md).
 
 
 ## Assessment focus
