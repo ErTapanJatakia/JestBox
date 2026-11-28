@@ -28,8 +28,14 @@ If the repository state does not contain an npm lockfile, do not substitute an u
 node --check script.js
 node --check jokes.js
 node --check share-bridge.entry.js
+node --check scripts/prepare-web.mjs
+node --check scripts/prepare-android-branding.mjs
+node --check scripts/prepare-android-security.mjs
+python3 -m unittest discover -s tests -p 'test_android_apk_*.py' -v
 node --test
 ```
+
+The current `android-debug.yml` workflow runs these syntax checks, the Python APK-validator tests and Node test suite. The `validate.yml` workflow runs the core JavaScript syntax checks and `node --test`.
 
 Run additional repository-specific checks when modifying their inputs, including joke-content audits and Android configuration validators.
 
@@ -43,7 +49,7 @@ Do not distribute a debug or unsigned APK as a production release.
 
 ## CI workflows
 
-The workflow files under `.github/workflows/` are authoritative for triggers, permissions, tool versions, and job steps. Current checks include application regression/syntax validation, Android debug and release-candidate builds, dependency review, SBOM generation, Scorecard, secret scanning, SAST, container/dependency scanning, workflow security linting, OWASP ZAP, MobSF, and tablet responsive validation.
+The workflow files under `.github/workflows/` are authoritative for triggers, permissions, tool versions, and job steps. The current workflow inventory includes `validate.yml`, `android-debug.yml`, `android-release-candidate.yml`, `protected-production-signing.yml`, `dependency-review.yml`, `sbom.yml`, `scorecard.yml`, `gitleaks.yml`, `devskim.yml`, `njsscan.yml`, `osv-scanner.yml`, `trivy.yml`, `zizmor.yml`, `actionlint.yml`, `zap-pt.yml`, `mobsf-android.yml`, `mobsf-android-dynamic.yml`, `tablet-responsive.yml`, and `cleanup-transient-android-artifacts.yml`. The exact event, job and scan scope is workflow-specific; for example, ZAP targets an isolated local static build, not a production website.
 
 Some workflows are scheduled or manual-only. A workflow existing in the repository does not prove it has run successfully for a particular commit.
 
