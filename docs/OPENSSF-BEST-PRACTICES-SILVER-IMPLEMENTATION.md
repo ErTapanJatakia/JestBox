@@ -8,16 +8,8 @@ Repository: ErTapanJatakia/JestBox
 
 ## Assessment summary
 
-| Internal status | Count |
-|---|---:|
-| Met | 0 |
-| Partial | 0 |
-| Unmet | 0 |
-| N/A | 0 |
-| Unverified | 55 |
-| Total | 55 |
+**Not scored.** The register is an internal checklist only. Import the exact current BadgeApp criteria and verify each control individually before submitting any answers. JestBox is proprietary; see [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md). Do not claim an award or eligibility without confirmation from the programme.
 
-Verify the current official criteria set and count before submission.
 
 ## Additional Silver assessment focus
 
@@ -28,9 +20,10 @@ Verify the current official criteria set and count before submission.
 - Security response operations and dependency management.
 - Release integrity, build verification and security assurance.
 
-## DCO status
+## Contributor rights mechanism
 
-JestBox's contribution policy requests DCO sign-off, but automated sign-off validation is not currently a required PR status check. Any Silver criterion requiring enforcement or demonstrated sign-off must not be marked Met on the basis of documentation alone.
+JestBox is proprietary. Its project-specific written contributor authorization and rights-certification policy is documented in [Contributor Authorization](CONTRIBUTOR-AUTHORIZATION.md). This is not a standard DCO 1.1 implementation. Automated DCO trailer validation is not currently enforced as a required PR check. Do not claim DCO enforcement or mark a criterion Met unless the exact current criterion permits the documented alternative and the rights mechanism is legally reviewed and operationally evidenced.
+
 
 ## Evidence discipline
 
