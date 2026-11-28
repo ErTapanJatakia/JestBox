@@ -17,13 +17,13 @@ Level 2 assessment must establish both applicability/eligibility and evidence fo
 
 | Control area | Evidence required | Initial status |
 |---|---|---|
-| Maintainer/project eligibility | Current contributor and maintainer roles, sustained project use where required | Unverified |
-| Change control | PR/ruleset settings, review and required-check records | Unverified |
-| Contributor identity and authorization | Project-specific written contributor authorization, commit-level assertion mechanism and required-check state | Unverified |
-| Build and test reproducibility | Toolchain versions, lockfiles, build instructions, CI runs | Unverified |
-| Security response | Private reporting configuration, response history and disclosure process | Unverified |
-| Dependency and supply-chain assurance | SBOM, dependency review, pinned actions, vulnerability scans | Unverified |
-| Release integrity | Protected signing, artifact identity, provenance and verification | Unverified |
+| Maintainer/project eligibility | Current contributor and maintainer roles, sustained project use where required | Not assessed — internal only |
+| Change control | PR/ruleset settings, review and required-check records | Not assessed — internal only |
+| Contributor identity and authorization | Project-specific written contributor authorization, commit-level assertion mechanism and required-check state | Not assessed — internal only |
+| Build and test reproducibility | Toolchain versions, lockfiles, build instructions, CI runs | Not assessed — internal only |
+| Security response | Private reporting configuration, response history and disclosure process | Not assessed — internal only |
+| Dependency and supply-chain assurance | SBOM, dependency review, pinned actions, vulnerability scans | Not assessed — internal only |
+| Release integrity | Protected signing, artifact identity, provenance and verification | Not assessed — internal only |
 
 ## Contributor authorization status
 
