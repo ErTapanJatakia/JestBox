@@ -22,15 +22,62 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 ## Project documentation
 
 - [Product and Technical Documentation](DOCUMENTATION.md)
+- [Build, Validation and Test Instructions](docs/BUILD-AND-TEST-INSTRUCTIONS.md)
+- [Android Release Signing](docs/ANDROID-RELEASE-SIGNING.md)
+- [Joke Content Quality Audit](docs/content-quality-audit.md)
+- [Coding and Documentation Standards](docs/CODING-STANDARDS.md)
+- [Project Governance](docs/PROJECT-GOVERNANCE.md)
+- [Repository QA Policy](docs/REPOSITORY-QA-POLICY.md)
+- [Repository Automation Architecture](docs/REPOSITORY-AUTOMATION-ARCHITECTURE.md)
+- [Threat Model](docs/THREAT-MODEL.md)
+- [Security Assurance Case](docs/SECURITY-ASSURANCE-CASE.md)
+- [Security Assessment Roadmap](docs/SECURITY-BADGE-ROADMAP.md)
+- [OpenSSF Eligibility and Applicability](docs/OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md)
+- [OpenSSF Scorecard Assessment](docs/OPENSSF-SCORECARD.md)
+- [OpenSSF Baseline and Best Practices Assessment Registers](docs/OPENSSF-BASELINE-L1-IMPLEMENTATION.md)
+- [Contributor Authorization and Rights Certification](docs/CONTRIBUTOR-AUTHORIZATION.md)
+- [Access Governance](docs/ACCESS-GOVERNANCE.md)
+- [Secrets and Credentials Policy](docs/SECRETS-AND-CREDENTIALS-POLICY.md)
+- [SAST Policy](docs/SAST-POLICY.md) · [SCA and Dependency Policy](docs/SCA-AND-DEPENDENCY-POLICY.md)
+- [Dependency and Licence Register](docs/DEPENDENCY-LICENSE-REGISTER.md)
+- [External Software Interfaces](docs/EXTERNAL-SOFTWARE-INTERFACES.md) · [Interface Currency Review](docs/INTERFACE-CURRENCY-REVIEW.md)
+- [Network and Cryptography Review](docs/NETWORK-CRYPTOGRAPHY-REVIEW.md)
+- [Accessibility Review](docs/ACCESSIBILITY-REVIEW.md)
+- [Regression Test Review Process](docs/REGRESSION-TEST-REVIEW.md)
+- [Release Policy](docs/RELEASE-POLICY.md) · [Release Verification](docs/RELEASE-VERIFICATION.md)
+- [VEX Process](docs/VEX-PROCESS.md) · [VEX Statement Registry](docs/vex/README.md)
+- [Subproject Security Policy](docs/SUBPROJECT-SECURITY-POLICY.md)
+- [Documentation Maintenance](docs/DOCUMENTATION-MAINTENANCE.md)
 - Privacy Policies: [en-US](PRIVACY-POLICY.md) · [es-PE](PRIVACY-POLICY.es-PE.md) · [ru-RU](PRIVACY-POLICY.ru-RU.md) · [es-ES](PRIVACY-POLICY.es-ES.md) · [en-IN](PRIVACY-POLICY.en-IN.md) · [hi-IN](PRIVACY-POLICY.hi-IN.md) · [ur-IN](PRIVACY-POLICY.ur-IN.md) · [ur-PK](PRIVACY-POLICY.ur-PK.md)
 - Accessibility Statements: [en-US](ACCESSIBILITY-STATEMENT.md) · [es-PE](ACCESSIBILITY-STATEMENT.es-PE.md) · [ru-RU](ACCESSIBILITY-STATEMENT.ru-RU.md) · [es-ES](ACCESSIBILITY-STATEMENT.es-ES.md) · [en-IN](ACCESSIBILITY-STATEMENT.en-IN.md) · [hi-IN](ACCESSIBILITY-STATEMENT.hi-IN.md) · [ur-IN](ACCESSIBILITY-STATEMENT.ur-IN.md) · [ur-PK](ACCESSIBILITY-STATEMENT.ur-PK.md)
 - [Release QA Checklist](QA-CHECKLIST.md)
 - [Proprietary Licence — All Rights Reserved](LICENSE)
 - [Security Policy](SECURITY.md)
 - [Security Assessment Programme](SECURITY.md#security-assessment-programme)
+- [Internal Security Review — 28 November 2026](docs/SECURITY-REVIEW-2026-11-28.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Android Implementation Plan](ANDROID-IMPLEMENTATION.md)
+
+## Copyright and licence
+
+JestBox is proprietary software. Copyright in the original JestBox code, joke
+content, designs, documentation, and project materials is reserved by the
+respective rights holders. The repository is public so that people can inspect
+the project and use GitHub's public-repository features.
+
+Public visibility does not make JestBox open source and does not grant a
+general licence to use, copy, modify, adapt, redistribute, sublicense, sell,
+or commercially exploit its proprietary materials. GitHub users may view and
+fork the public repository only to the extent permitted by GitHub's Terms of
+Service and platform rules. Those limited platform permissions are not a
+general licence to use or exploit JestBox outside GitHub.
+
+Third-party dependencies and materials remain subject to their own licences
+and attribution requirements; the JestBox proprietary notice does not override
+rights granted by those third-party licences. See [LICENSE](LICENSE) for the
+full terms. Any additional permission must be obtained in writing from the
+relevant rights holder.
 
 ## Features
 
