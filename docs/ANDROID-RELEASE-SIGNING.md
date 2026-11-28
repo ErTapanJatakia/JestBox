@@ -13,64 +13,52 @@ The standalone native WebView implementation in the draft Android wrapper PR is 
 - Keep this application ID stable after the first store release. Changing it later makes Android and app stores treat the application as a different app.
 - Before the first store upload, confirm that the RuStore app card is created with exactly this application ID.
 
-## Current build and signing state (24 November 2026)
+## Current build and signing state (28 November 2026)
 
-**Production signing is not yet safely disabled across all workflows.** The ordinary `.github/workflows/android-release-candidate.yml` workflow builds and validates an **unsigned release candidate only**, but the separate `.github/workflows/hardened-apk-assurance.yml` workflow still contains a production-keystore decryption and APK-signing step backed by repository-level secrets. This is an unsafe, unprotected signing path. PR `security/retire-unprotected-signed-assurance` removes that workflow and its signed-MobSF caller. Until that remediation is merged, the hardened assurance workflow must be disabled in GitHub Actions settings and must not be run.
+**The former unprotected signing path has been retired.** PR [#105](https://github.com/ErTapanJatakia/JestBox/pull/105) removed the former `.github/workflows/hardened-apk-assurance.yml` workflow and its reusable `.github/workflows/mobsf-signed-apk.yml` caller, which accessed signing secrets without a protected GitHub Environment gate.
 
-- The release-candidate workflow does not sign APKs and does not produce a distributable release.
-- The Android debug workflow produces a debug-signed development APK; that debug certificate is not the production signing identity.
+**A protected production-signing workflow is now implemented and has completed successfully.** PR [#107](https://github.com/ErTapanJatakia/JestBox/pull/107) introduced `.github/workflows/protected-production-signing.yml`; PRs [#109](https://github.com/ErTapanJatakia/JestBox/pull/109) and [#110](https://github.com/ErTapanJatakia/JestBox/pull/110) corrected its APK validator artifact selection.
+
+- The workflow is manual-dispatch only and restricted to the protected `main` branch.
+- The signing job uses the `production-signing` GitHub Environment. The maintainer-confirmed configuration includes a required reviewer checkpoint, a five-minute wait timer, and deployment branch restriction to `main`; administrator bypass is disabled. The configured reviewer is the maintainer's own account, so this is an auditable gate, not independent two-person approval. Environment settings were confirmed by the maintainer; the GitHub connection did not independently expose all Environment settings for API verification.
+- Existing signing secrets are used by the gated workflow. No secret values are recorded in this document or exposed in logs.
+- The ordinary Android release-candidate workflow remains **unsigned**. The Android debug workflow produces a debug-signed development APK; that debug certificate is not the production signing identity.
 - Do not distribute, submit, or upload either the debug APK or unsigned release candidate as a production release.
-- No signing credentials were generated, rotated, or changed by PR #103. No release, store submission, or production publication was performed.
-- The previously assessed signed APK and its certificate fingerprint are historical security-assessment evidence only. They do not establish that a production signing pipeline is currently enabled.
 
-The current main-branch release-candidate workflow is deliberately unsigned. Production signing must remain unavailable until a separately protected signing design is implemented and verified. The legacy hardened assurance workflow is being retired because it bypasses that required protection.
+### Successful protected signing evidence
 
-## Legacy signing bootstrap retired
+- **Run:** [#46091336344](https://github.com/ErTapanJatakia/JestBox/actions/runs/46091336344), assessed main commit `46e8d265f7787d9a581d01749f9ad212b2244495`.
+- **Result:** successful. The Environment gate was satisfied; no bypass was used.
+- **APK:** package `com.jestbox.app`, version 1.1, versionCode 2.
+- **APK SHA-256:** `1906704999261b8f0667f7dee07cffe146543fba05561bbf77ded839a8ef1504`.
+- **Signature:** APK Signature Scheme v3 verified; RSA 4096-bit signing certificate.
+- **Certificate SHA-256 fingerprint:** `bf24d400008bf790561b6a20e4724d95cbd312e9dd6a07a38d8872fb83dcc61f`.
+- **Artifacts:** [production-signed APK and verification evidence](https://github.com/ErTapanJatakia/JestBox/actions/runs/46091336344/artifacts/15241112583) · [MobSF report and evidence](https://github.com/ErTapanJatakia/JestBox/actions/runs/46091336344/artifacts/15241373543).
+- All 14 substantive job steps passed, including regression tests, unsigned build, protected keystore decryption, signing, APK validators, MobSF scan, artifact upload, container shutdown and temporary signing-material cleanup.
 
-The former `.github/workflows/android-signing-bootstrap.yml` bootstrap and the separate `.github/workflows/hardened-apk-assurance.yml` signing workflow are being retired because neither provides acceptable production key custody. The hardened workflow had direct access to repository-level signing secrets and no protected environment gate. Its reusable `.github/workflows/mobsf-signed-apk.yml` caller is also being retired with it.
+### MobSF static-analysis disposition
 
-The former bootstrap was unsuitable for production key custody:
+The machine-readable MobSF report recorded 0 High, 3 Warning and 1 Informational findings; manifest analysis recorded 0/0/0; no network-security findings; no hardcoded secrets detected by the report; and 0 trackers of 432.
 
-- It generated a new RSA-4096 JKS using repository-level secrets rather than a verified, reviewer-protected GitHub Environment.
-- It placed base64-encoded encrypted keystore ciphertext in the workflow summary as well as uploading an encrypted backup artifact. Ciphertext is still sensitive recovery material and should not be exposed in broadly visible run summaries.
-- It did not create or verify an Environment, configure required reviewers, or wire a trusted signing job to the release candidate workflow.
-- Its 90-day artifact retention was not a durable recovery strategy.
+The three Warning observations map to generic bundled Capacitor framework classes: hardcoded-data heuristics in Share/Bridge/Plugin/AppUUID classes, and external-storage/temporary-file handling in BridgeWebChromeClient/FileUtils. The Informational logging observation maps to Capacitor Logger. Source review did not establish an app-owned credential, a corresponding JestBox file-capture workflow, or sensitive-data disclosure. These are contextual static-analysis observations, not proof that every framework path is safe at runtime. Reassess if the application adds file upload/download, camera capture, or sensitive-data handling.
 
-**Do not recreate or replace this bootstrap with another key-generation workflow until the target controls and recovery custody are verified.** No key-generation workflow has been run as part of this remediation. No signing credentials, private keys, or encrypted backups were generated or changed.
+MobSF was run as static APK analysis; malware reputation lookups were disabled. This is not dynamic analysis, rooted-device assessment, or a human-led penetration test.
 
-Do not paste passwords, private keys, ciphertext, or recovery material into chat, issues, pull requests, source files, or logs.
+## Legacy signing bootstrap retirement
 
-## Required target architecture before production signing
+The former `.github/workflows/android-signing-bootstrap.yml` bootstrap had previously been removed. It was unsuitable for production key custody because it generated a new RSA-4096 JKS using repository-level secrets, exposed encrypted keystore ciphertext in a workflow summary, lacked a protected reviewer gate, and relied on temporary artifact retention.
 
-A future signing implementation must be a separate, narrowly scoped workflow and must satisfy all of the following before it is enabled:
+Do not recreate that bootstrap or generate a replacement signing identity. Preserve the existing production signing identity. Do not delete or migrate existing signing secrets until independent recovery custody is verified and a controlled migration plan is explicitly approved.
 
-1. A dedicated GitHub Environment (for example, `production-signing`) with required human reviewer approval, configured and independently verified in repository settings.
-2. Signing credentials scoped to that environment, not available to pull-request builds or ordinary source-validation jobs.
-3. A trusted immutable source commit from the protected `main` branch; no arbitrary PR head, fork, tag override, or user-supplied source ref may access signing credentials.
-4. Verified branch protection or repository rules that prevent unreviewed changes to signing workflows and release-critical build scripts.
-5. Least-privilege workflow permissions, pinned third-party actions, and checkout with persisted credentials disabled where appropriate.
-6. Fail-closed verification of application ID, version, merged manifest, APK checksum, alignment, and release flags before signing.
-7. An isolated signing job that receives only the validated candidate and required environment-scoped secrets.
-8. Post-sign verification of APK signature schemes, signer certificate SHA-256 fingerprint, and exact APK checksum.
-9. A durable evidence package containing the signed APK, checksum, certificate fingerprint, source commit, build metadata/provenance, SBOM, and corresponding MobSF report.
-10. A separate explicit approval before any store upload, moderation submission, publication, or distribution.
-
-Do not assume that a GitHub Environment, required reviewers, or branch protection exist until the settings have been inspected and verified. A workflow-level `environment:` declaration alone does not configure protection rules.
+Do not paste passwords, private keys, ciphertext, or recovery material into chat, issues, pull requests, source files, or logs. No signing key was generated, rotated, or changed by the successful protected signing work.
 
 ## Evidence retention and archive policy
 
-GitHub Actions artifacts are temporary evidence. The repository's current maximum artifact retention is 90 days; the transient debug APK artifact has a shorter three-day retention. Neither should be described as permanent.
+GitHub Actions artifacts are temporary evidence. The workflow requests a longer retention period, but the repository's current maximum artifact retention is **30 days**. The two artifacts linked above are temporary CI evidence, not a permanent archive.
 
-A durable archive should be created only after an approved signed release exists. The proposed evidence set is:
+A durable archive should preserve the exact approved signed APK, checksum, certificate fingerprint, source commit, version/build metadata, provenance, SBOM, MobSF report, release notes and approval record. A GitHub Release asset archive is a candidate approach, subject to confirming repository policy, access, retention expectations and recovery arrangements.
 
-- Production-signed APK (the exact binary assessed and approved for distribution).
-- SHA-256 checksum and signing-certificate fingerprint.
-- Source commit, versionCode/versionName, build run identifiers, and build provenance.
-- SBOM for the exact release build.
-- MobSF static report and assessment summary correlated to the same APK checksum.
-- Release notes and approval record.
-
-A GitHub Release asset archive is a candidate approach, subject to confirming repository policy, asset access, retention expectations, and recovery arrangements. No Release has been created by this work. Do not create or publish one without explicit maintainer approval. Describe evidence as retained only while the Release/archive remains available and retained; do not promise absolute or perpetual preservation.
+**No GitHub Release or other durable archive has been created.** Do not create or publish one without separate explicit maintainer approval. Describe evidence as retained only while the Release/archive remains available and retained; do not promise absolute or perpetual preservation.
 
 ## Release metadata
 
@@ -80,4 +68,4 @@ A GitHub Release asset archive is a candidate approach, subject to confirming re
 
 ## Release and distribution boundary
 
-The current release-candidate workflow builds and validates an unsigned APK only. It does not sign, upload to RuStore, submit moderation, publish, or modify a live application. Store submission and distribution are separate gated stages and require explicit approval. No production release or store submission is authorised by this document.
+The protected workflow can create and assess a signed APK, but a successful signing run does not itself authorise publication. Store submission, moderation, public distribution, GitHub Release creation and production deployment remain separate actions requiring explicit approval. No store submission, publication or production deployment occurred as part of the 28 November signing verification.
