@@ -137,7 +137,7 @@ def main() -> int:
             "Android platform APIs supplied by the Android SDK/device are not application-bundled libraries.",
             "Gradle build plugins and host runner packages are outside this runtime dependency SBOM.",
             "A missing licence declaration is reported, not inferred or silently assigned.",
-            "The APK SHA-256 binds this dependency graph to the exact signed APK; signing metadata itself is not a software component."
+            "The APK SHA-256 binds this dependency graph to the exact APK bytes supplied to this verifier; this statement does not assert that the supplied APK is signed."
         ],
     }
     args.output.write_text(json.dumps(binding, indent=2) + "\n", encoding="utf-8")

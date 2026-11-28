@@ -72,6 +72,7 @@ class AndroidReleaseSbomTests(unittest.TestCase):
             self.assertEqual(binding["androidxComponentCount"], 3)
             self.assertEqual(binding["componentsWithoutDeclaredLicense"], 1)
             self.assertEqual(binding["dependencyScope"], "Gradle :app releaseRuntimeClasspath")
+            self.assertIn("exact APK bytes supplied to this verifier", binding["limitations"][-1])
 
     def test_rejects_graph_without_androidx_runtime_components(self):
         with tempfile.TemporaryDirectory() as directory:
