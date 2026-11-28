@@ -29,7 +29,12 @@ The committed npm lockfiles were enumerated at the reviewed branch head. The pac
 
 The full inventory includes transitive and optional entries. A lockfile entry does not establish that a component is included in an Android or web release. The five tracked Trivy licence findings and their attribution records are documented in [THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md); the in-app notice page is [THIRD_PARTY_NOTICES.html](../THIRD_PARTY_NOTICES.html). These files have distinct purposes and should be maintained rather than replaced with a duplicate NOTICE file.
 
-The repository asset tree contains `assets/JestBox-Original.png` and `assets/wcag22aa-blue.svg`. Their presence was confirmed, but source/provenance and rights evidence for each asset have not yet been established from repository metadata. Do not infer ownership or a third-party licence from filenames. Confirm provenance before treating this asset review as complete. The WCAG badge artwork also uses W3C/WCAG identification and should be checked against the relevant W3C mark/conformance-logo usage guidance before redistribution.
+The repository asset tree contains two distinct assets, with provenance clarified by the maintainer on 2026-11-28:
+
+- `assets/JestBox-Original.png` — original JestBox logo created by the project team. Record as original project artwork; this attribution does not change the proprietary rights position.
+- `assets/wcag22aa-blue.svg` — locally stored WCAG 2.2 Level AA blue conformance logo supplied by W3C/WAI for use by content providers making the corresponding conformance claim. Treat as W3C/WAI-provided material, not as JestBox-owned artwork. W3C/WAI's official [WCAG conformance-logo guidance](https://www.w3.org/WAI/standards-guidelines/wcag/conformance-logos/) permits use of the appropriate level logo and local copies, specifies the corresponding conformance link and alternative text, and places responsibility for accuracy of the claim on the content provider. W3C explicitly states that the logo is not a W3C/WAI review or validation. The logo should not be altered, and its use must be limited to pages within the accurately evaluated conformance scope. See also [WAI material-use guidance](https://www.w3.org/WAI/about/using-wai-material/) for attribution and no-modification requirements.
+
+The repository provenance item is now clarified by maintainer statement. A separate conformance-evidence check remains: confirm that the exact page(s) displaying this logo have been evaluated against all applicable WCAG 2.2 Level A and AA success criteria, that the page links to the official Level AA explanation, and that the visible claim states its scope. Automated checks alone are insufficient. Do not describe the logo as W3C-certified or W3C-verified.
 
 The repository does not commit a generated Android Gradle project or wrapper in this tree. Android SDK/Gradle transitive components therefore require a release-build/SBOM artefact review rather than inference from the npm lockfiles. GitHub Actions and scanner container licence inventories also remain separate follow-up scope; successful scanners do not constitute a complete licence audit of those tools.
 
@@ -49,4 +54,4 @@ Refresh after dependency updates and at least quarterly. Confirm exact Action re
 
 | Date | Change |
 |---|---|
-| 2026-11-28 | Enumerated both committed npm lockfiles (126 root entries and 3 tablet-tooling entries), reconciled the existing detailed licence inventory and notice records, and identified two asset-provenance plus non-npm toolchain follow-ups. |
+| 2026-11-28 | Enumerated both committed npm lockfiles (126 root entries and 3 tablet-tooling entries), reconciled existing licence inventories/notices, and recorded maintainer-confirmed provenance for the original JestBox logo and W3C/WAI WCAG 2.2 AA conformance logo. Asset conformance-claim scope and non-npm toolchain review remain follow-ups. |
