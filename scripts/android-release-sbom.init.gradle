@@ -1,4 +1,4 @@
-import org.cyclonedx.gradle.CycloneDxPlugin
+import org.cyclonedx.gradle.CyclonedxPlugin
 import org.cyclonedx.model.Component
 
 // Generate an SBOM from the exact Android release runtime dependency graph.
@@ -13,7 +13,7 @@ initscript {
 }
 
 rootProject {
-    apply plugin: CycloneDxPlugin
+    apply plugin: CyclonedxPlugin
 
     allprojects {
         tasks.named('cyclonedxDirectBom') {
