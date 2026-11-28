@@ -10,6 +10,7 @@ from typing import Any
 
 SEVERITIES = ("high", "warning", "info")
 EXPECTED_PACKAGE = "com.jestbox.app"
+SHA1_RE = re.compile(r"^[a-f0-9]{40}$")
 SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
 
 
@@ -24,8 +25,8 @@ def summarize_report(report: Any, source_commit: str, apk_sha256: str) -> tuple[
         raise MobSFReportError(
             f"Unexpected MobSF package_name {report.get('package_name')!r}; expected {EXPECTED_PACKAGE!r}."
         )
-    if not isinstance(source_commit, str) or not source_commit.strip():
-        raise MobSFReportError("Source commit must be a non-empty string.")
+    if not isinstance(source_commit, str) or not SHA1_RE.fullmatch(source_commit):
+        raise MobSFReportError("Source commit must be exactly 40 lowercase hexadecimal characters.")
     if not isinstance(apk_sha256, str) or not SHA256_RE.fullmatch(apk_sha256):
         raise MobSFReportError("APK SHA-256 must be exactly 64 lowercase hexadecimal characters.")
     appsec = report.get("appsec")
@@ -38,10 +39,17 @@ def summarize_report(report: Any, source_commit: str, apk_sha256: str) -> tuple[
             raise MobSFReportError(
                 f"MobSF report appsec.{severity} must be an array; refusing to publish incomplete counts."
             )
+        for index, finding in enumerate(findings):
+            if not isinstance(finding, dict) or not isinstance(finding.get("title"), str) or not finding["title"].strip():
+                raise MobSFReportError(
+                    f"MobSF report appsec.{severity}[{index}] must contain a non-empty title."
+                )
         counts[severity] = len(findings)
     score = appsec.get("security_score")
-    if score is not None and (isinstance(score, bool) or not isinstance(score, (int, float))):
-        raise MobSFReportError("MobSF appsec.security_score must be numeric when supplied.")
+    if score is not None and (
+        isinstance(score, bool) or not isinstance(score, int) or not 0 <= score <= 100
+    ):
+        raise MobSFReportError("MobSF appsec.security_score must be an integer from 0 to 100.")
     metadata = {
         "package": EXPECTED_PACKAGE,
         "version_name": str(report.get("version_name", "unknown")),
