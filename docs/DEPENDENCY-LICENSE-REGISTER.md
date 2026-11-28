@@ -43,21 +43,37 @@ The PR-triggered Syft workflow completed successfully for PR #113 at head `05b52
 
 The source SBOM detected these GitHub Action identities and versions:
 
-| Action | SBOM version/tag |
-|---|---|
-| actions/checkout | v7.0.1 |
-| actions/dependency-review-action | v4 |
-| actions/deploy-pages | v5.0.1 |
-| actions/setup-dotnet | v6.1.0 |
-| actions/setup-go | v5.5.0 |
-| actions/setup-java | v4.7.1 |
-| actions/setup-node | v4.4.0 |
-| actions/setup-python | v7.1.0 |
-| actions/upload-artifact | v7.0.2 |
-| actions/upload-pages-artifact | v3 |
-| github/codeql-action/upload-sarif | v4.38.3 |
+| Action | Pinned commit | Version/tag | Licence at pinned commit |
+|---|---|---|---|
+| actions/checkout | `3d3c42e5aac5ba805825da76410c181273ba90b1` | v7.0.1 | MIT |
+| actions/dependency-review-action | `2031cfc080254a8a887f58cffee85186f0e49e48` | v4 | MIT |
+| actions/deploy-pages | `368f82528645a54fb793d4d04e342629a3f51346` | v5.0.1 | MIT |
+| actions/setup-dotnet | `0f4a354dd5547a28c70b7853dbd95d5b67886e73` | v6.1.0 | MIT |
+| actions/setup-go | `d35c59abb061a4a6fb18e82ac0862c26744d6ab5` | v5.5.0 | MIT |
+| actions/setup-java | `c5195efecf7bdfc987ee8bae7a71cb8b11521c00` | v4.7.1 | MIT |
+| actions/setup-node | `49933ea5288caeca8642d1e84afbd3f7d6820020` | v4.4.0 | MIT |
+| actions/setup-python | `6d4fd22b20465ccc0f7354476588e8df7c9ca0e0` | v7.1.0 | MIT |
+| actions/upload-artifact | `cf430e030ddbb5b0abf93d22962f4752f3646cd9` | v7.0.2 | MIT |
+| actions/upload-pages-artifact | `56afc609e74202658d3ffba0e8f6dda462b719fa` | v3 | MIT |
+| github/codeql-action | `24c54180a607b1449ed407dd24f251e4e9147c8d` | v4.38.3 | MIT |
 
-Syft's GitHub Actions cataloguer did not populate licence declarations for these Action components in the generated CycloneDX file. The observed SBOM tags are inventory identifiers, not a substitute for checking the exact immutable workflow references and each upstream repository's licence. Review the pinned commit, source repository, licence file, maintenance status and permissions for each Action before marking its licence verified.
+The SBOM catalogue did not populate Action licences. To close that gap, each repository's `LICENSE` file was fetched at the exact immutable commit referenced by the workflow; all 11 listed Action revisions declare MIT. The SHA pins and adjacent version comments were cross-checked against the branch's workflow YAML. This is a licence-file check for the pinned Action repositories, not a complete audit of their nested runtime dependencies.
+
+The workflow files also invoke these scanner containers:
+
+| Container image | Workflow reference | Pinning observation | Licence review |
+|---|---|---|---|
+| `anchore/syft:v1.54.0` | `.github/workflows/sbom.yml` | Version tag; no digest in workflow | Apache-2.0 at upstream `v1.54.0` tag |
+| `ghcr.io/google/osv-scanner:v2.7.1` | `.github/workflows/osv-scanner.yml` | Version tag; no digest in workflow | Apache-2.0 at upstream `v2.7.1` source tag |
+| `ghcr.io/ossf/scorecard:v5.5.0` | `.github/workflows/scorecard.yml` | Version tag; no digest in workflow | Apache-2.0 at upstream `v5.5.0` source tag |
+| `aquasec/trivy:0.76.2` | `.github/workflows/trivy.yml` | Version tag; no digest in workflow | Upstream licence verification remains open |
+| `zricethezav/gitleaks:v8.24.3` | `.github/workflows/gitleaks.yml` | Version tag; no digest in workflow | Upstream licence verification remains open |
+| `ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af` | `.github/workflows/zap-pt.yml` | Digest-pinned | Upstream image/source licence verification remains open |
+| `ghcr.io/zizmorcore/zizmor:1.32.0` | `.github/workflows/zizmor.yml` | Version tag; no digest in workflow | Upstream licence verification remains open |
+| `opensecurity/mobile-security-framework-mobsf@sha256:815bb96de3c78a22e0a0996c667c164a227239c9d8a4aba80f188d247b928954` | `.github/workflows/mobsf-android-dynamic.yml`, `.github/workflows/protected-production-signing.yml` | Digest-pinned (MobSF v4.6.9 comment on dynamic workflow) | Upstream image/source licence verification remains open |
+| `opensecurity/mobile-security-framework-mobsf:latest` | `.github/workflows/mobsf-android.yml` | Mutable `:latest` tag; not digest-pinned | Upstream licence verification remains open; mutable tag is a reproducibility/supply-chain follow-up |
+
+The workflow inventory is not an exhaustive SBOM of the container images or their operating-system packages. In particular, the MobSF static-analysis workflow currently uses a mutable `:latest` tag; record this as a reproducibility risk for a separate workflow-hardening change, not as a licence incompatibility. Do not change workflow references as part of this documentation-only update.
 
 The source SBOM also detected the root npm packages `@capacitor/core@8.6.2` (MIT) and `@capacitor/share@8.0.3` (MIT), tablet-tooling packages `playwright@1.56.1` and `playwright-core@1.56.1` (Apache-2.0), and `tslib@2.9.1` (0BSD). It did not populate a licence for `fsevents@2.3.2`; the lockfile and upstream manifest review recorded above remain the source for that finding. The SBOM also contains project root package entries without a declared licence; these are project identifiers, not third-party licence findings.
 
@@ -91,4 +107,4 @@ Refresh after dependency updates and at least quarterly. Confirm exact Action re
 | Date | Change |
 |---|---|
 | 2026-11-28 | Enumerated both committed npm lockfiles (126 root entries and 3 tablet-tooling entries), reconciled existing licence inventories/notices, and recorded maintainer-confirmed provenance for the original JestBox logo and W3C/WAI WCAG 2.2 AA conformance logo. |
-| 2026-11-28 | Added evidence-backed PR source-tree SBOM inventory (95 CycloneDX components, 74 SPDX packages, 11 detected GitHub Action identities), documented scope limitations, and recorded the maintainer's independent voluntary WCAG self-audit without requiring an audit artefact. Accessibility Statement text explicitly remains out of scope and unchanged. |
+| 2026-11-28 | Added evidence-backed PR source-tree SBOM inventory (95 CycloneDX components, 74 SPDX packages, 11 detected GitHub Action identities), verified all 11 immutable Action revisions as MIT from their pinned LICENSE files, inventoried scanner images and recorded remaining licence/pinning gaps, and recorded the maintainer's independent voluntary WCAG self-audit without requiring an audit artefact. Accessibility Statement text explicitly remains out of scope and unchanged. |
