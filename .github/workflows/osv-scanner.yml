@@ -45,7 +45,7 @@ jobs:
           fi
       - name: Upload OSV findings to code scanning
         if: always() && hashFiles('osv-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        uses: github/codeql-action/upload-sarif@915412ff23e8b7659517e607487dbeae018f2934 # v4.39.5
         with:
           sarif_file: osv-results.sarif
           category: osv-scanner
