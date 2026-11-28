@@ -1,0 +1,121 @@
+name: Android release SBOM validation
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-release-sbom-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Build unsigned release and validate CycloneDX SBOM
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +o pipefail
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          set -o pipefail
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Install locked dependencies and run regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          node --check script.js
+          node --check jokes.js
+          node --check share-bridge.entry.js
+          node --check scripts/prepare-web.mjs
+          node --check scripts/prepare-android-branding.mjs
+          node --check scripts/prepare-android-security.mjs
+          node --check scripts/prepare-android-release-version.mjs
+          python3 -m unittest discover -s tests -p 'test_android_apk_*.py' -v
+          node --test
+
+      - name: Build unsigned release candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run prepare:web
+          npx cap add android
+          node scripts/prepare-android-branding.mjs
+          npx cap sync android
+          node scripts/prepare-android-security.mjs
+          node scripts/prepare-android-release-version.mjs
+          cd android
+          ./gradlew --no-daemon --max-workers=2 assembleRelease
+          cd ..
+          APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          test -s "$APK"
+          python3 scripts/verify_android_apk_config.py --artifact release-unsigned
+          APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
+          "$APKANALYZER" manifest application-id "$APK" | grep -Fx "com.jestbox.app"
+          "$APKANALYZER" manifest debuggable "$APK" | grep -Fx "false"
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -v 4 "$APK"
+          unzip -l "$APK" | grep -q 'assets/public/index.html'
+
+      - name: Generate SBOM from resolved Android release runtime graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android
+          ./gradlew --no-daemon --max-workers=2 \
+            --init-script ../scripts/android-release-sbom.init.gradle \
+            cyclonedxBom
+          cd ..
+          SBOM="android/build/reports/cyclonedx/jestbox-android-release-sbom.json"
+          test -s "$SBOM"
+
+      - name: Validate SBOM and bind it to the exact release APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          SBOM="android/build/reports/cyclonedx/jestbox-android-release-sbom.json"
+          APKANALYZER="$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer"
+          python3 scripts/verify_android_release_sbom.py \
+            --sbom "$SBOM" \
+            --apk "$APK" \
+            --output android-release-sbom-binding.json \
+            --source-commit "$GITHUB_SHA" \
+            --package-name "$("$APKANALYZER" manifest application-id "$APK")" \
+            --version-name "$("$APKANALYZER" manifest version-name "$APK")" \
+            --version-code "$("$APKANALYZER" manifest version-code "$APK")"
+
+      - name: Upload unsigned release SBOM validation evidence
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: jestbox-android-release-sbom-validation
+          path: |
+            android/build/reports/cyclonedx/jestbox-android-release-sbom.json
+            android-release-sbom-binding.json
+          if-no-files-found: error
+          retention-days: 30
