@@ -9,14 +9,8 @@ Scope: source, documentation, Android application, Capacitor packaging and GitHu
 
 ## Assessment summary
 
-| Status | Count |
-|---|---:|
-| Met | 0 |
-| Partial | 0 |
-| Unmet | 0 |
-| N/A | 0 |
-| Unverified | 24 |
-| Total | 24 |
+**Not scored.** This is an internal gap-analysis register only. Exact current control IDs, wording, applicability and evidence must be imported from the official v2026.08.28 catalogue before assigning outcomes. JestBox is proprietary; consult [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md) before any formal attestation.
+
 
 ## Control assessment method
 
