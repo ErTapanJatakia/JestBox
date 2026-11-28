@@ -854,3 +854,26 @@ PR [#105](https://github.com/ErTapanJatakia/JestBox/pull/105) removed the former
 **Retention limitation:** GitHub Actions artifact retention is currently capped by repository settings at 30 days, despite the workflow requesting a longer period. These links are temporary CI evidence, not a permanent archive. No GitHub Release or other durable archive has been created. Any permanent archival or distribution requires separate explicit authorisation.
 
 **Scope boundary:** this verifies a protected signing workflow and a specific signed APK. It is not store acceptance, public distribution, a formal certification, a human-led penetration test, or a guarantee that the application is vulnerability-free. No store submission, publication or production deployment occurred.
+
+
+### Protected production signing and MobSF report reconciliation — 28 November 2026
+
+- **Successful protected run:** [#46115617387](https://github.com/ErTapanJatakia/JestBox/actions/runs/46115617387), source commit `e16b46728130524922f1ad549175f266995fa536`.
+- **Production APK and verification evidence:** [artifact 15252136163](https://github.com/ErTapanJatakia/JestBox/actions/runs/46115617387/artifacts/15252136163).
+- **MobSF report and signed APK evidence:** [artifact 15252220554](https://github.com/ErTapanJatakia/JestBox/actions/runs/46115617387/artifacts/15252220554).
+- **Exact APK:** `com.jestbox.app`, version 1.1, versionCode 2; SHA-256 `1906704999261b8f0667f7dee07cffe146543fba05561bbf77ded839a8ef1504`. The signature identity and SBOM binding match the earlier verified production artifact; no signing material was changed.
+- **MobSF result:** 85/100; 0 High, 3 Warning, 1 Informational; no manifest or network-security findings; empty secrets collection; 0 detected trackers. Static analysis only; VirusTotal integration was disabled.
+- **Report integrity issue identified:** the original workflow summary queried root-level `.high`, `.warning`, and `.info` keys, while the actual report stores finding arrays under `.appsec.high`, `.appsec.warning`, and `.appsec.info`. The raw report remained intact, but the generated Markdown summary said "not supplied" instead of reporting the counts. This was a reporting defect, not a change to the scanner result. The correction validates the report schema and derives counts from the three arrays; missing or malformed arrays fail closed rather than silently becoming zero.
+- **Artifact retention:** the workflow requested 90 days, but repository policy capped actual retention at 30 days. The workflow is being corrected to request 30 days explicitly. These artifact links remain temporary evidence and should be archived only under a separately approved retention process.
+
+#### MobSF finding triage — exact signed APK
+
+The three warnings are generic findings in bundled Capacitor dependencies, not app-owned JestBox classes:
+
+1. `android_read_write_external` and 3. `android_temp_file` reference `com/getcapacitor/BridgeWebChromeClient.java` and `com/getcapacitor/FileUtils.java`. The external-storage and temporary-file patterns are associated with the WebView file chooser / media capture and Capacitor file-URI handling. The app's current feature set does not expose a user file-picker, upload, download, camera-capture or user-document workflow, and the packaged manifest does not request broad external-storage permissions. The findings therefore identify framework capability, not demonstrated use or a confirmed app vulnerability. Reassess before introducing any such feature; then test URI validation, FileProvider scope, temporary-file lifecycle, and access grants.
+2. `android_hardcoded` references `SharePlugin.java`, `AppUUID.java`, `Bridge.java`, and `Plugin.java`. The MobSF secrets collector returned an empty result. The flagged strings are framework identifiers/configuration constants and app-instance/bridge metadata, not an identified credential or private key. No concrete secret was found in the exact APK. This generic heuristic is not a confirmed sensitive-data disclosure.
+3. `android_logging` references Capacitor's `Logger.java`. The finding indicates logging APIs in the bundled runtime. It does not establish that JestBox logs credentials, personal information or other sensitive user data. The product does not collect user identity or sensitive profile data; no sensitive logging path was identified by this static report. Continue to keep secrets and user content out of log statements.
+
+**Disposition:** no app-specific remediation or blanket suppression is justified by these static heuristics alone. Retain the three warnings and one informational observation as contextual framework findings, with the feature-triggered reassessment conditions above. This conclusion is limited to the exact APK and static evidence; it is not proof that every Capacitor code path is safe at runtime.
+
+The workflow corrections are tracked separately in the pull request for this assessment. No GitHub Release, store submission, publication, distribution or production website deployment was performed or authorised.
