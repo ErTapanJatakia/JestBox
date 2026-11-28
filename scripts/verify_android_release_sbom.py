@@ -77,10 +77,33 @@ def main() -> int:
         )
         return 1
 
-    relationship_count = sum(
-        len(item.get("dependsOn", []))
-        for item in dependencies if isinstance(item, dict)
-    )
+    # CycloneDX dependency records may reference the metadata root as well
+    # as components. Every record and edge must resolve to a declared BOM ref.
+    metadata_component = bom.get("metadata", {}).get("component", {})
+    metadata_ref = metadata_component.get("bom-ref") if isinstance(metadata_component, dict) else None
+    known_refs = set(refs)
+    if metadata_ref:
+        known_refs.add(metadata_ref)
+
+    relationship_count = 0
+    for item in dependencies:
+        if not isinstance(item, dict):
+            print("SBOM dependency relationship entry is not an object.", file=sys.stderr)
+            return 1
+        dependency_ref = item.get("ref")
+        if not isinstance(dependency_ref, str) or dependency_ref not in known_refs:
+            print(f"SBOM dependency record references an unknown bom-ref: {dependency_ref!r}.", file=sys.stderr)
+            return 1
+        targets = item.get("dependsOn", [])
+        if not isinstance(targets, list):
+            print(f"SBOM dependency targets are not a list for {dependency_ref!r}.", file=sys.stderr)
+            return 1
+        for target in targets:
+            if not isinstance(target, str) or target not in known_refs:
+                print(f"SBOM dependency edge references an unknown bom-ref: {target!r}.", file=sys.stderr)
+                return 1
+        relationship_count += len(targets)
+
     if relationship_count == 0:
         print("SBOM dependency relationship graph contains no edges.", file=sys.stderr)
         return 1
