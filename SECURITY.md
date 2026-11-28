@@ -854,3 +854,34 @@ PR [#105](https://github.com/ErTapanJatakia/JestBox/pull/105) removed the former
 **Retention limitation:** GitHub Actions artifact retention is currently capped by repository settings at 30 days, despite the workflow requesting a longer period. These links are temporary CI evidence, not a permanent archive. No GitHub Release or other durable archive has been created. Any permanent archival or distribution requires separate explicit authorisation.
 
 **Scope boundary:** this verifies a protected signing workflow and a specific signed APK. It is not store acceptance, public distribution, a formal certification, a human-led penetration test, or a guarantee that the application is vulnerability-free. No store submission, publication or production deployment occurred.
+
+
+### Protected production signing follow-up — MobSF summary validation and finding triage — 28 November 2026
+
+**Assessed workflow:** [run #46115617387](https://github.com/ErTapanJatakia/JestBox/actions/runs/46115617387), source commit `e16b46728130524922f1ad549175f266995fa536`. The exact signed APK is `com.jestbox.app`, version `1.1`, versionCode `2`, SHA-256 `1906704999261b8f0667f7dee07cffe146543fba05561bbf77ded839a8ef1504`. Its signature and SBOM binding are recorded above.
+
+#### MobSF report and summary correction
+
+The raw report records **85/100**, **0 High**, **3 Warning**, and **1 Informational** finding under `appsec.high`, `appsec.warning`, and `appsec.info`. Manifest and network-security analyses reported no findings; the secrets result was empty; no trackers were detected; VirusTotal lookups were disabled.
+
+The original workflow summary incorrectly read top-level `.high`, `.warning`, and `.info` fields, so it displayed “not supplied” despite the nested severity arrays being present. The workflow now calls a dedicated fail-closed summarizer. It validates the expected package, all three nested arrays, each finding title, and the optional score before writing the summary. Regression tests exercise the actual nested schema and reject the legacy top-level-only shape and malformed reports.
+
+#### Contextual triage of the MobSF findings
+
+The lockfile pins `@capacitor/android` **8.6.2** and `@capacitor/share` **8.0.3**. Review of the Capacitor Android 8.6.2 source tag provides the following context:
+
+1. **External-storage read/write — Warning.** The reported `BridgeWebChromeClient` and `FileUtils` classes are generic framework components. The WebChromeClient implements WebView file selection and optional media capture; its image-capture helper creates a timestamped JPEG under `Activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)` and exposes it using AndroidX `FileProvider`. This is app-specific external storage, not the public shared-storage directory. `FileUtils` resolves document-provider URIs and checks whether resolved files exist and are readable. The assessed manifest has no broad external-storage read/write permission. These are framework capabilities, not proof of arbitrary shared-storage access or exfiltration. No JestBox-specific file upload/download or camera-capture workflow was identified. **Disposition:** contextual framework finding; no permission relaxation or scanner suppression. Reassess if file selection, capture, or user-file processing is introduced.
+
+2. **Hardcoded sensitive information — Warning.** The report identifies Capacitor Share, `AppUUID`, `Bridge`, and `Plugin`. The pinned `AppUUID` source stores a static preference-key name (`CapacitorAppUUID`) and generates a per-install identifier by hashing a random UUID; this is not an embedded credential. The cited Bridge and Plugin locations are framework documentation/import lines, not passwords or keys. MobSF's separate secrets collection is empty. The Share class is bundled framework code; this generic rule did not identify a concrete secret value. **Disposition:** no app-owned secret established. Keep the finding visible and continue secret scanning; do not label it a confirmed credential leak.
+
+3. **Temporary file — Warning.** The report identifies the generic Capacitor image-capture helper. In the pinned source, it creates a timestamp-named JPEG in the app-specific external Pictures directory and returns a content URI through the app's FileProvider. The source location is not evidence that credentials or user records are written to a shared temporary directory. The WebView capture/file chooser path depends on a corresponding web request and feature. No such JestBox camera-capture or file-upload workflow was identified. **Disposition:** contextual framework heuristic; no evidence of sensitive data being written to this capture file. Reassess if camera or file-upload features are introduced.
+
+4. **Logging — Informational.** The report identifies Capacitor's `Logger` wrapper. Its methods gate Android log emission through `shouldLog()`; the finding does not establish that JestBox passes secrets or sensitive user data to those methods. The production APK is non-debuggable, but that alone does not prove every log path is unreachable. **Disposition:** informational framework observation, with no confirmed sensitive-data disclosure. Application code must continue to avoid logging credentials, personal data, or security-sensitive content; runtime log review remains useful if dynamic testing becomes available.
+
+**Triage conclusion:** the available static report, manifest, locked dependency versions, and source review do not establish an exploitable application vulnerability from these observations. The findings are not suppressed or removed from the raw report. Source review cannot prove runtime unreachability or the absence of every data flow; focused runtime review of WebView file chooser/capture and Android log output remains a future assurance activity.
+
+#### Artifact retention correction
+
+The workflow requested 90-day retention, while the repository limit is 30 days; GitHub therefore applied 30 days and emitted a warning. Both production APK/evidence and MobSF artifact declarations now request **30 days** explicitly. This aligns the workflow with the configured limit; it does not change repository policy or create a permanent archive.
+
+**Scope boundary:** this is a CI reporting correction and contextual static/source triage, not dynamic testing, rooted-device assessment, human-led penetration testing, certification, or a guarantee of vulnerability-free software. No release, publication, app-store submission, or distribution was performed.
