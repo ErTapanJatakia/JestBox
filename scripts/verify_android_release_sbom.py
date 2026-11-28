@@ -77,6 +77,14 @@ def main() -> int:
         )
         return 1
 
+    relationship_count = sum(
+        len(item.get("dependsOn", []))
+        for item in dependencies if isinstance(item, dict)
+    )
+    if relationship_count == 0:
+        print("SBOM dependency relationship graph contains no edges.", file=sys.stderr)
+        return 1
+
     license_missing = sum(
         1 for item in components
         if not item.get("licenses")
@@ -84,8 +92,9 @@ def main() -> int:
     apk_digest = sha256(args.apk)
     sbom_digest = sha256(args.sbom)
     binding = {
-        "schema": "https://cyclonedx.org/",
-        "schemaVersion": bom["specVersion"],
+        "bindingFormat": "JestBox Android APK/SBOM binding",
+        "bindingVersion": 1,
+        "sbomSchemaVersion": bom["specVersion"],
         "sbomFile": args.sbom.name,
         "sbomSha256": sbom_digest,
         "apkFile": args.apk.name,
@@ -99,10 +108,7 @@ def main() -> int:
         "mavenComponentCount": len(maven_components),
         "androidxComponentCount": len(androidx_components),
         "componentsWithoutDeclaredLicense": license_missing,
-        "relationshipCount": sum(
-            len(item.get("dependsOn", []))
-            for item in dependencies if isinstance(item, dict)
-        ),
+        "relationshipCount": relationship_count,
         "limitations": [
             "The SBOM inventories resolved Android release runtime dependencies from Gradle.",
             "Android platform APIs supplied by the Android SDK/device are not application-bundled libraries.",
