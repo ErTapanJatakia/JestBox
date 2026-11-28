@@ -32,3 +32,30 @@ JestBox uses a project-specific written contributor authorization policy because
 ## Evidence guardrails
 
 Record exact criterion ID/text, applicability, evidence path, commit/run ID, observation date, status, rationale and remediation. Never infer control effectiveness from another repository's assessment. N/A requires a criterion-specific rationale and must not be used to conceal a missing control.
+
+
+## Official control inventory — v2026.08.28
+
+The identifiers below are transcribed from the official v2026.08.28 control overview. These entries are provided for internal benchmarking only. Because JestBox's proprietary licence fails OSPS-LE-02.01, this register is not a formal compliance assessment. No control is marked Met.
+
+| Control ID | Control summary | Internal status |
+|---|---|---|
+| OSPS-AC-04.01 | Default CI task permissions to least privilege | Not assessed — internal only |
+| OSPS-BR-02.01 | Assign unique version identifiers to releases | Not assessed — internal only |
+| OSPS-BR-04.01 | Include functional and security change logs in releases | Not assessed — internal only |
+| OSPS-BR-05.01 | Use standardized dependency tooling where available | Not assessed — internal only |
+| OSPS-BR-06.01 | Sign releases or provide signed hash manifests | Not assessed — internal only |
+| OSPS-DO-06.01 | Document dependency selection, acquisition and tracking | Not assessed — internal only |
+| OSPS-DO-07.01 | Document complete build instructions and dependencies | Not assessed — internal only |
+| OSPS-GV-01.01 | Document project members with sensitive-resource access | Not assessed — internal only |
+| OSPS-GV-01.02 | Document project member roles and responsibilities | Not assessed — internal only |
+| OSPS-GV-03.02 | Document acceptable contribution requirements | Not assessed — internal only |
+| OSPS-LE-01.01 | Require per-commit legal authorization assertions | Not assessed — internal only |
+| OSPS-QA-03.01 | Require automated checks to pass before primary-branch commit | Not assessed — internal only |
+| OSPS-QA-06.01 | Run an automated test suite before accepting commits | Not assessed — internal only |
+| OSPS-SA-01.01 | Document system actors and actions | Not assessed — internal only |
+| OSPS-SA-02.01 | Document external software interfaces | Not assessed — internal only |
+| OSPS-SA-03.01 | Perform a project security assessment | Not assessed — internal only |
+| OSPS-VM-01.01 | Publish coordinated vulnerability disclosure policy and response timeframe | Not assessed — internal only |
+| OSPS-VM-03.01 | Provide private vulnerability reporting | Not assessed — internal only |
+| OSPS-VM-04.01 | Publish vulnerability data | Not assessed — internal only |
