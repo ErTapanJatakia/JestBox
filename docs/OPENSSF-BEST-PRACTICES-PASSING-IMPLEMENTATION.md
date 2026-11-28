@@ -8,16 +8,8 @@ Repository: ErTapanJatakia/JestBox
 
 ## Assessment summary
 
-| Internal status | Count |
-|---|---:|
-| Met | 0 |
-| Partial | 0 |
-| Unmet | 0 |
-| N/A | 0 |
-| Unverified | 67 |
-| Total | 67 |
+**Not scored.** The register is an internal checklist only. Import the exact current BadgeApp criteria and verify each control individually before submitting any answers. JestBox is proprietary; see [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md). Do not claim an award or eligibility without confirmation from the programme.
 
-Confirm the current official criteria count/version before entering any result in BadgeApp.
 
 ## Assessment domains
 
