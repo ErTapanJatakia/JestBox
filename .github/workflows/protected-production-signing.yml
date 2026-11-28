@@ -168,7 +168,7 @@ jobs:
           test "$("$APKANALYZER" manifest debuggable "$SIGNED")" = "false"
           test "$("$APKANALYZER" manifest min-sdk "$SIGNED")" = "29"
           export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
-          python3 scripts/verify_android_apk_config.py --artifact assessment-signed
+          python3 scripts/verify_android_apk_config.py --artifact production-signed
           python3 scripts/verify_android_apk_manifest.py --output android-apk-manifest-assessment.json
           sha256sum "$SIGNED" | tee production-signed-apk.sha256
 
