@@ -8,7 +8,7 @@ Repository: ErTapanJatakia/JestBox
 
 ## Assessment summary
 
-**Not scored.** The register is an internal checklist only. Import the exact current BadgeApp criteria and verify each control individually before submitting any answers. JestBox is proprietary; see [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md). Do not claim an award or eligibility without confirmation from the programme.
+**Not eligible for formal submission while proprietary; not scored.** OpenSSF describes this programme as a FLOSS-project badge. This register is retained solely as an internal checklist. Verify current BadgeApp criteria and evidence for internal benchmarking. See [OpenSSF Eligibility and Applicability](OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md).
 
 
 ## Assessment domains
@@ -17,7 +17,7 @@ Repository: ErTapanJatakia/JestBox
 Verify project identity, purpose, audience, licensing, contribution instructions, user documentation, and project communication channels.
 
 ### Change Control
-Verify source repository, version control, contribution review, branch controls, release process, and contributor sign-off requirements. DCO policy and technical enforcement are separate facts.
+Verify source repository, version control, contribution review, branch controls, release process, and contributor sign-off requirements. JestBox's proprietary contributor authorization policy is not standard DCO 1.1, and automated sign-off validation is not enforced. These are distinct from programme eligibility, which is not met while the project remains proprietary.
 
 ### Reporting
 Verify public defect reporting, private vulnerability reporting, supported versions, response targets, and actual response history. Do not invent historical report or response metrics.
