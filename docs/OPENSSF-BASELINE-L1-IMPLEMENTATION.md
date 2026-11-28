@@ -18,12 +18,12 @@ Assess each official Level 1 control individually. Record the exact criterion id
 
 | Control area | JestBox evidence to inspect | Initial status |
 |---|---|---|
-| Project identity and documentation | README, user guide, supported locales, scope, license | Unverified |
-| Change control | Main ruleset, PR requirements, status checks, review records | Unverified |
-| Reporting and vulnerability handling | SECURITY.md, private reporting setting, response records | Unverified |
-| Quality and testing | Regression tests, build instructions, QA workflows | Unverified |
-| Security practices | Threat model, dependency policy, secret handling, SAST and SBOM | Unverified |
-| Release and provenance | Protected signing workflow, APK verification and release policy | Unverified |
+| Project identity and documentation | README, user guide, supported locales, scope, license | Not assessed — internal only |
+| Change control | Main ruleset, PR requirements, status checks, review records | Not assessed — internal only |
+| Reporting and vulnerability handling | SECURITY.md, private reporting setting, response records | Not assessed — internal only |
+| Quality and testing | Regression tests, build instructions, QA workflows | Not assessed — internal only |
+| Security practices | Threat model, dependency policy, secret handling, SAST and SBOM | Not assessed — internal only |
+| Release and provenance | Protected signing workflow, APK verification and release policy | Not assessed — internal only |
 
 ## Evidence guardrails
 
