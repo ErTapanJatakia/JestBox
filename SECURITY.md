@@ -877,3 +877,20 @@ The three warnings were traced to the exact locked framework versions in `packag
 **Disposition:** these are contextual third-party framework findings, not confirmed app vulnerabilities or secrets. No app-specific remediation, blanket suppression or scanner-rule change is justified by the available static evidence. Retain the findings and reassess if the feature surface changes. This conclusion is limited to the exact signed APK, pinned source versions and static configuration; it is not proof that every framework path is safe at runtime.
 
 The workflow corrections are tracked separately in the pull request for this assessment. No GitHub Release, store submission, publication, distribution or production website deployment was performed or authorised.
+
+
+### Latest protected production signing and assurance evidence — 28 November 2026
+
+**Result: successful protected signing verification on the merged `main` line.** This entry supersedes earlier protected-run snapshots as the latest recorded evidence; it does not change the prior source-level MobSF triage or authorise distribution.
+
+- **Workflow run:** [#46120099306](https://github.com/ErTapanJatakia/JestBox/actions/runs/46120099306).
+- **Workflow outcome:** 15/15 reported substantive steps passed; zero failed steps. The run completed the protected Environment gate, release build, signing, signature/alignment verification, APK/SBOM binding, MobSF assessment, evidence upload and temporary signing-material cleanup.
+- **APK identity:** `com.jestbox.app`, version `1.1`, versionCode `2`; minSdk `29`, targetSdk `36`; non-debuggable.
+- **APK SHA-256:** `1906704999261b8f0667f7dee07cffe146543fba05561bbf77ded839a8ef1504`. The hash was independently recomputed from the artifact and matched the MobSF report and SBOM binding. It is identical to the preceding verified signed APK, providing a reproducibility check for the packaged binary.
+- **Signing identity:** RSA 4096-bit certificate; APK Signature Scheme v3 verified. Certificate SHA-256 fingerprint: `bf24d400008bf790561b6a20e4724d95cbd312e9dd6a07a38d8872fb83dcc61f`. The existing production signing identity was preserved; no key was generated, rotated or changed.
+- **MobSF v4.6.9:** score **85/100**; **0 High, 3 Warning, 1 Informational**. Manifest analysis: 0 High / 0 Warning / 0 Informational. No network-security findings. The three warnings and one informational observation retain the contextual Capacitor source-review disposition documented above; no blanket suppression or app-specific remediation is inferred from these static heuristics.
+- **CycloneDX SBOM:** version 1.6; 72 components and 285 relationships. SBOM SHA-256: `074360c62c6dbf76b85fb6c12459aed39c900d65366d384e4a639e254e9f933b`. The binding records the exact APK hash, source commit, package and version. Four components have no declared licence metadata; no licence was inferred. Dependency scope is Gradle `:app releaseRuntimeClasspath`; Android platform APIs, build plugins and host-runner packages are outside this runtime dependency scope.
+- **Evidence artifacts (30-day retention):** [signed APK and signing evidence, artifact 15253327915](https://github.com/ErTapanJatakia/JestBox/actions/runs/46120099306/artifacts/15253327915) · [MobSF report and signed APK evidence, artifact 15253651404](https://github.com/ErTapanJatakia/JestBox/actions/runs/46120099306/artifacts/15253651404). Expected expiry: **28 December 2026**, subject to repository retention policy.
+- **Assessment boundary:** MobSF result is static APK analysis. This run does not establish dynamic/runtime security, a human-led penetration test, independent audit, certification, or vulnerability-free status. No app-store submission, public release, publication, distribution or production website deployment occurred.
+
+The APK hash matching the prior run is useful reproducibility evidence, not proof of runtime equivalence across devices or environments. Preserve the artifacts only within their configured retention window; any durable archive requires separate approval.

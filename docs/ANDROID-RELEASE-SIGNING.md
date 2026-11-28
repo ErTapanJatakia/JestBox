@@ -83,3 +83,20 @@ The protected workflow can create and assess a signed APK, but a successful sign
 - **Retention:** both workflow artifact uploads are being aligned to the repository's 30-day maximum.
 
 No release, publication, distribution, store submission or signing-key change occurred.
+
+
+### Latest protected production signing verification — 28 November 2026
+
+This entry supersedes the preceding 28 November protected-run snapshot as the latest recorded evidence. It records the post-merge protected verification; it does not authorise release or distribution.
+
+- **Successful run:** [#46120099306](https://github.com/ErTapanJatakia/JestBox/actions/runs/46120099306).
+- **Workflow outcome:** 15/15 reported substantive steps passed; zero failed steps. Protected signing, APK signature/alignment verification, SBOM binding, MobSF assessment, evidence upload and temporary signing-material cleanup completed successfully.
+- **APK:** `com.jestbox.app`, version `1.1`, versionCode `2`; minSdk `29`, targetSdk `36`; non-debuggable.
+- **APK SHA-256:** `1906704999261b8f0667f7dee07cffe146543fba05561bbf77ded839a8ef1504`. Independently recomputed from the artifact and matched the MobSF report and SBOM binding; identical to the prior verified signed APK.
+- **Signing:** RSA 4096-bit certificate; APK Signature Scheme v3 verified. Certificate SHA-256 fingerprint: `bf24d400008bf790561b6a20e4724d95cbd312e9dd6a07a38d8872fb83dcc61f`. Existing production signing identity unchanged; no key generation or rotation.
+- **MobSF v4.6.9:** 85/100; 0 High, 3 Warning, 1 Informational. Manifest analysis 0/0/0; no network-security findings. Existing contextual Capacitor finding triage remains applicable.
+- **CycloneDX SBOM:** version 1.6; 72 components; 285 relationships; SHA-256 `074360c62c6dbf76b85fb6c12459aed39c900d65366d384e4a639e254e9f933b`. Binding identifies the exact APK hash, source commit, package and version. Four components lack declared licence metadata; none was inferred. Scope is Gradle `:app releaseRuntimeClasspath`; Android platform APIs, build plugins and host-runner packages are outside this runtime SBOM scope.
+- **Artifacts:** [signed APK and signing evidence, artifact 15253327915](https://github.com/ErTapanJatakia/JestBox/actions/runs/46120099306/artifacts/15253327915) · [MobSF report and signed APK evidence, artifact 15253651404](https://github.com/ErTapanJatakia/JestBox/actions/runs/46120099306/artifacts/15253651404). Both have 30-day retention, with expected expiry **28 December 2026**.
+- **Limitations:** static APK analysis and protected signing verification only; not dynamic/runtime testing, a human-led penetration test, independent audit, certification or a guarantee of security. No GitHub Release, app-store submission, publication, public distribution or production website deployment occurred.
+
+The identical APK digest across the two protected runs supports binary reproducibility for this artifact. It does not establish identical runtime behaviour on every device. Durable archival remains a separate approval decision.
