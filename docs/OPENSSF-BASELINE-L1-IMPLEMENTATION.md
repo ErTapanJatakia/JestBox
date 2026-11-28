@@ -5,7 +5,7 @@ Criteria snapshot: v2026.08.28, current official version confirmed on 2026-11-28
 Repository: ErTapanJatakia/JestBox  
 Scope: source, documentation, Android application, Capacitor packaging and GitHub automation.
 
-> This is an internal assessment register, not an OpenSSF award, certification or independent audit. JestBox's proprietary licence fails OSPS-LE-02.01, which requires an OSI- or FSF-compliant open-source licence. JestBox is therefore not eligible to claim formal OSPS Baseline compliance while proprietary. Controls are retained solely as internal security benchmarks.
+> This is an internal assessment register, not an OpenSSF award, certification or independent audit. JestBox's proprietary licence fails OSPS-LE-02.01 and OSPS-LE-02.02, which require OSI- or FSF-compliant open-source licences for both source code and released software assets. JestBox is therefore not eligible to claim formal OSPS Baseline compliance while proprietary. Controls are retained solely as internal security benchmarks.
 
 ## Assessment summary
 
