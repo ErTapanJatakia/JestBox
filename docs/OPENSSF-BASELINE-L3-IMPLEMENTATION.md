@@ -15,12 +15,12 @@ Repository: ErTapanJatakia/JestBox
 
 | Control area | Evidence required | Initial status |
 |---|---|---|
-| Advanced project and maintainer eligibility | Current project profile, maintainer roles and official eligibility conditions | Unverified |
-| Strong change review and provenance | Ruleset, review records, signed commits/tags where required, attestations | Unverified |
-| Secure development lifecycle | Threat model, security reviews, regression coverage and vulnerability response | Unverified |
-| Build/release integrity | Reproducible build inputs, artifact provenance, signing and verification | Unverified |
-| Supply-chain security | Complete dependency inventory, SBOM, provenance, vulnerability management | Unverified |
-| Operational resilience | Access review, continuity, incident handling and recovery evidence | Unverified |
+| Advanced project and maintainer eligibility | Current project profile, maintainer roles and official eligibility conditions | Not assessed — internal only |
+| Strong change review and provenance | Ruleset, review records, signed commits/tags where required, attestations | Not assessed — internal only |
+| Secure development lifecycle | Threat model, security reviews, regression coverage and vulnerability response | Not assessed — internal only |
+| Build/release integrity | Reproducible build inputs, artifact provenance, signing and verification | Not assessed — internal only |
+| Supply-chain security | Complete dependency inventory, SBOM, provenance, vulnerability management | Not assessed — internal only |
+| Operational resilience | Access review, continuity, incident handling and recovery evidence | Not assessed — internal only |
 
 ## Assessment rules
 
