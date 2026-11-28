@@ -36,7 +36,7 @@ Record exact criterion ID/text, applicability, evidence path, commit/run ID, obs
 
 ## Official control inventory — v2026.08.28
 
-The identifiers below are transcribed from the official v2026.08.28 control overview. These entries are provided for internal benchmarking only. Because JestBox's proprietary licence fails OSPS-LE-02.01, this register is not a formal compliance assessment. No control is marked Met.
+The identifiers below are transcribed from the official v2026.08.28 control overview. These entries are provided for internal benchmarking only. Because JestBox's proprietary licence fails OSPS-LE-02.01 and OSPS-LE-02.02, this register is not a formal compliance assessment. No control is marked Met.
 
 | Control ID | Control summary | Internal status |
 |---|---|---|
