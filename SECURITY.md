@@ -864,6 +864,7 @@ The Security Policy and Security Assessment Programme are supported by the follo
 
 - [Threat Model](docs/THREAT-MODEL.md)
 - [Security Assurance Case](docs/SECURITY-ASSURANCE-CASE.md)
+- [Internal Security Review — 28 November 2026](docs/SECURITY-REVIEW-2026-11-28.md)
 - [Security Assessment Roadmap](docs/SECURITY-BADGE-ROADMAP.md)
 - [OpenSSF Scorecard Assessment](docs/OPENSSF-SCORECARD.md)
 - [OpenSSF Eligibility and Applicability](docs/OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md)
