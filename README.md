@@ -43,7 +43,7 @@ The language selector is searchable. English (`en-US`) is the default. Joke text
 - [Accessibility Review](docs/ACCESSIBILITY-REVIEW.md)
 - [Regression Test Review Process](docs/REGRESSION-TEST-REVIEW.md)
 - [Release Policy](docs/RELEASE-POLICY.md) · [Release Verification](docs/RELEASE-VERIFICATION.md)
-- [VEX Process](docs/VEX-PROCESS.md)
+- [VEX Process](docs/VEX-PROCESS.md) · [VEX Statement Registry](docs/vex/README.md)
 - [Subproject Security Policy](docs/SUBPROJECT-SECURITY-POLICY.md)
 - [Documentation Maintenance](docs/DOCUMENTATION-MAINTENANCE.md)
 - Privacy Policies: [en-US](PRIVACY-POLICY.md) · [es-PE](PRIVACY-POLICY.es-PE.md) · [ru-RU](PRIVACY-POLICY.ru-RU.md) · [es-ES](PRIVACY-POLICY.es-ES.md) · [en-IN](PRIVACY-POLICY.en-IN.md) · [hi-IN](PRIVACY-POLICY.hi-IN.md) · [ur-IN](PRIVACY-POLICY.ur-IN.md) · [ur-PK](PRIVACY-POLICY.ur-PK.md)
