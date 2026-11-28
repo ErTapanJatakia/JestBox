@@ -89,9 +89,9 @@ A non-blocking evaluation workflow was added in [PR #80](https://github.com/ErTa
 
 | Finding | Location | Assessment | Disposition |
 |---|---|---|---|
-| `python_lang_os_command_injection` | `scripts/verify_android_apk_manifest.py:203` | Uses an argv list with no shell expansion; the scanner does not model the fixed trusted CI invocation. | Open for hardening: use a fixed executable name, explicit `shell=False`, and retain command-argument validation. |
-| `python_lang_path_traversal` | `scripts/verify_android_apk_manifest.py:214` | Output path is a CLI argument; current workflow passes a fixed workspace-relative path. | Open for hardening: constrain APK and report paths to the repository workspace and test traversal rejection. |
-| `javascript_lang_manual_html_sanitization` | `scripts/prepare-web.mjs:25` | Markdown sources are repository-owned legal/accessibility documents, not user submissions. The renderer currently passes raw HTML lines through and performs manual escaping; this deserves a narrower HTML policy and attribute-safe link handling. | Open for remediation/review; do not dismiss as a false positive yet. |
+| `python_lang_os_command_injection` | `scripts/verify_android_apk_manifest.py` | Initial evaluation flagged subprocess invocation. Follow-up source review confirms fixed `apkanalyzer` executable resolution, explicit `executable=`, argv invocation, `shell=False`, timeout, and regression coverage. | Source-level remediation verified on `main`; Bearer CLI has not been rerun, so scanner-alert closure is not claimed. |
+| `python_lang_path_traversal` | `scripts/verify_android_apk_manifest.py` | Initial evaluation flagged CLI-controlled paths. Follow-up source review confirms workspace confinement, symlink-escape rejection, fixed artifact allowlisting, and traversal regression tests for APK and report paths. | Source-level remediation verified on `main`; Bearer CLI has not been rerun, so scanner-alert closure is not claimed. |
+| `javascript_lang_manual_html_sanitization` | `scripts/prepare-web.mjs`; `scripts/legal-markdown-renderer.mjs` | Initial renderer design was superseded. Current pipeline transports Markdown as base64 and renders only parsed Markdown constructs with DOM APIs; raw HTML remains inert text, and link protocols are allowlisted. Dedicated tests cover raw HTML, `javascript:` links, and attribute-injection attempts. | Source-level remediation verified on `main`; Bearer CLI has not been rerun, so scanner-alert closure is not claimed. |
 | `javascript_lang_logger_leak` | `scripts/audit-joke-diversity.mjs:50` | Logs locale/category counts, line-distinctness counts and ratios; it does not log joke text, personal data or secrets. | Candidate contextual false positive; retain evidence and recheck after review. |
 | `javascript_lang_logger_leak` | `scripts/prepare-web.mjs:87` | Logs only the fixed count of generated locale-specific legal pages. | Candidate contextual false positive; retain evidence and recheck after review. |
 
@@ -894,3 +894,33 @@ The workflow corrections are tracked separately in the pull request for this ass
 - **Assessment boundary:** MobSF result is static APK analysis. This run does not establish dynamic/runtime security, a human-led penetration test, independent audit, certification, or vulnerability-free status. No app-store submission, public release, publication, distribution or production website deployment occurred.
 
 The APK hash matching the prior run is useful reproducibility evidence, not proof of runtime equivalence across devices or environments. Preserve the artifacts only within their configured retention window; any durable archive requires separate approval.
+
+
+### Final read-only security-assurance reconciliation — 28 November 2026
+
+This reconciliation was performed against the merged `main` tree at `da82f571024ff79f18cb6c15fd4e859da48cf5a4`. It updates the initial Bearer CLI triage above where later source changes materially changed the assessment. It does not represent a new Bearer scan or claim that historical SARIF/GitHub alerts were automatically closed.
+
+#### Follow-up to the initial Bearer CLI observations
+
+- **APK verifier command invocation:** `scripts/verify_android_apk_manifest.py` now resolves the Android SDK tool with `shutil.which`, invokes the fixed executable name `apkanalyzer` through an argument array, supplies the resolved executable explicitly, sets `shell=False`, and enforces a timeout. This removes the earlier shell/command-selection ambiguity identified in the initial review.
+- **APK and report path handling:** the verifier resolves paths and requires them to remain inside the repository workspace. It rejects traversal and symlink escapes, requires APK inputs to be regular files, and selects build artifacts through a fixed allowlist. Regression tests cover outside-workspace APK paths, report traversal, symlink escapes, shell metacharacters in report names, and rejection of unapproved artifact names.
+- **Legal Markdown rendering:** `scripts/prepare-web.mjs` now copies a dedicated renderer and bootstrap; localized Markdown is encoded for transport and is not interpolated as executable HTML. `scripts/legal-markdown-renderer.mjs` constructs a limited set of DOM elements, writes ordinary content through text nodes/`textContent`, and permits only `https`, `http`, `mailto`, and `tel` link schemes. Raw HTML remains inert text. Tests explicitly cover raw HTML payloads, rejected `javascript:` links, attribute-injection attempts, and expected rendered elements.
+- **Scanner-state caveat:** these are source-and-test observations on the current `main` tree. Bearer CLI v2.1.3 was not rerun as part of this reconciliation; therefore this document does not assert a new Bearer clean result, SARIF refresh, or GitHub alert closure. The initial evaluation remains historical evidence, not a current scanner result.
+- **Logger observations:** the diversity audit logs aggregate locale/category counts and uniqueness metrics, not joke text; the web preparation script logs a fixed preparation status. No sensitive-data disclosure was identified in the inspected log statements. Keep these contextual observations under review if log content changes; do not suppress findings solely on this assessment.
+
+#### Current main-branch regression and DAST evidence
+
+- **Main commit:** `da82f571024ff79f18cb6c15fd4e859da48cf5a4`.
+- **Regression validation:** [run #46122224452](https://github.com/ErTapanJatakia/JestBox/actions/runs/46122224452) completed successfully; the Node test report records **57 passed, 0 failed, 0 skipped**.
+- **OWASP ZAP:** [run #46122224451](https://github.com/ErTapanJatakia/JestBox/actions/runs/46122224451) completed baseline plus bounded active DAST against the disposable local static build at `127.0.0.1:8080). The active scan log reports **0 FAIL alerts, 6 WARN categories, 0 informational alerts, and 136 PASS checks**. The warning categories are missing anti-clickjacking, X-Content-Type-Options, CSP, Permissions Policy and Cross-Origin-Resource-Policy headers, plus the local server's version-disclosing `Server` response header. These observations were made against the local test server and do not establish the same conditions on any future production host.
+- **ZAP evidence:** [report artifact 15253999184](https://github.com/ErTapanJatakia/JestBox/actions/runs/46122224451/artifacts/15253999184), uploaded with 30-day retention; expected expiry **28 December 2026**.
+- **Other main-branch workflows:** the 28 November push triggered successful runs for Gitleaks, Trivy, DevSkim, njsscan, OSV-Scanner, zizmor, actionlint, OpenSSF Scorecard, Syft SBOM, Android debug build, tablet screenshots, JestBox validation and ZAP. These are workflow-success results, not a claim that every scanner reported zero findings.
+- **Workflow-runtime maintenance note:** the ZAP job log emitted a GitHub Actions warning that `actions/setup-node` currently targets Node.js 20 and is being forced to Node.js 24 on the runner. It did not fail this run, but the action/runtime compatibility should be reviewed in normal CI maintenance rather than ignored indefinitely.
+
+#### Assessment boundary and remaining work
+
+The 28 November evidence supports successful automated regression validation, repository scanning workflows, a local-build DAST pass with the warnings above, and the separate protected APK signing/static MobSF verification recorded in the preceding section. It does **not** establish production-host security headers, authenticated/backend security, exhaustive Android runtime behavior, a human-led penetration test, independent audit, certification, or vulnerability-free status.
+
+The GitHub connector used for this review did not expose the repository's Code Scanning alerts endpoint. Accordingly, this reconciliation does not independently certify the current open/closed state of every CodeQL alert. Review the Code Scanning dashboard directly if an authoritative alert-state inventory is required.
+
+No application code, CI workflow, signing credential, key, protected gate, or release/distribution control was changed by this documentation reconciliation. No production signing run, app-store submission, publication, distribution, GitHub Release, or website deployment was performed.
