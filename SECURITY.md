@@ -876,7 +876,7 @@ The Security Policy and Security Assessment Programme are supported by the follo
 - [Access Governance](docs/ACCESS-GOVERNANCE.md)
 - [Contributor Authorization](docs/CONTRIBUTOR-AUTHORIZATION.md)
 - [Release Policy](docs/RELEASE-POLICY.md), [Android Release Signing](docs/ANDROID-RELEASE-SIGNING.md) and [Release Verification](docs/RELEASE-VERIFICATION.md)
-- [External Software Interfaces](docs/EXTERNAL-SOFTWARE-INTERFACES.md) and [Network/Cryptography Review](docs/NETWORK-CRYPTOGRAPHY-REVIEW.md)
+- [External Software Interfaces](docs/EXTERNAL-SOFTWARE-INTERFACES.md), [Interface Currency Review](docs/INTERFACE-CURRENCY-REVIEW.md) and [Network/Cryptography Review](docs/NETWORK-CRYPTOGRAPHY-REVIEW.md)
 - [VEX Process](docs/VEX-PROCESS.md)
 - [Documentation Maintenance](docs/DOCUMENTATION-MAINTENANCE.md)
 
