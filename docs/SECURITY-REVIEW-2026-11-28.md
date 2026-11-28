@@ -48,3 +48,53 @@ The reviewed evidence supports the existence of repository, build, signing and s
 - ZAP report artifact 15253999184: https://github.com/ErTapanJatakia/JestBox/actions/runs/46122224451/artifacts/15253999184
 
 The regression and ZAP runs above assessed the main source/workflow tree at `da82f571024ff79f18cb6c15fd4e859da48cf5a4`; PR #118 subsequently made a documentation-only SECURITY.md reconciliation. The local ZAP target was a disposable static server, not a production website.
+
+
+## 6. Post-merge scanner evidence and dispositions — 28 November 2026
+
+**Commit:** `fbcea7ed10babcaad7a46d1d7a69dd12acdbcd92` (PR #120). Post-merge validation completed with 15/15 workflow runs and 17/17 check runs successful. This does not mean every scanner emitted zero findings.
+
+### 6.1 OSV-Scanner and Trivy
+
+- OSV-Scanner run [#46164418763](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418763): 0 SARIF results.
+- Trivy run [#46164418910](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418910): 0 Error, 0 Warning and 5 Note records. The five notes are licence classifications only: Playwright (Apache-2.0), Playwright Core (Apache-2.0), Capacitor Core (MIT), Capacitor Share (MIT), and tslib (0BSD). No vulnerability alert was represented by these five notes.
+
+### 6.2 Bearer CLI 2.1.3
+
+Run [#46164418904](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418904), artifact [15271475010](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418904/artifacts/15271475010): 175 rules evaluated, 4 SARIF results.
+
+| SARIF rule | Location | Source review and disposition |
+|---|---|---|
+| `javascript_lang_dangerous_insert_html` | `scripts/legal-markdown-renderer.mjs:124` | The source creates DOM elements and assigns parsed label text with `textContent`; links pass a URL parser/protocol allowlist. No HTML-string sink was identified in the inspected renderer. Likely DOM-API false positive; preserve as tracked pending focused regression confirmation. |
+| `javascript_lang_dangerous_insert_html` | `scripts/legal-markdown-renderer.mjs:167` | The image path is a fixed local asset; alt text is assigned as an attribute. No HTML parsing sink was identified. Likely safe-attribute false positive; preserve as tracked pending focused regression confirmation. |
+| `javascript_lang_logger_leak` | `scripts/audit-joke-diversity.mjs:50-55` | Logs aggregate threshold, category count, distinct-line counts and uniqueness ratios, not joke content or secrets. Contextual false-positive candidate; keep output aggregate-only. |
+| `javascript_lang_logger_leak` | `scripts/prepare-android-release-version.mjs:43` | Logs Android version name and version code, both public release metadata. Contextual false-positive candidate; no sensitive data identified. |
+
+No Bearer finding is described as cleared, suppressed or closed. This source review is not a fresh scanner re-run or a formal false-positive adjudication by the tool vendor.
+
+### 6.3 OWASP ZAP
+
+Run [#46164418915](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418915), artifact [15271240634](https://github.com/ErTapanJatakia/JestBox/actions/runs/46164418915/artifacts/15271240634):
+
+| Report | High | Medium | Low | Informational | Alert records |
+|---|---:|---:|---:|---:|---:|
+| Baseline | 0 | 2 | 6 | 2 | 10 |
+| Active | 0 | 2 | 6 | 3 | 11 |
+
+The medium observations were Content Security Policy not set and Missing Anti-clickjacking Header. Low observations included missing COEP, COOP, CORP, Permissions Policy and X-Content-Type-Options headers, plus server-version disclosure. Informational observations included suspicious comments and cacheability; the active scan also reported User Agent Fuzzer. These are responses from the disposable local static server, not proof of weaknesses in the Android APK or any production hosting. The server uses Python `http.server`; its default headers account for the missing-header and version observations. The temporary harness should not be mistaken for a deployed web service. Do not change Android runtime code to address a test-server-only header warning.
+
+### 6.4 Residual actions and assurance limits
+
+- Preserve the four Bearer results and their source-level rationale; add/retain regression cases for hostile Markdown labels, links, image attributes and inert raw HTML where the renderer contract supports those inputs.
+- Re-run Bearer after any renderer change; compare SARIF results without weakening the non-blocking evaluation or suppressing rules.
+- Treat ZAP header warnings as local harness observations. If JestBox ever gains an intentionally hosted web surface, define and test its production security-header policy separately.
+- Retain Trivy licence notes as inventory metadata; do not infer or invent licence terms beyond the scanner's records.
+- No Code Scanning alert closure is claimed because the connector did not expose the alerts endpoint for independent verification.
+
+These are automated source and disposable-target checks. They are not an independent audit, human-led penetration test, certification, guarantee of security, or assessment of a deployed website. JestBox remains an Android APK project; no web deployment, production signing or APK publication was initiated by this review.
+
+## 7. Review history update
+
+| Date | Change |
+|---|---|
+| 2026-11-28 | Added exact PR #120 post-merge scanner counts, Bearer source review, Trivy licence-note interpretation, OSV result and ZAP disposable-server scope/dispositions. |
