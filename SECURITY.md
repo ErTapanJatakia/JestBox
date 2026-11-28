@@ -865,6 +865,8 @@ The Security Policy and Security Assessment Programme are supported by the follo
 - [Threat Model](docs/THREAT-MODEL.md)
 - [Security Assurance Case](docs/SECURITY-ASSURANCE-CASE.md)
 - [Security Assessment Roadmap](docs/SECURITY-BADGE-ROADMAP.md)
+- [OpenSSF Scorecard Assessment](docs/OPENSSF-SCORECARD.md)
+- [OpenSSF Eligibility and Applicability](docs/OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md)
 - [OpenSSF Baseline and Best Practices assessment registers](docs/OPENSSF-BASELINE-L1-IMPLEMENTATION.md)
 - [Repository QA Policy](docs/REPOSITORY-QA-POLICY.md)
 - [SAST Policy](docs/SAST-POLICY.md)
