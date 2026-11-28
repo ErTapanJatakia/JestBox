@@ -43,10 +43,11 @@ jobs:
           ' "$RUNNER_TEMP/artifacts-pages.json")"
 
           if [[ -z "$KEEP_ID" ]]; then
-            echo "No unexpired main-branch debug APK artifact found; no debug artifact will be retained."
-          else
-            echo "Retaining latest main-branch debug APK artifact ID: $KEEP_ID"
+            echo "No unexpired main-branch debug APK artifact found; skipping all deletion as a fail-safe."
+            exit 0
           fi
+
+          echo "Retaining latest main-branch debug APK artifact ID: $KEEP_ID"
 
           jq -r --arg keep "$KEEP_ID" '
             [.[].artifacts[]
