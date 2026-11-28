@@ -15,8 +15,8 @@ def valid_report():
         "appsec": {
             "security_score": 85,
             "high": [],
-            "warning": [{"rule": "external"}, {"rule": "temp"}, {"rule": "hardcoded"}],
-            "info": [{"rule": "logging"}],
+            "warning": [{"title": "external"}, {"title": "temp"}, {"title": "hardcoded"}],
+            "info": [{"title": "logging"}],
         },
     }
 
@@ -39,7 +39,7 @@ class MobSFReportSummaryTests(unittest.TestCase):
         report = valid_report()
         report["package_name"] = "com.example.other"
         with self.assertRaisesRegex(MobSFReportError, "Unexpected MobSF package_name"):
-            summarize_report(report, "e16b467", "a" * 64)
+            summarize_report(report, "a" * 40, "b" * 64)
 
     def test_rejects_missing_appsec_object(self):
         report = valid_report()
@@ -68,6 +68,22 @@ class MobSFReportSummaryTests(unittest.TestCase):
         report["appsec"]["security_score"] = "85"
         with self.assertRaisesRegex(MobSFReportError, "must be numeric"):
             summarize_report(report, "e16b467", "a" * 64)
+
+    def test_rejects_malformed_source_commit(self):
+        with self.assertRaisesRegex(MobSFReportError, "40 lowercase hexadecimal"):
+            summarize_report(valid_report(), "not-a-commit", "b" * 64)
+
+    def test_rejects_findings_without_nonempty_titles(self):
+        report = valid_report()
+        report["appsec"]["high"] = [{"description": "missing title"}]
+        with self.assertRaisesRegex(MobSFReportError, "must contain a non-empty title"):
+            summarize_report(report, "a" * 40, "b" * 64)
+
+    def test_rejects_out_of_range_security_score(self):
+        report = valid_report()
+        report["appsec"]["security_score"] = 101
+        with self.assertRaisesRegex(MobSFReportError, "integer from 0 to 100"):
+            summarize_report(report, "a" * 40, "b" * 64)
 
     def test_workflow_uses_validated_summary_and_repository_retention_cap(self):
         workflow = (ROOT / ".github" / "workflows" / "protected-production-signing.yml").read_text(encoding="utf-8")
