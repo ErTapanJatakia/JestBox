@@ -1,47 +1,70 @@
 JESTBOX PROPRIETARY SOFTWARE LICENCE
+SPDX-License-Identifier: LicenseRef-Proprietary
+
 Copyright (c) 2026 Er. Tapan Jatakia (C. Eng.). All rights reserved.
 
-IMPORTANT: This repository is publicly viewable. Public availability of the
-source code does not grant any licence or permission to use, copy, modify,
-adapt, publish, distribute, sublicense, sell, or otherwise exploit the
-software or its contents.
+IMPORTANT: This repository is publicly viewable on GitHub. Public availability
+does not grant a general licence to use, reproduce, modify, adapt, distribute,
+sublicense, sell, or commercially exploit JestBox or its proprietary materials.
+The limited permissions that GitHub's Terms of Service grant to users of public
+repositories, including viewing and forking through GitHub's platform features,
+are not removed by this notice. Those platform permissions are limited to the
+scope of GitHub's Terms of Service and do not create a general licence to use
+or exploit JestBox outside those permissions.
 
 1. OWNERSHIP
 Unless a file states otherwise, the software, source code, design, documentation,
 and original project materials in this repository are proprietary materials
 owned by Er. Tapan Jatakia (C. Eng.) or their respective rights holders.
-Third-party materials, if any, remain subject to their own terms.
+Third-party materials, if any, remain subject to their own copyright notices
+and licence terms. This notice does not claim ownership of, or impose these
+terms on, third-party materials.
 
-2. NO GENERAL LICENCE
-No rights are granted to you by implication, estoppel, or otherwise. You may
-view this public repository through the hosting service's ordinary interface
-and may use the hosting service's standard features to inspect it. That access
-does not grant permission to download for reuse, reproduce, modify, create
-derivative works, redistribute, publish, sublicense, commercially exploit,
-or incorporate any portion into another product or service.
+2. LIMITED PLATFORM PERMISSIONS; NO GENERAL LICENCE
+You may view this public repository and use GitHub's standard public-repository
+features, including forking, only to the extent permitted by GitHub's Terms of
+Service and applicable platform rules. This is a limited platform permission,
+not a general software licence from the rights holder.
 
-3. PERMISSION
-Any use beyond ordinary viewing requires prior express written permission
-from the relevant rights holder. A permission must identify the material,
-the permitted activity, and any applicable conditions. Permission for one
-purpose does not imply permission for another.
+Except for those limited platform permissions or a separate written permission
+from the relevant rights holder, no permission is granted to download, copy,
+reproduce, modify, adapt, create derivative works from, publish, distribute,
+sublicense, sell, commercially exploit, or incorporate JestBox or its
+proprietary materials into another product or service. No rights are granted
+by implication, estoppel, or otherwise.
 
-4. NO WARRANTY
+3. SEPARATE WRITTEN PERMISSION
+Any permission beyond the limited platform permissions described above requires
+prior express written permission from the relevant rights holder. A permission
+must identify the material, the permitted activity, and any applicable
+conditions. Permission for one purpose does not imply permission for another.
+
+4. THIRD-PARTY MATERIALS
+Third-party libraries, tools, fonts, images, icons, and other materials are
+not relicensed by this notice. Their respective copyright notices and licence
+terms continue to apply. Where a third-party licence grants rights directly
+to recipients, those rights are governed by that licence and are not withdrawn
+or restricted by this proprietary notice. Required third-party notices and
+attributions must be preserved.
+
+5. NO WARRANTY
 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE MATERIALS ARE PROVIDED
 "AS IS", WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EXPRESS OR IMPLIED,
 INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND
 NON-INFRINGEMENT. THE RIGHTS HOLDER IS NOT LIABLE FOR CLAIMS OR DAMAGES
 ARISING FROM USE OF THE MATERIALS, TO THE EXTENT PERMITTED BY LAW.
 
-5. NO SUPPORT OR REDISTRIBUTION COMMITMENT
+6. NO SUPPORT OR REDISTRIBUTION COMMITMENT
 Nothing in this notice obliges the rights holder to provide support, updates,
 maintenance, access, or future availability. No right to redistribute or
-repackage JestBox is granted.
+repackage JestBox is granted except to the extent expressly permitted by
+GitHub's Terms of Service for its platform features or by separate written
+permission from the relevant rights holder.
 
-6. GOVERNING LAW
+7. GOVERNING LAW
 This notice does not select a governing law or override non-waivable rights
 under applicable law. Questions about permissions should be directed to the
 project maintainer through the contact details in the repository's README.
 
-If you require a licence for a specific use, obtain written authorization
-before using, copying, modifying, or distributing the relevant materials.
+If you require permission for a specific use beyond GitHub's limited platform
+permissions, obtain written authorization before undertaking that use.

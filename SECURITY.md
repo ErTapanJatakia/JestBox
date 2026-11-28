@@ -924,3 +924,34 @@ The 28 November evidence supports successful automated regression validation, re
 The GitHub connector used for this review did not expose the repository's Code Scanning alerts endpoint. Accordingly, this reconciliation does not independently certify the current open/closed state of every CodeQL alert. Review the Code Scanning dashboard directly if an authoritative alert-state inventory is required.
 
 No application code, CI workflow, signing credential, key, protected gate, or release/distribution control was changed by this documentation reconciliation. No production signing run, app-store submission, publication, distribution, GitHub Release, or website deployment was performed.
+
+
+---
+
+## Repository security governance and assurance documentation
+
+The Security Policy and Security Assessment Programme are supported by the following project-specific documents:
+
+- [Threat Model](docs/THREAT-MODEL.md)
+- [Security Assurance Case](docs/SECURITY-ASSURANCE-CASE.md)
+- [Internal Security Review — 28 November 2026](docs/SECURITY-REVIEW-2026-11-28.md)
+- [Security Assessment Roadmap](docs/SECURITY-BADGE-ROADMAP.md)
+- [OpenSSF Scorecard Assessment](docs/OPENSSF-SCORECARD.md)
+- [OpenSSF Eligibility and Applicability](docs/OPENSSF-ELIGIBILITY-AND-APPLICABILITY.md)
+- [OpenSSF Baseline and Best Practices assessment registers](docs/OPENSSF-BASELINE-L1-IMPLEMENTATION.md)
+- [Repository QA Policy](docs/REPOSITORY-QA-POLICY.md)
+- [SAST Policy](docs/SAST-POLICY.md)
+- [Software Composition Analysis and Dependency Policy](docs/SCA-AND-DEPENDENCY-POLICY.md)
+- [Secrets and Credentials Policy](docs/SECRETS-AND-CREDENTIALS-POLICY.md)
+- [Access Governance](docs/ACCESS-GOVERNANCE.md)
+- [Contributor Authorization](docs/CONTRIBUTOR-AUTHORIZATION.md)
+- [Release Policy](docs/RELEASE-POLICY.md), [Android Release Signing](docs/ANDROID-RELEASE-SIGNING.md) and [Release Verification](docs/RELEASE-VERIFICATION.md)
+- [External Software Interfaces](docs/EXTERNAL-SOFTWARE-INTERFACES.md), [Interface Currency Review](docs/INTERFACE-CURRENCY-REVIEW.md) and [Network/Cryptography Review](docs/NETWORK-CRYPTOGRAPHY-REVIEW.md)
+- [VEX Process](docs/VEX-PROCESS.md)
+- [Documentation Maintenance](docs/DOCUMENTATION-MAINTENANCE.md)
+
+### Contribution authorization and DCO status
+
+JestBox is proprietary / All Rights Reserved. Standard DCO 1.1 requires contributors to certify that they have the right to submit a contribution under the open-source licence identified by the project. It is not a proprietary rights assignment and does not replace the project's separate written authorization and rights terms.
+
+JestBox therefore requires project-specific written contributor authorization and agreement on ownership/permission terms before accepting contributions. Automated DCO trailer validation is not currently enforced as a required pull-request check. A policy statement, a `Signed-off-by` trailer, a validator, and a required CI gate are distinct controls. Do not claim DCO enforcement. Any future sign-off mechanism must remain consistent with the proprietary licence and separate written contributor authorization.

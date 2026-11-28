@@ -48,3 +48,10 @@ After three consecutive failures of the same test/CI strategy, stop repeating it
 ## Licence
 
 JestBox is proprietary / All Rights Reserved. Contributions are accepted only with prior written authorization and agreed ownership/permission terms. No public licence is granted by submitting or viewing a contribution.
+
+
+## Contributor authorization and rights
+
+JestBox is proprietary. Before contributing, obtain express written authorization and agree the applicable rights/ownership terms. Read [Contributor Authorization and Rights Certification](docs/CONTRIBUTOR-AUTHORIZATION.md). A pull-request submission or Git commit trailer does not itself grant public reuse rights or establish a proprietary rights agreement.
+
+The standard DCO 1.1 text is not adopted as a substitute for the project's proprietary contribution authorization. At this stage, automated DCO sign-off validation is not configured as a required pull-request check. Do not claim DCO enforcement. Any later sign-off mechanism must be designed to remain consistent with the proprietary licence and written contributor authorization.
