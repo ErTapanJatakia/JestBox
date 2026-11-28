@@ -18,6 +18,7 @@ EXPECTED_MIN_SDK = 29
 EXPECTED_APK_RELATIVE_PATHS = {
     "assessment-signed": Path("android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk"),
     "release-unsigned": Path("android/app/build/outputs/apk/release/app-release-unsigned.apk"),
+    "production-signed": Path("production-signed.apk"),
 }
 MIN_SAFE_TARGET_SDK = 28
 
@@ -216,7 +217,7 @@ def resolve_workspace_path(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--artifact", choices=tuple(EXPECTED_APK_RELATIVE_PATHS), default="assessment-signed", help="Select one of the two fixed, approved build artifacts")
+    parser.add_argument("--artifact", choices=tuple(EXPECTED_APK_RELATIVE_PATHS), default="assessment-signed", help="Select one of the fixed, approved build artifacts")
     parser.add_argument("--output", help="Optional JSON evidence report path inside the repository workspace")
     args = parser.parse_args()
 

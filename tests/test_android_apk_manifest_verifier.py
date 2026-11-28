@@ -186,5 +186,33 @@ class PackagedApkManifestVerifierTests(unittest.TestCase):
             verify_manifest(duplicate_launcher)
 
 
+    def test_cli_selects_only_allowlisted_production_signed_artifact(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as workspace:
+            root = Path(workspace)
+            binary_dir = root / "bin"
+            binary_dir.mkdir()
+            analyzer = binary_dir / "apkanalyzer"
+            analyzer.write_text("#!/usr/bin/env python3\nprint(" + repr(manifest()) + ")\n", encoding="utf-8")
+            analyzer.chmod(0o755)
+            apk = root / "production-signed.apk"
+            apk.write_bytes(b"production-signed-apk")
+            environment = os.environ.copy()
+            environment["PATH"] = str(binary_dir) + os.pathsep + environment.get("PATH", "")
+            command = [
+                sys.executable,
+                str(repository_root / "scripts" / "verify_android_apk_manifest.py"),
+                "--artifact",
+                "production-signed",
+                "--output",
+                "production-assessment.json",
+            ]
+            completed = subprocess.run(command, cwd=root, env=environment, capture_output=True, text=True, check=False)
+            self.assertEqual(completed.returncode, 0, completed.stderr or completed.stdout)
+            report = json.loads((root / "production-assessment.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["result"], "passed")
+            self.assertEqual(report["apk"], "production-signed.apk")
+
+
 if __name__ == "__main__":
     unittest.main()
