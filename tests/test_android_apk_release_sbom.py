@@ -110,5 +110,36 @@ class AndroidReleaseSbomTests(unittest.TestCase):
             self.assertIn("relationship graph", result.stderr)
 
 
+    def test_rejects_dangling_dependency_reference(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            components = [
+                component("androidx.core", f"core-{index}", "1.0")
+                for index in range(6)
+            ]
+            sbom = root / "bom.json"
+            apk = root / "app-release.apk"
+            output = root / "binding.json"
+            sbom.write_text(json.dumps({
+                "bomFormat": "CycloneDX",
+                "specVersion": "1.6",
+                "components": components,
+                "dependencies": [{
+                    "ref": components[0]["bom-ref"],
+                    "dependsOn": [components[1]["bom-ref"], "pkg:maven/ghost/missing@9.9"],
+                }],
+            }), encoding="utf-8")
+            apk.write_bytes(b"apk")
+            result = subprocess.run([
+                sys.executable, str(SCRIPT), "--sbom", str(sbom),
+                "--apk", str(apk), "--output", str(output),
+                "--source-commit", "c" * 40,
+                "--package-name", "com.jestbox.app",
+                "--version-name", "1.1", "--version-code", "2",
+            ], capture_output=True, text=True, check=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("unknown bom-ref", result.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()
