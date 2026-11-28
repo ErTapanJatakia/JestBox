@@ -13,6 +13,7 @@ APK_PATHS = {
     "assessment-signed": Path("android/app/build/outputs/apk/release/jestbox-hardened-assessment-signed.apk"),
     "release-unsigned": Path("android/app/build/outputs/apk/release/app-release-unsigned.apk"),
     "release-signed": Path("android/app/build/outputs/apk/release/jestbox-release-signed.apk"),
+    "production-signed": Path("production-signed.apk"),
 }
 ALLOWED_ORIGIN = "http://localhost"
 NO_INDEX = 0xFFFFFFFF
