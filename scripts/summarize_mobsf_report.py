@@ -10,7 +10,7 @@ from typing import Any
 
 SEVERITIES = ("high", "warning", "info")
 EXPECTED_PACKAGE = "com.jestbox.app"
-SHA1_RE = re.compile(r"^[a-f0-9]{40}$")
+COMMIT_RE = re.compile(r"^[a-f0-9]{40}$")
 SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
 
 
@@ -25,7 +25,7 @@ def summarize_report(report: Any, source_commit: str, apk_sha256: str) -> tuple[
         raise MobSFReportError(
             f"Unexpected MobSF package_name {report.get('package_name')!r}; expected {EXPECTED_PACKAGE!r}."
         )
-    if not isinstance(source_commit, str) or not SHA1_RE.fullmatch(source_commit):
+    if not isinstance(source_commit, str) or not COMMIT_RE.fullmatch(source_commit):
         raise MobSFReportError("Source commit must be exactly 40 lowercase hexadecimal characters.")
     if not isinstance(apk_sha256, str) or not SHA256_RE.fullmatch(apk_sha256):
         raise MobSFReportError("APK SHA-256 must be exactly 64 lowercase hexadecimal characters.")
