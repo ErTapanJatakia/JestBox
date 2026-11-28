@@ -40,7 +40,7 @@ The standalone native WebView implementation in the draft Android wrapper PR is 
 
 The machine-readable MobSF report recorded 0 High, 3 Warning and 1 Informational findings; manifest analysis recorded 0/0/0; no network-security findings; no hardcoded secrets detected by the report; and 0 trackers of 432.
 
-The three Warning observations map to generic bundled Capacitor framework classes: hardcoded-data heuristics in Share/Bridge/Plugin/AppUUID classes, and external-storage/temporary-file handling in BridgeWebChromeClient/FileUtils. The Informational logging observation maps to Capacitor Logger. Source review did not establish an app-owned credential, a corresponding JestBox file-capture workflow, or sensitive-data disclosure. These are contextual static-analysis observations, not proof that every framework path is safe at runtime. Reassess if the application adds file upload/download, camera capture, or sensitive-data handling.
+The three Warning observations were traced to the locked Capacitor Android 8.6.2 and Share 8.0.3 source. The WebView file chooser/media-capture and URI resolver APIs are framework capabilities; JestBox has no file input, capture control, getUserMedia flow or file upload/download feature, and its manifest declares no broad storage, camera or microphone permission. The Share plugin's flagged `_share_nonce` is an identifier; the plugin generates a fresh random nonce per share, while JestBox passes only text/title/dialogTitle and no files. AppUUID is a randomly generated, SHA-256-derived app-instance identifier stored under a fixed private SharedPreferences key, not a credential. Capacitor Logger defaults to debug-only logging; the app does not override loggingBehavior and the production APK is non-debuggable. No app-owned secret or sensitive logging path was established. These remain contextual static-analysis observations, not proof that every framework path is safe at runtime. Reassess before adding file/media handling or sensitive-data features.
 
 MobSF was run as static APK analysis; malware reputation lookups were disabled. This is not dynamic analysis, rooted-device assessment, or a human-led penetration test.
 
@@ -54,7 +54,7 @@ Do not paste passwords, private keys, ciphertext, or recovery material into chat
 
 ## Evidence retention and archive policy
 
-GitHub Actions artifacts are temporary evidence. The workflow requests a longer retention period, but the repository's current maximum artifact retention is **30 days**. The two artifacts linked above are temporary CI evidence, not a permanent archive.
+GitHub Actions artifacts are temporary evidence. The protected signing workflow is configured to request **30 days**, matching the repository's current maximum artifact retention. The two artifacts linked above are temporary CI evidence, not a permanent archive.
 
 A durable archive should preserve the exact approved signed APK, checksum, certificate fingerprint, source commit, version/build metadata, provenance, SBOM, MobSF report, release notes and approval record. A GitHub Release asset archive is a candidate approach, subject to confirming repository policy, access, retention expectations and recovery arrangements.
 
@@ -69,3 +69,17 @@ A durable archive should preserve the exact approved signed APK, checksum, certi
 ## Release and distribution boundary
 
 The protected workflow can create and assess a signed APK, but a successful signing run does not itself authorise publication. Store submission, moderation, public distribution, GitHub Release creation and production deployment remain separate actions requiring explicit approval. No store submission, publication or production deployment occurred as part of the 28 November signing verification.
+
+
+### Latest protected production assessment — 28 November 2026
+
+- **Run:** [#46115617387](https://github.com/ErTapanJatakia/JestBox/actions/runs/46115617387), source commit `e16b46728130524922f1ad549175f266995fa536`.
+- **APK and verification evidence:** [artifact 15252136163](https://github.com/ErTapanJatakia/JestBox/actions/runs/46115617387/artifacts/15252136163).
+- **MobSF report/evidence:** [artifact 15252220554](https://github.com/ErTapanJatakia/JestBox/actions/runs/46115617387/artifacts/15252220554).
+- **Result:** successful protected signing and static assessment; 15/15 job steps passed.
+- **APK SHA-256:** `1906704999261b8f0667f7dee07cffe146543fba05561bbf77ded839a8ef1504`.
+- **SBOM SHA-256:** `9c754bf68b8aee2d7895377da0ac26a60543935d44f8c7f8f27fd730c645ef07`.
+- **MobSF:** 85/100; 0 High, 3 Warning, 1 Informational. The raw report was complete; a workflow-summary path mismatch was identified and is being corrected with schema validation and regression tests.
+- **Retention:** both workflow artifact uploads are being aligned to the repository's 30-day maximum.
+
+No release, publication, distribution, store submission or signing-key change occurred.
