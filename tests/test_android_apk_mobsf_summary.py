@@ -25,8 +25,8 @@ class MobSFReportSummaryTests(unittest.TestCase):
     def test_counts_actual_appsec_arrays_and_renders_score(self):
         metadata, markdown = summarize_report(
             valid_report(),
-            "e16b46728130524922f1ad549175f266995fa536",
-            "1906704999261b8f0667f7dee07cffe146543fba05561bbf77ded839a8ef1504",
+            "a" * 40,
+            "b" * 64,
         )
         self.assertEqual((metadata["high"], metadata["warning"], metadata["info"]), (0, 3, 1))
         self.assertEqual(metadata["security_score"], 85)
